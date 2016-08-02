@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	//"fmt"
+	_ "fmt"
 	"github.com/goadesign/goa"
 	"github.com/jaredwarren/easypostTester/app"
 	"io/ioutil"
@@ -87,20 +87,17 @@ func (c *CarrierAccountController) Show(ctx *app.ShowCarrierAccountContext) erro
 
 	file, e := ioutil.ReadFile("./data/" + ctx.ID + ".json")
 	if e != nil {
-		//fmt.Printf("File error: %v\n", e)
 		return e
 	}
 
 	resJson := &app.EasypostCarrierAccounts{}
 	e = json.Unmarshal(file, resJson)
 	if e != nil {
-		//fmt.Printf("Json Error: %v\n", e)
 		return e
 	}
 
 	// CarrierAccountController_Show: end_implement
-	res := &app.EasypostCarrierAccounts{}
-	return ctx.OK(res)
+	return ctx.OK(resJson)
 }
 
 // Update runs the update action.

@@ -46,8 +46,11 @@ var _ = Resource("carrier_account", func() {
 	})
 
 	Action("delete", func() {
-		Routing(DELETE("/:id"))
 		Description("CarrierAccount objects may be removed from your account when they become out of date or no longer useful.")
+		Routing(DELETE("/:id"))
+		Params(func() {
+			Param("id", String, "Carrier ID")
+		})
 		Response(OK)
 	})
 })

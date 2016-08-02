@@ -23,6 +23,7 @@ type (
 
 	// DeleteCarrierAccountCommand is the command line data structure for the delete action of carrier_account
 	DeleteCarrierAccountCommand struct {
+		// Carrier ID
 		ID          string
 		PrettyPrint bool
 	}
@@ -230,7 +231,7 @@ func (cmd *DeleteCarrierAccountCommand) Run(c *client.Client, args []string) err
 // RegisterFlags registers the command flags with the command line.
 func (cmd *DeleteCarrierAccountCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var id string
-	cc.Flags().StringVar(&cmd.ID, "id", id, ``)
+	cc.Flags().StringVar(&cmd.ID, "id", id, `Carrier ID`)
 }
 
 // Run makes the HTTP request corresponding to the ListCarrierAccountCommand command.

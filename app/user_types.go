@@ -74,6 +74,20 @@ type carrierAccountPayload struct {
 
 // Finalize sets the default values for carrierAccountPayload type instance.
 func (ut *carrierAccountPayload) Finalize() {
+	var defaultClone = false
+	if ut.Clone == nil {
+		ut.Clone = &defaultClone
+	}
+	if ut.Fields != nil {
+		var defaultAutoLink = false
+		if ut.Fields.AutoLink == nil {
+			ut.Fields.AutoLink = &defaultAutoLink
+		}
+		var defaultCustomWorkflow = false
+		if ut.Fields.CustomWorkflow == nil {
+			ut.Fields.CustomWorkflow = &defaultCustomWorkflow
+		}
+	}
 	var defaultObject = "CarrierAccount"
 	if ut.Object == nil {
 		ut.Object = &defaultObject
@@ -98,7 +112,7 @@ func (ut *carrierAccountPayload) Validate() (err error) {
 func (ut *carrierAccountPayload) Publicize() *CarrierAccountPayload {
 	var pub CarrierAccountPayload
 	if ut.Clone != nil {
-		pub.Clone = ut.Clone
+		pub.Clone = *ut.Clone
 	}
 	if ut.CreatedAt != nil {
 		pub.CreatedAt = ut.CreatedAt
@@ -139,7 +153,7 @@ func (ut *carrierAccountPayload) Publicize() *CarrierAccountPayload {
 // A CarrierAccount encapsulates your credentials with the carrier. The CarrierAccount object provides CRUD operations for all CarrierAccounts.
 type CarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
-	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
+	Clone bool `form:"clone" json:"clone" xml:"clone"`
 	// The name used when displaying a readable value for the type of the account
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
@@ -188,17 +202,29 @@ type fieldsObjectPayload struct {
 	TestCredentials *interface{} `form:"test_credentials,omitempty" json:"test_credentials,omitempty" xml:"test_credentials,omitempty"`
 }
 
+// Finalize sets the default values for fieldsObjectPayload type instance.
+func (ut *fieldsObjectPayload) Finalize() {
+	var defaultAutoLink = false
+	if ut.AutoLink == nil {
+		ut.AutoLink = &defaultAutoLink
+	}
+	var defaultCustomWorkflow = false
+	if ut.CustomWorkflow == nil {
+		ut.CustomWorkflow = &defaultCustomWorkflow
+	}
+}
+
 // Publicize creates FieldsObjectPayload from fieldsObjectPayload
 func (ut *fieldsObjectPayload) Publicize() *FieldsObjectPayload {
 	var pub FieldsObjectPayload
 	if ut.AutoLink != nil {
-		pub.AutoLink = ut.AutoLink
+		pub.AutoLink = *ut.AutoLink
 	}
 	if ut.Credentials != nil {
 		pub.Credentials = ut.Credentials
 	}
 	if ut.CustomWorkflow != nil {
-		pub.CustomWorkflow = ut.CustomWorkflow
+		pub.CustomWorkflow = *ut.CustomWorkflow
 	}
 	if ut.TestCredentials != nil {
 		pub.TestCredentials = ut.TestCredentials
@@ -209,11 +235,11 @@ func (ut *fieldsObjectPayload) Publicize() *FieldsObjectPayload {
 // Contains "credentials" and/or "test_credentials", or may be empty
 type FieldsObjectPayload struct {
 	// For USPS this designates that no credentials are required.
-	AutoLink *bool `form:"auto_link,omitempty" json:"auto_link,omitempty" xml:"auto_link,omitempty"`
+	AutoLink bool `form:"auto_link" json:"auto_link" xml:"auto_link"`
 	// Credentials used in the production environment.
 	Credentials *interface{} `form:"credentials,omitempty" json:"credentials,omitempty" xml:"credentials,omitempty"`
 	// When present, a seperate authentication process will be required through the UI to link this account type.
-	CustomWorkflow *bool `form:"custom_workflow,omitempty" json:"custom_workflow,omitempty" xml:"custom_workflow,omitempty"`
+	CustomWorkflow bool `form:"custom_workflow" json:"custom_workflow" xml:"custom_workflow"`
 	// Credentials used in the test environment.
 	TestCredentials *interface{} `form:"test_credentials,omitempty" json:"test_credentials,omitempty" xml:"test_credentials,omitempty"`
 }

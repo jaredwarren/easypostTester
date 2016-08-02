@@ -7,6 +7,7 @@ definitions:
       The CarrierAccount object provides CRUD operations for all CarrierAccounts.
     properties:
       clone:
+        default: false
         description: If clone is true, only the reference and description are possible
           to update
         type: boolean
@@ -64,22 +65,22 @@ definitions:
       clone: false
       created_at: Non excepturi tenetur.
       credentials:
-      - 97
-      - 40
-      - 234
-      - 231
-      - 180
-      - 53
-      - 67
-      - 79
-      - 160
-      - 187
-      - 33
-      - 208
-      - 128
       - 35
-      - 114
-      - 214
+      - 96
+      - 147
+      - 69
+      - 217
+      - 203
+      - 78
+      - 24
+      - 189
+      - 143
+      - 95
+      - 202
+      - 176
+      - 209
+      - 17
+      - 105
       description: Et saepe.
       fields:
         auto_link: true
@@ -108,22 +109,22 @@ definitions:
         description: Unlike the "credentials" object contained in "fields", this nullable
           object contains just raw credential pairs for client library consumption
         example:
-        - 97
-        - 40
-        - 234
-        - 231
-        - 180
-        - 53
-        - 67
-        - 79
-        - 160
-        - 187
-        - 33
-        - 208
-        - 128
         - 35
-        - 114
-        - 214
+        - 96
+        - 147
+        - 69
+        - 217
+        - 203
+        - 78
+        - 24
+        - 189
+        - 143
+        - 95
+        - 202
+        - 176
+        - 209
+        - 17
+        - 105
         type: any
       description:
         description: An optional, user-readable field to help distinguish accounts
@@ -256,12 +257,14 @@ definitions:
     description: Contains "credentials" and/or "test_credentials", or may be empty
     properties:
       auto_link:
+        default: false
         description: For USPS this designates that no credentials are required.
         type: boolean
       credentials:
         description: Credentials used in the production environment.
         type: any
       custom_workflow:
+        default: false
         description: When present, a seperate authentication process will be required
           through the UI to link this account type.
         type: boolean
@@ -275,6 +278,7 @@ definitions:
       The CarrierAccount object provides CRUD operations for all CarrierAccounts.
     properties:
       clone:
+        default: false
         description: If clone is true, only the reference and description are possible
           to update
         type: boolean

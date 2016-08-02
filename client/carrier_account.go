@@ -11,7 +11,7 @@ import (
 // CreateCarrierAccountPayload is the carrier_account create action payload.
 type CreateCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
-	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
+	Clone bool `form:"clone" json:"clone" xml:"clone"`
 	// The name used when displaying a readable value for the type of the account
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
@@ -163,7 +163,7 @@ func (c *Client) NewShowCarrierAccountRequest(ctx context.Context, path string) 
 // UpdateCarrierAccountPayload is the carrier_account update action payload.
 type UpdateCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
-	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
+	Clone bool `form:"clone" json:"clone" xml:"clone"`
 	// The name used when displaying a readable value for the type of the account
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption

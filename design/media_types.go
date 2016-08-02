@@ -115,7 +115,9 @@ var CarrierAccountPayload = Type("CarrierAccountPayload", func() {
 	})
 	Attribute("type", String, "The name of the carrier type. Note that \"EndiciaAccount\" is the current USPS integration account type")
 	Attribute("fields", FieldsObjectPayload, "Contains \"credentials\" and/or \"test_credentials\", or may be empty")
-	Attribute("clone", Boolean, "If clone is true, only the reference and description are possible to update")
+	Attribute("clone", Boolean, "If clone is true, only the reference and description are possible to update", func() {
+		Default(false)
+	})
 	Attribute("description", String, "An optional, user-readable field to help distinguish accounts")
 	Attribute("reference", String, "An optional field that may be used in place of carrier_account_id in other API endpoints")
 	Attribute("readable", String, "The name used when displaying a readable value for the type of the account")
@@ -132,6 +134,10 @@ var FieldsObjectPayload = Type("FieldsObjectPayload", func() {
 	Description("Contains \"credentials\" and/or \"test_credentials\", or may be empty")
 	Attribute("credentials", Any, "Credentials used in the production environment.")
 	Attribute("test_credentials", Any, "Credentials used in the test environment.")
-	Attribute("auto_link", Boolean, "For USPS this designates that no credentials are required.")
-	Attribute("custom_workflow", Boolean, "When present, a seperate authentication process will be required through the UI to link this account type.")
+	Attribute("auto_link", Boolean, "For USPS this designates that no credentials are required.", func() {
+		Default(false)
+	})
+	Attribute("custom_workflow", Boolean, "When present, a seperate authentication process will be required through the UI to link this account type.", func() {
+		Default(false)
+	})
 })

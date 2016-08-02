@@ -3,13 +3,16 @@ package main
 import (
 	"crypto/rand"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/goadesign/goa"
 	"github.com/jaredwarren/easypostTester/app"
 	"io"
 	"io/ioutil"
 	"os"
+	"reflect"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -36,47 +39,117 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 	//// make sure type matches a type
 
 	payload := ctx.Payload
-	if *payload.Clone {
+
+	// Clone
+	if payload.Clone {
 		// TODO: copy everything, then override reference and description
-		*payload.Clone = false // for now
+		payload.Clone = false // for now
 	}
 
+	// Type
 	if payload.Type == "EndiciaAccount" {
-		// TODO: check that there is only one.
+		// TODO: check that there is only one account with theis type(excluding clones). Might be able to do this async
+	}
+	file, e := ioutil.ReadFile("./data/carrier_types.json")
+	if e != nil {
+		fmt.Printf("File error: %v\n", e)
+		return e
+	}
+	carrierTypes := &app.EasypostCarrierTypesCollection{}
+	e = json.Unmarshal(file, carrierTypes)
+	if e != nil {
+		fmt.Printf("Json Error: %v\n", e)
+		return e
 	}
 
-	// generate id
+	var sourceType *app.EasypostCarrierTypes
+	for _, carrierType := range *carrierTypes {
+		if carrierType.Type == payload.Type {
+			sourceType = carrierType
+			break
+		}
+	}
+	if sourceType == nil {
+		return errors.New("Invalid Carrier Type:" + payload.Type)
+	}
+
+	// ID
 	uuid := make([]byte, 10)
 	n, err := io.ReadFull(rand.Reader, uuid)
 	if n != len(uuid) || err != nil {
 		return err
 	}
 	id := fmt.Sprintf("ca_%x", uuid)
-	// TODO: make sure id is unique
+	// TODO: make sure id is unique, and touch file
 	payload.ID = &id
 
-	if payload.Fields == nil {
-
+	// Readable
+	if payload.Readable == nil {
+		payload.Readable = sourceType.Readable
 	}
+
+	// Time
 	now := time.Now().UTC().Format("2006-01-02T15:04:05-0700")
 	payload.CreatedAt = &now
 	payload.UpdatedAt = &now
 
-	// apply defaults
-	//// created_at: now
-	//// updated_at: now
-	//// readable: {from carrier_type if empty}
-	//// credentials {if empty use fields}
-	//// fields {if empty use credentials}
-	////// visibility: visible, unless key contains "password"
-	////// value: value
-	////// key: key
-	////// Label: ??
+	// Credentials & Fields
+	if payload.Fields == nil {
+		if payload.Credentials == nil {
+			return errors.New("Missing Credentials")
+		} else {
+			// update fields with credentials
+			a := reflect.ValueOf(*payload.Credentials).Interface().(map[string]interface{})
+			fieldJsons := make([]string, len(a))
+			i := 0
+			for key, val := range a {
+				visibility := "visible"
+				matched, _ := regexp.MatchString(`(?i)password`, key)
+				if matched {
+					visibility = "password"
+				}
+				fieldJsons[i] = fmt.Sprintf("\"%s\": {\"visibility\": \"%s\", \"label\": \"\", \"value\": \"%s\"}", key, visibility, val)
+				i += 1
+			}
 
-	//27839172aee03918a701
-	//0d388c36db23ae6a
-	//00bbaaae809fbce74bc0
-	//9bc7ffdd-e765-4f00-948c-948ba2ea3293
+			var f interface{}
+			err := json.Unmarshal([]byte("{"+strings.Join(fieldJsons, ", ")+"}"), &f)
+			if err != nil {
+				return err
+			}
+
+			fields := &app.FieldsObjectPayload{
+				Credentials: &f,
+			}
+			payload.Fields = fields
+		}
+	} else {
+		if payload.Fields.Credentials == nil {
+			return errors.New("Missing Fields Credentials")
+		} else {
+			// update credentials with fields. Fields override credentials
+			a := reflect.ValueOf(*payload.Fields.Credentials).Interface().(map[string]interface{})
+			fieldJsons := make([]string, len(a))
+			i := 0
+			for key, val := range a {
+				// Assume val is a (map[string]interface{}) for now
+				a := reflect.ValueOf(val).Interface().(map[string]interface{})
+				fieldJsons[i] = fmt.Sprintf("\"%s\": \"%s\"", key, a["value"])
+
+				i += 1
+			}
+			var f interface{}
+			err := json.Unmarshal([]byte("{"+strings.Join(fieldJsons, ", ")+"}"), &f)
+			if err != nil {
+				return err
+			}
+			payload.Credentials = &f
+		}
+	}
+	// TODO: do same for test_credentials and fields.test_credentials
+
+	// TODO: make sure account fields and account_type fields match
+
 	fmt.Printf("%+v\n", id)
 
 	// CarrierAccountController_Create: end_implement

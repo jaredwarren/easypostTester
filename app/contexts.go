@@ -66,6 +66,20 @@ type createCarrierAccountPayload struct {
 
 // Finalize sets the default values defined in the design.
 func (payload *createCarrierAccountPayload) Finalize() {
+	var defaultClone = false
+	if payload.Clone == nil {
+		payload.Clone = &defaultClone
+	}
+	if payload.Fields != nil {
+		var defaultAutoLink = false
+		if payload.Fields.AutoLink == nil {
+			payload.Fields.AutoLink = &defaultAutoLink
+		}
+		var defaultCustomWorkflow = false
+		if payload.Fields.CustomWorkflow == nil {
+			payload.Fields.CustomWorkflow = &defaultCustomWorkflow
+		}
+	}
 	var defaultObject = "CarrierAccount"
 	if payload.Object == nil {
 		payload.Object = &defaultObject
@@ -90,7 +104,7 @@ func (payload *createCarrierAccountPayload) Validate() (err error) {
 func (payload *createCarrierAccountPayload) Publicize() *CreateCarrierAccountPayload {
 	var pub CreateCarrierAccountPayload
 	if payload.Clone != nil {
-		pub.Clone = payload.Clone
+		pub.Clone = *payload.Clone
 	}
 	if payload.CreatedAt != nil {
 		pub.CreatedAt = payload.CreatedAt
@@ -131,7 +145,7 @@ func (payload *createCarrierAccountPayload) Publicize() *CreateCarrierAccountPay
 // CreateCarrierAccountPayload is the carrier_account create action payload.
 type CreateCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
-	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
+	Clone bool `form:"clone" json:"clone" xml:"clone"`
 	// The name used when displaying a readable value for the type of the account
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
@@ -325,6 +339,20 @@ type updateCarrierAccountPayload struct {
 
 // Finalize sets the default values defined in the design.
 func (payload *updateCarrierAccountPayload) Finalize() {
+	var defaultClone = false
+	if payload.Clone == nil {
+		payload.Clone = &defaultClone
+	}
+	if payload.Fields != nil {
+		var defaultAutoLink = false
+		if payload.Fields.AutoLink == nil {
+			payload.Fields.AutoLink = &defaultAutoLink
+		}
+		var defaultCustomWorkflow = false
+		if payload.Fields.CustomWorkflow == nil {
+			payload.Fields.CustomWorkflow = &defaultCustomWorkflow
+		}
+	}
 	var defaultObject = "CarrierAccount"
 	if payload.Object == nil {
 		payload.Object = &defaultObject
@@ -349,7 +377,7 @@ func (payload *updateCarrierAccountPayload) Validate() (err error) {
 func (payload *updateCarrierAccountPayload) Publicize() *UpdateCarrierAccountPayload {
 	var pub UpdateCarrierAccountPayload
 	if payload.Clone != nil {
-		pub.Clone = payload.Clone
+		pub.Clone = *payload.Clone
 	}
 	if payload.CreatedAt != nil {
 		pub.CreatedAt = payload.CreatedAt
@@ -390,7 +418,7 @@ func (payload *updateCarrierAccountPayload) Publicize() *UpdateCarrierAccountPay
 // UpdateCarrierAccountPayload is the carrier_account update action payload.
 type UpdateCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
-	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
+	Clone bool `form:"clone" json:"clone" xml:"clone"`
 	// The name used when displaying a readable value for the type of the account
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption

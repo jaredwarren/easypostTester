@@ -12,10 +12,7 @@
 
 package app
 
-import (
-	"github.com/goadesign/goa"
-	"time"
-)
+import "github.com/goadesign/goa"
 
 // A CarrierAccount encapsulates your credentials with the carrier. The CarrierAccount object provides CRUD operations for all CarrierAccounts. (default view)
 //
@@ -24,7 +21,7 @@ type EasypostCarrierAccounts struct {
 	// If clone is true, only the reference and description are possible to update
 	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
 	// The name used when displaying a readable value for the type of the account
-	CreatedAt *time.Time `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
 	Credentials *interface{} `form:"credentials,omitempty" json:"credentials,omitempty" xml:"credentials,omitempty"`
 	// An optional, user-readable field to help distinguish accounts
@@ -44,7 +41,7 @@ type EasypostCarrierAccounts struct {
 	// The name of the carrier type. Note that "EndiciaAccount" is the current USPS integration account type
 	Type *string `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
 	// The name used when displaying a readable value for the type of the account
-	UpdatedAt *time.Time `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
 // Validate validates the EasypostCarrierAccounts media type instance.

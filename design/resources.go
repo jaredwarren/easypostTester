@@ -38,7 +38,7 @@ var _ = Resource("carrier_account", func() {
 		Response(OK)
 	})
 
-	Action("careate", func() {
+	Action("create", func() {
 		Routing(POST("/"))
 		Payload(CarrierAccountPayload)
 		Description("CarrierAccount objects may be managed through the EasyPost API using the Production mode API key only. Multiple accounts can be added for a single carrier (with the exception of the USPS).")

@@ -2,7 +2,7 @@ basePath: /v2
 consumes:
 - application/json
 definitions:
-  CareateCarrierAccountPayload:
+  CreateCarrierAccountPayload:
     description: A CarrierAccount encapsulates your credentials with the carrier.
       The CarrierAccount object provides CRUD operations for all CarrierAccounts.
     properties:
@@ -13,7 +13,6 @@ definitions:
       created_at:
         description: The name used when displaying a readable value for the type of
           the account
-        format: date-time
         type: string
       credentials:
         description: Unlike the "credentials" object contained in "fields", this nullable
@@ -22,9 +21,10 @@ definitions:
       description:
         description: An optional, user-readable field to help distinguish accounts
         type: string
+      fields:
+        $ref: '#/definitions/FieldsObjectPayload'
       id:
         description: Unique, begins with "ca_"
-        pattern: ^ca_
         type: string
       object:
         default: CarrierAccount
@@ -51,12 +51,10 @@ definitions:
       updated_at:
         description: The name used when displaying a readable value for the type of
           the account
-        format: date-time
         type: string
     required:
-    - id
-    - object
-    title: CareateCarrierAccountPayload
+    - type
+    title: CreateCarrierAccountPayload
     type: object
   EasypostCarrier_accounts:
     description: A CarrierAccount encapsulates your credentials with the carrier.
@@ -64,53 +62,37 @@ definitions:
       (default view)
     example:
       clone: false
-      created_at: 1990-09-16T02:24:00-06:00
-      credentials: 8.017938e+18
-      description: Officia tenetur.
+      created_at: Non excepturi tenetur.
+      credentials:
+      - 97
+      - 40
+      - 234
+      - 231
+      - 180
+      - 53
+      - 67
+      - 79
+      - 160
+      - 187
+      - 33
+      - 208
+      - 128
+      - 35
+      - 114
+      - 214
+      description: Et saepe.
       fields:
-        auto_link: false
-        credentials: 4.9685924e+18
+        auto_link: true
+        credentials: 1970-02-20T19:43:19-07:00
         custom_workflow: true
-        test_credentials:
-        - 255
-        - 235
-        - 210
-        - 113
-        - 148
-        - 181
-        - 65
-        - 48
-        - 163
-        - 126
-        - 93
-        - 22
-        - 194
-        - 34
-        - 94
-        - 86
+        test_credentials: 2000-05-16T17:07:22-06:00
       id: ca_
       object: CarrierAccount
-      readable: Expedita sit laboriosam placeat ducimus doloribus voluptates.
-      reference: Eos labore.
-      test_credentials:
-      - 101
-      - 204
-      - 22
-      - 226
-      - 47
-      - 76
-      - 69
-      - 188
-      - 163
-      - 183
-      - 91
-      - 33
-      - 88
-      - 82
-      - 180
-      - 138
-      type: Consequuntur voluptatibus odit.
-      updated_at: 1983-08-05T16:55:52-06:00
+      readable: Placeat ducimus doloribus voluptates iusto.
+      reference: Labore voluptatem omnis consequuntur voluptatibus odit.
+      test_credentials: 0.08249953
+      type: Corporis doloremque voluptates esse magnam ut consequatur.
+      updated_at: Quo rerum et ut omnis praesentium non.
     properties:
       clone:
         description: If clone is true, only the reference and description are possible
@@ -120,17 +102,32 @@ definitions:
       created_at:
         description: The name used when displaying a readable value for the type of
           the account
-        example: 1990-09-16T02:24:00-06:00
-        format: date-time
+        example: Non excepturi tenetur.
         type: string
       credentials:
         description: Unlike the "credentials" object contained in "fields", this nullable
           object contains just raw credential pairs for client library consumption
-        example: 8.017938e+18
+        example:
+        - 97
+        - 40
+        - 234
+        - 231
+        - 180
+        - 53
+        - 67
+        - 79
+        - 160
+        - 187
+        - 33
+        - 208
+        - 128
+        - 35
+        - 114
+        - 214
         type: any
       description:
         description: An optional, user-readable field to help distinguish accounts
-        example: Officia tenetur.
+        example: Et saepe.
         type: string
       fields:
         $ref: '#/definitions/EasypostFields_object'
@@ -148,45 +145,28 @@ definitions:
       readable:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Expedita sit laboriosam placeat ducimus doloribus voluptates.
+        example: Placeat ducimus doloribus voluptates iusto.
         type: string
       reference:
         description: An optional field that may be used in place of carrier_account_id
           in other API endpoints
-        example: Eos labore.
+        example: Labore voluptatem omnis consequuntur voluptatibus odit.
         type: string
       test_credentials:
         description: Unlike the "test_credentials" object contained in "fields", this
           nullable object contains just raw test_credential pairs for client library
           consumption
-        example:
-        - 101
-        - 204
-        - 22
-        - 226
-        - 47
-        - 76
-        - 69
-        - 188
-        - 163
-        - 183
-        - 91
-        - 33
-        - 88
-        - 82
-        - 180
-        - 138
+        example: 0.08249953
         type: any
       type:
         description: The name of the carrier type. Note that "EndiciaAccount" is the
           current USPS integration account type
-        example: Consequuntur voluptatibus odit.
+        example: Corporis doloremque voluptates esse magnam ut consequatur.
         type: string
       updated_at:
         description: The name used when displaying a readable value for the type of
           the account
-        example: 1983-08-05T16:55:52-06:00
-        format: date-time
+        example: Quo rerum et ut omnis praesentium non.
         type: string
     required:
     - id
@@ -199,29 +179,13 @@ definitions:
       when a new carrier is added to EasyPost. (default view)
     example:
       fields:
-        auto_link: false
-        credentials: 4.9685924e+18
+        auto_link: true
+        credentials: 1970-02-20T19:43:19-07:00
         custom_workflow: true
-        test_credentials:
-        - 255
-        - 235
-        - 210
-        - 113
-        - 148
-        - 181
-        - 65
-        - 48
-        - 163
-        - 126
-        - 93
-        - 22
-        - 194
-        - 34
-        - 94
-        - 86
+        test_credentials: 2000-05-16T17:07:22-06:00
       object: CarrierType
-      readable: Dolorem corporis doloremque voluptates.
-      type: Magnam ut consequatur.
+      readable: Rerum explicabo laboriosam.
+      type: Delectus doloribus vero est mollitia eos.
     properties:
       fields:
         $ref: '#/definitions/EasypostFields_object'
@@ -234,12 +198,12 @@ definitions:
       readable:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Dolorem corporis doloremque voluptates.
+        example: Rerum explicabo laboriosam.
         type: string
       type:
         description: The name of the carrier type. Note that "EndiciaAccount" is the
           current USPS integration account type
-        example: Magnam ut consequatur.
+        example: Delectus doloribus vero est mollitia eos.
         type: string
     required:
     - type
@@ -252,29 +216,13 @@ definitions:
       EasypostCarrier_types (default view)
     example:
     - fields:
-        auto_link: false
-        credentials: 4.9685924e+18
+        auto_link: true
+        credentials: 1970-02-20T19:43:19-07:00
         custom_workflow: true
-        test_credentials:
-        - 255
-        - 235
-        - 210
-        - 113
-        - 148
-        - 181
-        - 65
-        - 48
-        - 163
-        - 126
-        - 93
-        - 22
-        - 194
-        - 34
-        - 94
-        - 86
+        test_credentials: 2000-05-16T17:07:22-06:00
       object: CarrierType
-      readable: Dolorem corporis doloremque voluptates.
-      type: Magnam ut consequatur.
+      readable: Rerum explicabo laboriosam.
+      type: Delectus doloribus vero est mollitia eos.
     items:
       $ref: '#/definitions/EasypostCarrier_types'
     title: 'Mediatype identifier: application/easypost.carrier_types+json; type=collection'
@@ -285,11 +233,11 @@ definitions:
     properties:
       auto_link:
         description: For USPS this designates that no credentials are required.
-        example: false
+        example: true
         type: boolean
       credentials:
         description: Credentials used in the production environment.
-        example: 4.9685924e+18
+        example: 1970-02-20T19:43:19-07:00
         type: any
       custom_workflow:
         description: When present, a seperate authentication process will be required
@@ -298,27 +246,29 @@ definitions:
         type: boolean
       test_credentials:
         description: Credentials used in the test environment.
-        example:
-        - 255
-        - 235
-        - 210
-        - 113
-        - 148
-        - 181
-        - 65
-        - 48
-        - 163
-        - 126
-        - 93
-        - 22
-        - 194
-        - 34
-        - 94
-        - 86
+        example: 2000-05-16T17:07:22-06:00
         type: any
     required:
     - credentials
     title: 'Mediatype identifier: application/easypost.fields_object+json'
+    type: object
+  FieldsObjectPayload:
+    description: Contains "credentials" and/or "test_credentials", or may be empty
+    properties:
+      auto_link:
+        description: For USPS this designates that no credentials are required.
+        type: boolean
+      credentials:
+        description: Credentials used in the production environment.
+        type: any
+      custom_workflow:
+        description: When present, a seperate authentication process will be required
+          through the UI to link this account type.
+        type: boolean
+      test_credentials:
+        description: Credentials used in the test environment.
+        type: any
+    title: FieldsObjectPayload
     type: object
   UpdateCarrierAccountPayload:
     description: A CarrierAccount encapsulates your credentials with the carrier.
@@ -331,7 +281,6 @@ definitions:
       created_at:
         description: The name used when displaying a readable value for the type of
           the account
-        format: date-time
         type: string
       credentials:
         description: Unlike the "credentials" object contained in "fields", this nullable
@@ -340,9 +289,10 @@ definitions:
       description:
         description: An optional, user-readable field to help distinguish accounts
         type: string
+      fields:
+        $ref: '#/definitions/FieldsObjectPayload'
       id:
         description: Unique, begins with "ca_"
-        pattern: ^ca_
         type: string
       object:
         default: CarrierAccount
@@ -369,11 +319,9 @@ definitions:
       updated_at:
         description: The name used when displaying a readable value for the type of
           the account
-        format: date-time
         type: string
     required:
-    - id
-    - object
+    - type
     title: UpdateCarrierAccountPayload
     type: object
 host: localhost:8080
@@ -405,7 +353,7 @@ paths:
       description: CarrierAccount objects may be managed through the EasyPost API
         using the Production mode API key only. Multiple accounts can be added for
         a single carrier (with the exception of the USPS).
-      operationId: carrier_account#careate
+      operationId: carrier_account#create
       parameters:
       - description: A CarrierAccount encapsulates your credentials with the carrier.
           The CarrierAccount object provides CRUD operations for all CarrierAccounts.
@@ -413,7 +361,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/CareateCarrierAccountPayload'
+          $ref: '#/definitions/CreateCarrierAccountPayload'
       responses:
         "200":
           description: OK
@@ -421,7 +369,7 @@ paths:
             $ref: '#/definitions/EasypostCarrier_accounts'
       schemes:
       - http
-      summary: careate carrier_account
+      summary: create carrier_account
       tags:
       - carrier_account
   /carrier_accounts/{id}:
@@ -430,8 +378,10 @@ paths:
         become out of date or no longer useful.
       operationId: carrier_account#delete
       parameters:
-      - in: path
+      - description: Carrier ID
+        in: path
         name: id
+        pattern: ^ca_
         required: true
         type: string
       responses:

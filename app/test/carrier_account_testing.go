@@ -15,11 +15,11 @@ import (
 	"testing"
 )
 
-// CareateCarrierAccountOK runs the method Careate of the given controller with the given parameters and payload.
+// CreateCarrierAccountOK runs the method Create of the given controller with the given parameters and payload.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func CareateCarrierAccountOK(t *testing.T, ctx context.Context, service *goa.Service, ctrl app.CarrierAccountController, payload *app.CareateCarrierAccountPayload) (http.ResponseWriter, *app.EasypostCarrierAccounts) {
+func CreateCarrierAccountOK(t *testing.T, ctx context.Context, service *goa.Service, ctrl app.CarrierAccountController, payload *app.CreateCarrierAccountPayload) (http.ResponseWriter, *app.EasypostCarrierAccounts) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -64,14 +64,14 @@ func CareateCarrierAccountOK(t *testing.T, ctx context.Context, service *goa.Ser
 		ctx = context.Background()
 	}
 	goaCtx := goa.NewContext(goa.WithAction(ctx, "CarrierAccountTest"), rw, req, prms)
-	careateCtx, err := app.NewCareateCarrierAccountContext(goaCtx, service)
+	createCtx, err := app.NewCreateCarrierAccountContext(goaCtx, service)
 	if err != nil {
 		panic("invalid test data " + err.Error()) // bug
 	}
-	careateCtx.Payload = payload
+	createCtx.Payload = payload
 
 	// Perform action
-	err = ctrl.Careate(careateCtx)
+	err = ctrl.Create(createCtx)
 
 	// Validate response
 	if err != nil {

@@ -15,38 +15,39 @@ package app
 import (
 	"github.com/goadesign/goa"
 	"golang.org/x/net/context"
-	"time"
 )
 
-// CareateCarrierAccountContext provides the carrier_account careate action context.
-type CareateCarrierAccountContext struct {
+// CreateCarrierAccountContext provides the carrier_account create action context.
+type CreateCarrierAccountContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Payload *CareateCarrierAccountPayload
+	Payload *CreateCarrierAccountPayload
 }
 
-// NewCareateCarrierAccountContext parses the incoming request URL and body, performs validations and creates the
-// context used by the carrier_account controller careate action.
-func NewCareateCarrierAccountContext(ctx context.Context, service *goa.Service) (*CareateCarrierAccountContext, error) {
+// NewCreateCarrierAccountContext parses the incoming request URL and body, performs validations and creates the
+// context used by the carrier_account controller create action.
+func NewCreateCarrierAccountContext(ctx context.Context, service *goa.Service) (*CreateCarrierAccountContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
-	rctx := CareateCarrierAccountContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := CreateCarrierAccountContext{Context: ctx, ResponseData: resp, RequestData: req}
 	return &rctx, err
 }
 
-// careateCarrierAccountPayload is the carrier_account careate action payload.
-type careateCarrierAccountPayload struct {
+// createCarrierAccountPayload is the carrier_account create action payload.
+type createCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
 	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
 	// The name used when displaying a readable value for the type of the account
-	CreatedAt *time.Time `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
 	Credentials *interface{} `form:"credentials,omitempty" json:"credentials,omitempty" xml:"credentials,omitempty"`
 	// An optional, user-readable field to help distinguish accounts
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	// Contains "credentials" and/or "test_credentials", or may be empty
+	Fields *fieldsObjectPayload `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
 	// Unique, begins with "ca_"
 	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// Always: "CarrierAccount"
@@ -60,11 +61,11 @@ type careateCarrierAccountPayload struct {
 	// The name of the carrier type. Note that "EndiciaAccount" is the current USPS integration account type
 	Type *string `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
 	// The name used when displaying a readable value for the type of the account
-	UpdatedAt *time.Time `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
 // Finalize sets the default values defined in the design.
-func (payload *careateCarrierAccountPayload) Finalize() {
+func (payload *createCarrierAccountPayload) Finalize() {
 	var defaultObject = "CarrierAccount"
 	if payload.Object == nil {
 		payload.Object = &defaultObject
@@ -72,19 +73,11 @@ func (payload *careateCarrierAccountPayload) Finalize() {
 }
 
 // Validate runs the validation rules defined in the design.
-func (payload *careateCarrierAccountPayload) Validate() (err error) {
-	if payload.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "id"))
-	}
-	if payload.Object == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "object"))
+func (payload *createCarrierAccountPayload) Validate() (err error) {
+	if payload.Type == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "type"))
 	}
 
-	if payload.ID != nil {
-		if ok := goa.ValidatePattern(`^ca_`, *payload.ID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.id`, *payload.ID, `^ca_`))
-		}
-	}
 	if payload.Object != nil {
 		if ok := goa.ValidatePattern(`^CarrierAccount$`, *payload.Object); !ok {
 			err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.object`, *payload.Object, `^CarrierAccount$`))
@@ -93,9 +86,9 @@ func (payload *careateCarrierAccountPayload) Validate() (err error) {
 	return
 }
 
-// Publicize creates CareateCarrierAccountPayload from careateCarrierAccountPayload
-func (payload *careateCarrierAccountPayload) Publicize() *CareateCarrierAccountPayload {
-	var pub CareateCarrierAccountPayload
+// Publicize creates CreateCarrierAccountPayload from createCarrierAccountPayload
+func (payload *createCarrierAccountPayload) Publicize() *CreateCarrierAccountPayload {
+	var pub CreateCarrierAccountPayload
 	if payload.Clone != nil {
 		pub.Clone = payload.Clone
 	}
@@ -108,8 +101,11 @@ func (payload *careateCarrierAccountPayload) Publicize() *CareateCarrierAccountP
 	if payload.Description != nil {
 		pub.Description = payload.Description
 	}
+	if payload.Fields != nil {
+		pub.Fields = payload.Fields.Publicize()
+	}
 	if payload.ID != nil {
-		pub.ID = *payload.ID
+		pub.ID = payload.ID
 	}
 	if payload.Object != nil {
 		pub.Object = *payload.Object
@@ -124,7 +120,7 @@ func (payload *careateCarrierAccountPayload) Publicize() *CareateCarrierAccountP
 		pub.TestCredentials = payload.TestCredentials
 	}
 	if payload.Type != nil {
-		pub.Type = payload.Type
+		pub.Type = *payload.Type
 	}
 	if payload.UpdatedAt != nil {
 		pub.UpdatedAt = payload.UpdatedAt
@@ -132,18 +128,20 @@ func (payload *careateCarrierAccountPayload) Publicize() *CareateCarrierAccountP
 	return &pub
 }
 
-// CareateCarrierAccountPayload is the carrier_account careate action payload.
-type CareateCarrierAccountPayload struct {
+// CreateCarrierAccountPayload is the carrier_account create action payload.
+type CreateCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
 	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
 	// The name used when displaying a readable value for the type of the account
-	CreatedAt *time.Time `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
 	Credentials *interface{} `form:"credentials,omitempty" json:"credentials,omitempty" xml:"credentials,omitempty"`
 	// An optional, user-readable field to help distinguish accounts
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	// Contains "credentials" and/or "test_credentials", or may be empty
+	Fields *FieldsObjectPayload `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
 	// Unique, begins with "ca_"
-	ID string `form:"id" json:"id" xml:"id"`
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// Always: "CarrierAccount"
 	Object string `form:"object" json:"object" xml:"object"`
 	// The name used when displaying a readable value for the type of the account
@@ -153,23 +151,17 @@ type CareateCarrierAccountPayload struct {
 	// Unlike the "test_credentials" object contained in "fields", this nullable object contains just raw test_credential pairs for client library consumption
 	TestCredentials *interface{} `form:"test_credentials,omitempty" json:"test_credentials,omitempty" xml:"test_credentials,omitempty"`
 	// The name of the carrier type. Note that "EndiciaAccount" is the current USPS integration account type
-	Type *string `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
+	Type string `form:"type" json:"type" xml:"type"`
 	// The name used when displaying a readable value for the type of the account
-	UpdatedAt *time.Time `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
 // Validate runs the validation rules defined in the design.
-func (payload *CareateCarrierAccountPayload) Validate() (err error) {
-	if payload.ID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "id"))
-	}
-	if payload.Object == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "object"))
+func (payload *CreateCarrierAccountPayload) Validate() (err error) {
+	if payload.Type == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "type"))
 	}
 
-	if ok := goa.ValidatePattern(`^ca_`, payload.ID); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.id`, payload.ID, `^ca_`))
-	}
 	if ok := goa.ValidatePattern(`^CarrierAccount$`, payload.Object); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.object`, payload.Object, `^CarrierAccount$`))
 	}
@@ -177,7 +169,7 @@ func (payload *CareateCarrierAccountPayload) Validate() (err error) {
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *CareateCarrierAccountContext) OK(r *EasypostCarrierAccounts) error {
+func (ctx *CreateCarrierAccountContext) OK(r *EasypostCarrierAccounts) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/easypost.carrier_accounts+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
@@ -202,6 +194,9 @@ func NewDeleteCarrierAccountContext(ctx context.Context, service *goa.Service) (
 	if len(paramID) > 0 {
 		rawID := paramID[0]
 		rctx.ID = rawID
+		if ok := goa.ValidatePattern(`^ca_`, rctx.ID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`id`, rctx.ID, `^ca_`))
+		}
 	}
 	return &rctx, err
 }
@@ -305,11 +300,13 @@ type updateCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
 	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
 	// The name used when displaying a readable value for the type of the account
-	CreatedAt *time.Time `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
 	Credentials *interface{} `form:"credentials,omitempty" json:"credentials,omitempty" xml:"credentials,omitempty"`
 	// An optional, user-readable field to help distinguish accounts
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	// Contains "credentials" and/or "test_credentials", or may be empty
+	Fields *fieldsObjectPayload `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
 	// Unique, begins with "ca_"
 	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// Always: "CarrierAccount"
@@ -323,7 +320,7 @@ type updateCarrierAccountPayload struct {
 	// The name of the carrier type. Note that "EndiciaAccount" is the current USPS integration account type
 	Type *string `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
 	// The name used when displaying a readable value for the type of the account
-	UpdatedAt *time.Time `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
 // Finalize sets the default values defined in the design.
@@ -336,18 +333,10 @@ func (payload *updateCarrierAccountPayload) Finalize() {
 
 // Validate runs the validation rules defined in the design.
 func (payload *updateCarrierAccountPayload) Validate() (err error) {
-	if payload.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "id"))
-	}
-	if payload.Object == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "object"))
+	if payload.Type == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "type"))
 	}
 
-	if payload.ID != nil {
-		if ok := goa.ValidatePattern(`^ca_`, *payload.ID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.id`, *payload.ID, `^ca_`))
-		}
-	}
 	if payload.Object != nil {
 		if ok := goa.ValidatePattern(`^CarrierAccount$`, *payload.Object); !ok {
 			err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.object`, *payload.Object, `^CarrierAccount$`))
@@ -371,8 +360,11 @@ func (payload *updateCarrierAccountPayload) Publicize() *UpdateCarrierAccountPay
 	if payload.Description != nil {
 		pub.Description = payload.Description
 	}
+	if payload.Fields != nil {
+		pub.Fields = payload.Fields.Publicize()
+	}
 	if payload.ID != nil {
-		pub.ID = *payload.ID
+		pub.ID = payload.ID
 	}
 	if payload.Object != nil {
 		pub.Object = *payload.Object
@@ -387,7 +379,7 @@ func (payload *updateCarrierAccountPayload) Publicize() *UpdateCarrierAccountPay
 		pub.TestCredentials = payload.TestCredentials
 	}
 	if payload.Type != nil {
-		pub.Type = payload.Type
+		pub.Type = *payload.Type
 	}
 	if payload.UpdatedAt != nil {
 		pub.UpdatedAt = payload.UpdatedAt
@@ -400,13 +392,15 @@ type UpdateCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
 	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
 	// The name used when displaying a readable value for the type of the account
-	CreatedAt *time.Time `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
 	Credentials *interface{} `form:"credentials,omitempty" json:"credentials,omitempty" xml:"credentials,omitempty"`
 	// An optional, user-readable field to help distinguish accounts
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	// Contains "credentials" and/or "test_credentials", or may be empty
+	Fields *FieldsObjectPayload `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
 	// Unique, begins with "ca_"
-	ID string `form:"id" json:"id" xml:"id"`
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// Always: "CarrierAccount"
 	Object string `form:"object" json:"object" xml:"object"`
 	// The name used when displaying a readable value for the type of the account
@@ -416,23 +410,17 @@ type UpdateCarrierAccountPayload struct {
 	// Unlike the "test_credentials" object contained in "fields", this nullable object contains just raw test_credential pairs for client library consumption
 	TestCredentials *interface{} `form:"test_credentials,omitempty" json:"test_credentials,omitempty" xml:"test_credentials,omitempty"`
 	// The name of the carrier type. Note that "EndiciaAccount" is the current USPS integration account type
-	Type *string `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
+	Type string `form:"type" json:"type" xml:"type"`
 	// The name used when displaying a readable value for the type of the account
-	UpdatedAt *time.Time `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
 // Validate runs the validation rules defined in the design.
 func (payload *UpdateCarrierAccountPayload) Validate() (err error) {
-	if payload.ID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "id"))
-	}
-	if payload.Object == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "object"))
+	if payload.Type == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "type"))
 	}
 
-	if ok := goa.ValidatePattern(`^ca_`, payload.ID); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.id`, payload.ID, `^ca_`))
-	}
 	if ok := goa.ValidatePattern(`^CarrierAccount$`, payload.Object); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.object`, payload.Object, `^CarrierAccount$`))
 	}

@@ -22,7 +22,6 @@ func NewCarrierTypesController(service *goa.Service) *CarrierTypesController {
 func (c *CarrierTypesController) Show(ctx *app.ShowCarrierTypesContext) error {
 	// CarrierTypesController_Show: start_implement
 
-	// Put your logic here
 	file, e := ioutil.ReadFile("./data/carrier_types.json")
 	if e != nil {
 		fmt.Printf("File error: %v\n", e)

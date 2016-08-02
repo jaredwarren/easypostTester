@@ -14,8 +14,8 @@ import (
 )
 
 type (
-	// CareateCarrierAccountCommand is the command line data structure for the careate action of carrier_account
-	CareateCarrierAccountCommand struct {
+	// CreateCarrierAccountCommand is the command line data structure for the create action of carrier_account
+	CreateCarrierAccountCommand struct {
 		Payload     string
 		ContentType string
 		PrettyPrint bool
@@ -58,10 +58,10 @@ type (
 func RegisterCommands(app *cobra.Command, c *client.Client) {
 	var command, sub *cobra.Command
 	command = &cobra.Command{
-		Use:   "careate",
+		Use:   "create",
 		Short: `CarrierAccount objects may be managed through the EasyPost API using the Production mode API key only. Multiple accounts can be added for a single carrier (with the exception of the USPS).`,
 	}
-	tmp1 := new(CareateCarrierAccountCommand)
+	tmp1 := new(CreateCarrierAccountCommand)
 	sub = &cobra.Command{
 		Use:   `carrier_account ["/v2/carrier_accounts"]`,
 		Short: ``,
@@ -175,15 +175,15 @@ func hasFlag(name string) bool {
 	return false
 }
 
-// Run makes the HTTP request corresponding to the CareateCarrierAccountCommand command.
-func (cmd *CareateCarrierAccountCommand) Run(c *client.Client, args []string) error {
+// Run makes the HTTP request corresponding to the CreateCarrierAccountCommand command.
+func (cmd *CreateCarrierAccountCommand) Run(c *client.Client, args []string) error {
 	var path string
 	if len(args) > 0 {
 		path = args[0]
 	} else {
 		path = "/v2/carrier_accounts"
 	}
-	var payload client.CareateCarrierAccountPayload
+	var payload client.CreateCarrierAccountPayload
 	if cmd.Payload != "" {
 		err := json.Unmarshal([]byte(cmd.Payload), &payload)
 		if err != nil {
@@ -192,7 +192,7 @@ func (cmd *CareateCarrierAccountCommand) Run(c *client.Client, args []string) er
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.CareateCarrierAccount(ctx, path, &payload, cmd.ContentType)
+	resp, err := c.CreateCarrierAccount(ctx, path, &payload, cmd.ContentType)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -203,7 +203,7 @@ func (cmd *CareateCarrierAccountCommand) Run(c *client.Client, args []string) er
 }
 
 // RegisterFlags registers the command flags with the command line.
-func (cmd *CareateCarrierAccountCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+func (cmd *CreateCarrierAccountCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
 }

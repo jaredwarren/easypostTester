@@ -6,21 +6,22 @@ import (
 	"golang.org/x/net/context"
 	"net/http"
 	"net/url"
-	"time"
 )
 
-// CareateCarrierAccountPayload is the carrier_account careate action payload.
-type CareateCarrierAccountPayload struct {
+// CreateCarrierAccountPayload is the carrier_account create action payload.
+type CreateCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
 	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
 	// The name used when displaying a readable value for the type of the account
-	CreatedAt *time.Time `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
 	Credentials *interface{} `form:"credentials,omitempty" json:"credentials,omitempty" xml:"credentials,omitempty"`
 	// An optional, user-readable field to help distinguish accounts
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	// Contains "credentials" and/or "test_credentials", or may be empty
+	Fields *FieldsObjectPayload `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
 	// Unique, begins with "ca_"
-	ID string `form:"id" json:"id" xml:"id"`
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// Always: "CarrierAccount"
 	Object string `form:"object" json:"object" xml:"object"`
 	// The name used when displaying a readable value for the type of the account
@@ -30,27 +31,27 @@ type CareateCarrierAccountPayload struct {
 	// Unlike the "test_credentials" object contained in "fields", this nullable object contains just raw test_credential pairs for client library consumption
 	TestCredentials *interface{} `form:"test_credentials,omitempty" json:"test_credentials,omitempty" xml:"test_credentials,omitempty"`
 	// The name of the carrier type. Note that "EndiciaAccount" is the current USPS integration account type
-	Type *string `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
+	Type string `form:"type" json:"type" xml:"type"`
 	// The name used when displaying a readable value for the type of the account
-	UpdatedAt *time.Time `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
-// CareateCarrierAccountPath computes a request path to the careate action of carrier_account.
-func CareateCarrierAccountPath() string {
+// CreateCarrierAccountPath computes a request path to the create action of carrier_account.
+func CreateCarrierAccountPath() string {
 	return fmt.Sprintf("/v2/carrier_accounts")
 }
 
 // CarrierAccount objects may be managed through the EasyPost API using the Production mode API key only. Multiple accounts can be added for a single carrier (with the exception of the USPS).
-func (c *Client) CareateCarrierAccount(ctx context.Context, path string, payload *CareateCarrierAccountPayload, contentType string) (*http.Response, error) {
-	req, err := c.NewCareateCarrierAccountRequest(ctx, path, payload, contentType)
+func (c *Client) CreateCarrierAccount(ctx context.Context, path string, payload *CreateCarrierAccountPayload, contentType string) (*http.Response, error) {
+	req, err := c.NewCreateCarrierAccountRequest(ctx, path, payload, contentType)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewCareateCarrierAccountRequest create the request corresponding to the careate action endpoint of the carrier_account resource.
-func (c *Client) NewCareateCarrierAccountRequest(ctx context.Context, path string, payload *CareateCarrierAccountPayload, contentType string) (*http.Request, error) {
+// NewCreateCarrierAccountRequest create the request corresponding to the create action endpoint of the carrier_account resource.
+func (c *Client) NewCreateCarrierAccountRequest(ctx context.Context, path string, payload *CreateCarrierAccountPayload, contentType string) (*http.Request, error) {
 	var body bytes.Buffer
 	if contentType == "" {
 		contentType = "*/*" // Use default encoder
@@ -164,13 +165,15 @@ type UpdateCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
 	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
 	// The name used when displaying a readable value for the type of the account
-	CreatedAt *time.Time `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
 	Credentials *interface{} `form:"credentials,omitempty" json:"credentials,omitempty" xml:"credentials,omitempty"`
 	// An optional, user-readable field to help distinguish accounts
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	// Contains "credentials" and/or "test_credentials", or may be empty
+	Fields *FieldsObjectPayload `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
 	// Unique, begins with "ca_"
-	ID string `form:"id" json:"id" xml:"id"`
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// Always: "CarrierAccount"
 	Object string `form:"object" json:"object" xml:"object"`
 	// The name used when displaying a readable value for the type of the account
@@ -180,9 +183,9 @@ type UpdateCarrierAccountPayload struct {
 	// Unlike the "test_credentials" object contained in "fields", this nullable object contains just raw test_credential pairs for client library consumption
 	TestCredentials *interface{} `form:"test_credentials,omitempty" json:"test_credentials,omitempty" xml:"test_credentials,omitempty"`
 	// The name of the carrier type. Note that "EndiciaAccount" is the current USPS integration account type
-	Type *string `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
+	Type string `form:"type" json:"type" xml:"type"`
 	// The name used when displaying a readable value for the type of the account
-	UpdatedAt *time.Time `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
 // UpdateCarrierAccountPath computes a request path to the update action of carrier_account.

@@ -24,8 +24,8 @@ var CarrierAccount = MediaType("application/easypost.carrier_accounts+json", fun
 		//Attribute("logo", String, "The name used when displaying a readable value for the type of the account") // Not supported yet
 		Attribute("credentials", Any, "Unlike the \"credentials\" object contained in \"fields\", this nullable object contains just raw credential pairs for client library consumption")
 		Attribute("test_credentials", Any, "Unlike the \"test_credentials\" object contained in \"fields\", this nullable object contains just raw test_credential pairs for client library consumption")
-		Attribute("created_at", DateTime, "The name used when displaying a readable value for the type of the account")
-		Attribute("updated_at", DateTime, "The name used when displaying a readable value for the type of the account")
+		Attribute("created_at", String, "The name used when displaying a readable value for the type of the account")
+		Attribute("updated_at", String, "The name used when displaying a readable value for the type of the account")
 
 		Required("id", "object")
 	})
@@ -106,17 +106,15 @@ var CarrierTypes = MediaType("application/easypost.carrier_types+json", func() {
 })
 
 // payloads
-var CarrierAccountPayload = Type("YesNoPayload", func() {
+var CarrierAccountPayload = Type("CarrierAccountPayload", func() {
 	Description("A CarrierAccount encapsulates your credentials with the carrier. The CarrierAccount object provides CRUD operations for all CarrierAccounts.")
-	Attribute("id", String, "Unique, begins with \"ca_\"", func() {
-		Pattern("^ca_")
-	})
+	Attribute("id", String, "Unique, begins with \"ca_\"")
 	Attribute("object", String, "Always: \"CarrierAccount\"", func() {
 		Pattern("^CarrierAccount$")
 		Default("CarrierAccount")
 	})
 	Attribute("type", String, "The name of the carrier type. Note that \"EndiciaAccount\" is the current USPS integration account type")
-	//Attribute("fields", FieldsObject, "Contains \"credentials\" and/or \"test_credentials\", or may be empty")
+	Attribute("fields", FieldsObjectPayload, "Contains \"credentials\" and/or \"test_credentials\", or may be empty")
 	Attribute("clone", Boolean, "If clone is true, only the reference and description are possible to update")
 	Attribute("description", String, "An optional, user-readable field to help distinguish accounts")
 	Attribute("reference", String, "An optional field that may be used in place of carrier_account_id in other API endpoints")
@@ -124,8 +122,16 @@ var CarrierAccountPayload = Type("YesNoPayload", func() {
 	//Attribute("logo", String, "The name used when displaying a readable value for the type of the account") // Not supported yet
 	Attribute("credentials", Any, "Unlike the \"credentials\" object contained in \"fields\", this nullable object contains just raw credential pairs for client library consumption")
 	Attribute("test_credentials", Any, "Unlike the \"test_credentials\" object contained in \"fields\", this nullable object contains just raw test_credential pairs for client library consumption")
-	Attribute("created_at", DateTime, "The name used when displaying a readable value for the type of the account")
-	Attribute("updated_at", DateTime, "The name used when displaying a readable value for the type of the account")
+	Attribute("created_at", String, "The name used when displaying a readable value for the type of the account")
+	Attribute("updated_at", String, "The name used when displaying a readable value for the type of the account")
 
-	Required("id", "object")
+	Required("type")
+})
+
+var FieldsObjectPayload = Type("FieldsObjectPayload", func() {
+	Description("Contains \"credentials\" and/or \"test_credentials\", or may be empty")
+	Attribute("credentials", Any, "Credentials used in the production environment.")
+	Attribute("test_credentials", Any, "Credentials used in the test environment.")
+	Attribute("auto_link", Boolean, "For USPS this designates that no credentials are required.")
+	Attribute("custom_workflow", Boolean, "When present, a seperate authentication process will be required through the UI to link this account type.")
 })

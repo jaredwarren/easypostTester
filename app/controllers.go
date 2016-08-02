@@ -32,7 +32,7 @@ func initService(service *goa.Service) {
 // CarrierAccountController is the controller interface for the CarrierAccount actions.
 type CarrierAccountController interface {
 	goa.Muxer
-	Careate(*CareateCarrierAccountContext) error
+	Create(*CreateCarrierAccountContext) error
 	Delete(*DeleteCarrierAccountContext) error
 	List(*ListCarrierAccountContext) error
 	Show(*ShowCarrierAccountContext) error
@@ -50,20 +50,20 @@ func MountCarrierAccountController(service *goa.Service, ctrl CarrierAccountCont
 			return err
 		}
 		// Build the context
-		rctx, err := NewCareateCarrierAccountContext(ctx, service)
+		rctx, err := NewCreateCarrierAccountContext(ctx, service)
 		if err != nil {
 			return err
 		}
 		// Build the payload
 		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*CareateCarrierAccountPayload)
+			rctx.Payload = rawPayload.(*CreateCarrierAccountPayload)
 		} else {
 			return goa.MissingPayloadError()
 		}
-		return ctrl.Careate(rctx)
+		return ctrl.Create(rctx)
 	}
-	service.Mux.Handle("POST", "/v2/carrier_accounts", ctrl.MuxHandler("Careate", h, unmarshalCareateCarrierAccountPayload))
-	service.LogInfo("mount", "ctrl", "CarrierAccount", "action", "Careate", "route", "POST /v2/carrier_accounts")
+	service.Mux.Handle("POST", "/v2/carrier_accounts", ctrl.MuxHandler("Create", h, unmarshalCreateCarrierAccountPayload))
+	service.LogInfo("mount", "ctrl", "CarrierAccount", "action", "Create", "route", "POST /v2/carrier_accounts")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -132,9 +132,9 @@ func MountCarrierAccountController(service *goa.Service, ctrl CarrierAccountCont
 	service.LogInfo("mount", "ctrl", "CarrierAccount", "action", "Update", "route", "PUT /v2/carrier_accounts/:id")
 }
 
-// unmarshalCareateCarrierAccountPayload unmarshals the request body into the context request data Payload field.
-func unmarshalCareateCarrierAccountPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &careateCarrierAccountPayload{}
+// unmarshalCreateCarrierAccountPayload unmarshals the request body into the context request data Payload field.
+func unmarshalCreateCarrierAccountPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &createCarrierAccountPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}

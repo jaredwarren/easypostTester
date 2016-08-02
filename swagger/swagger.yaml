@@ -1,0 +1,522 @@
+basePath: /v2
+consumes:
+- application/json
+definitions:
+  CareateCarrierAccountPayload:
+    description: A CarrierAccount encapsulates your credentials with the carrier.
+      The CarrierAccount object provides CRUD operations for all CarrierAccounts.
+    properties:
+      clone:
+        description: If clone is true, only the reference and description are possible
+          to update
+        type: boolean
+      created_at:
+        description: The name used when displaying a readable value for the type of
+          the account
+        format: date-time
+        type: string
+      credentials:
+        description: Unlike the "credentials" object contained in "fields", this nullable
+          object contains just raw credential pairs for client library consumption
+        type: any
+      description:
+        description: An optional, user-readable field to help distinguish accounts
+        type: string
+      id:
+        description: Unique, begins with "ca_"
+        pattern: ^ca_
+        type: string
+      object:
+        default: CarrierAccount
+        description: 'Always: "CarrierAccount"'
+        pattern: ^CarrierAccount$
+        type: string
+      readable:
+        description: The name used when displaying a readable value for the type of
+          the account
+        type: string
+      reference:
+        description: An optional field that may be used in place of carrier_account_id
+          in other API endpoints
+        type: string
+      test_credentials:
+        description: Unlike the "test_credentials" object contained in "fields", this
+          nullable object contains just raw test_credential pairs for client library
+          consumption
+        type: any
+      type:
+        description: The name of the carrier type. Note that "EndiciaAccount" is the
+          current USPS integration account type
+        type: string
+      updated_at:
+        description: The name used when displaying a readable value for the type of
+          the account
+        format: date-time
+        type: string
+    required:
+    - id
+    - object
+    title: CareateCarrierAccountPayload
+    type: object
+  EasypostCarrier_accounts:
+    description: A CarrierAccount encapsulates your credentials with the carrier.
+      The CarrierAccount object provides CRUD operations for all CarrierAccounts.
+      (default view)
+    example:
+      clone: false
+      created_at: 1990-09-16T02:24:00-06:00
+      credentials: 8.017938e+18
+      description: Officia tenetur.
+      fields:
+        auto_link: false
+        credentials: 4.9685924e+18
+        custom_workflow: true
+        test_credentials:
+        - 255
+        - 235
+        - 210
+        - 113
+        - 148
+        - 181
+        - 65
+        - 48
+        - 163
+        - 126
+        - 93
+        - 22
+        - 194
+        - 34
+        - 94
+        - 86
+      id: ca_
+      object: CarrierAccount
+      readable: Expedita sit laboriosam placeat ducimus doloribus voluptates.
+      reference: Eos labore.
+      test_credentials:
+      - 101
+      - 204
+      - 22
+      - 226
+      - 47
+      - 76
+      - 69
+      - 188
+      - 163
+      - 183
+      - 91
+      - 33
+      - 88
+      - 82
+      - 180
+      - 138
+      type: Consequuntur voluptatibus odit.
+      updated_at: 1983-08-05T16:55:52-06:00
+    properties:
+      clone:
+        description: If clone is true, only the reference and description are possible
+          to update
+        example: false
+        type: boolean
+      created_at:
+        description: The name used when displaying a readable value for the type of
+          the account
+        example: 1990-09-16T02:24:00-06:00
+        format: date-time
+        type: string
+      credentials:
+        description: Unlike the "credentials" object contained in "fields", this nullable
+          object contains just raw credential pairs for client library consumption
+        example: 8.017938e+18
+        type: any
+      description:
+        description: An optional, user-readable field to help distinguish accounts
+        example: Officia tenetur.
+        type: string
+      fields:
+        $ref: '#/definitions/EasypostFields_object'
+      id:
+        description: Unique, begins with "ca_"
+        example: ca_
+        pattern: ^ca_
+        type: string
+      object:
+        default: CarrierAccount
+        description: 'Always: "CarrierAccount"'
+        example: CarrierAccount
+        pattern: ^CarrierAccount$
+        type: string
+      readable:
+        description: The name used when displaying a readable value for the type of
+          the account
+        example: Expedita sit laboriosam placeat ducimus doloribus voluptates.
+        type: string
+      reference:
+        description: An optional field that may be used in place of carrier_account_id
+          in other API endpoints
+        example: Eos labore.
+        type: string
+      test_credentials:
+        description: Unlike the "test_credentials" object contained in "fields", this
+          nullable object contains just raw test_credential pairs for client library
+          consumption
+        example:
+        - 101
+        - 204
+        - 22
+        - 226
+        - 47
+        - 76
+        - 69
+        - 188
+        - 163
+        - 183
+        - 91
+        - 33
+        - 88
+        - 82
+        - 180
+        - 138
+        type: any
+      type:
+        description: The name of the carrier type. Note that "EndiciaAccount" is the
+          current USPS integration account type
+        example: Consequuntur voluptatibus odit.
+        type: string
+      updated_at:
+        description: The name used when displaying a readable value for the type of
+          the account
+        example: 1983-08-05T16:55:52-06:00
+        format: date-time
+        type: string
+    required:
+    - id
+    - object
+    title: 'Mediatype identifier: application/easypost.carrier_accounts+json'
+    type: object
+  EasypostCarrier_types:
+    description: The CarrierType object provides an interface for determining the
+      valid fields of a CarrierAccount. The list of CarrierType objects only changes
+      when a new carrier is added to EasyPost. (default view)
+    example:
+      fields:
+        auto_link: false
+        credentials: 4.9685924e+18
+        custom_workflow: true
+        test_credentials:
+        - 255
+        - 235
+        - 210
+        - 113
+        - 148
+        - 181
+        - 65
+        - 48
+        - 163
+        - 126
+        - 93
+        - 22
+        - 194
+        - 34
+        - 94
+        - 86
+      object: CarrierType
+      readable: Dolorem corporis doloremque voluptates.
+      type: Magnam ut consequatur.
+    properties:
+      fields:
+        $ref: '#/definitions/EasypostFields_object'
+      object:
+        default: CarrierType
+        description: 'Always: "CarrierType"'
+        example: CarrierType
+        pattern: ^CarrierType$
+        type: string
+      readable:
+        description: The name used when displaying a readable value for the type of
+          the account
+        example: Dolorem corporis doloremque voluptates.
+        type: string
+      type:
+        description: The name of the carrier type. Note that "EndiciaAccount" is the
+          current USPS integration account type
+        example: Magnam ut consequatur.
+        type: string
+    required:
+    - type
+    - object
+    - fields
+    title: 'Mediatype identifier: application/easypost.carrier_types+json'
+    type: object
+  EasypostCarrier_typesCollection:
+    description: EasypostCarrier_typesCollection is the media type for an array of
+      EasypostCarrier_types (default view)
+    example:
+    - fields:
+        auto_link: false
+        credentials: 4.9685924e+18
+        custom_workflow: true
+        test_credentials:
+        - 255
+        - 235
+        - 210
+        - 113
+        - 148
+        - 181
+        - 65
+        - 48
+        - 163
+        - 126
+        - 93
+        - 22
+        - 194
+        - 34
+        - 94
+        - 86
+      object: CarrierType
+      readable: Dolorem corporis doloremque voluptates.
+      type: Magnam ut consequatur.
+    items:
+      $ref: '#/definitions/EasypostCarrier_types'
+    title: 'Mediatype identifier: application/easypost.carrier_types+json; type=collection'
+    type: array
+  EasypostFields_object:
+    description: Contains "credentials" and/or "test_credentials", or may be empty
+      (default view)
+    properties:
+      auto_link:
+        description: For USPS this designates that no credentials are required.
+        example: false
+        type: boolean
+      credentials:
+        description: Credentials used in the production environment.
+        example: 4.9685924e+18
+        type: any
+      custom_workflow:
+        description: When present, a seperate authentication process will be required
+          through the UI to link this account type.
+        example: true
+        type: boolean
+      test_credentials:
+        description: Credentials used in the test environment.
+        example:
+        - 255
+        - 235
+        - 210
+        - 113
+        - 148
+        - 181
+        - 65
+        - 48
+        - 163
+        - 126
+        - 93
+        - 22
+        - 194
+        - 34
+        - 94
+        - 86
+        type: any
+    required:
+    - credentials
+    title: 'Mediatype identifier: application/easypost.fields_object+json'
+    type: object
+  UpdateCarrierAccountPayload:
+    description: A CarrierAccount encapsulates your credentials with the carrier.
+      The CarrierAccount object provides CRUD operations for all CarrierAccounts.
+    properties:
+      clone:
+        description: If clone is true, only the reference and description are possible
+          to update
+        type: boolean
+      created_at:
+        description: The name used when displaying a readable value for the type of
+          the account
+        format: date-time
+        type: string
+      credentials:
+        description: Unlike the "credentials" object contained in "fields", this nullable
+          object contains just raw credential pairs for client library consumption
+        type: any
+      description:
+        description: An optional, user-readable field to help distinguish accounts
+        type: string
+      id:
+        description: Unique, begins with "ca_"
+        pattern: ^ca_
+        type: string
+      object:
+        default: CarrierAccount
+        description: 'Always: "CarrierAccount"'
+        pattern: ^CarrierAccount$
+        type: string
+      readable:
+        description: The name used when displaying a readable value for the type of
+          the account
+        type: string
+      reference:
+        description: An optional field that may be used in place of carrier_account_id
+          in other API endpoints
+        type: string
+      test_credentials:
+        description: Unlike the "test_credentials" object contained in "fields", this
+          nullable object contains just raw test_credential pairs for client library
+          consumption
+        type: any
+      type:
+        description: The name of the carrier type. Note that "EndiciaAccount" is the
+          current USPS integration account type
+        type: string
+      updated_at:
+        description: The name used when displaying a readable value for the type of
+          the account
+        format: date-time
+        type: string
+    required:
+    - id
+    - object
+    title: UpdateCarrierAccountPayload
+    type: object
+host: localhost:8080
+info:
+  description: A simple goa service
+  license:
+    name: Apache License Version 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0
+  title: The virtual wine cellar
+  version: "2.0"
+paths:
+  /carrier_accounts:
+    get:
+      description: Retrieve an unpaginated list of all CarrierAccounts available to
+        the authenticated account. Only Production API keys may be used to retrieve
+        this list, as there is no test mode equivalent.
+      operationId: carrier_account#list
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostCarrier_accounts'
+      schemes:
+      - http
+      summary: list carrier_account
+      tags:
+      - carrier_account
+    post:
+      description: CarrierAccount objects may be managed through the EasyPost API
+        using the Production mode API key only. Multiple accounts can be added for
+        a single carrier (with the exception of the USPS).
+      operationId: carrier_account#careate
+      parameters:
+      - description: A CarrierAccount encapsulates your credentials with the carrier.
+          The CarrierAccount object provides CRUD operations for all CarrierAccounts.
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CareateCarrierAccountPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostCarrier_accounts'
+      schemes:
+      - http
+      summary: careate carrier_account
+      tags:
+      - carrier_account
+  /carrier_accounts/{id}:
+    delete:
+      description: CarrierAccount objects may be removed from your account when they
+        become out of date or no longer useful.
+      operationId: carrier_account#delete
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostCarrier_accounts'
+      schemes:
+      - http
+      summary: delete carrier_account
+      tags:
+      - carrier_account
+    get:
+      description: Retrieve an unpaginated list of all CarrierAccounts available to
+        the authenticated account. Only Production API keys may be used to retrieve
+        this list, as there is no test mode equivalent.
+      operationId: carrier_account#show
+      parameters:
+      - description: Carrier ID
+        in: path
+        name: id
+        pattern: ^ca_
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostCarrier_accounts'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show carrier_account
+      tags:
+      - carrier_account
+    put:
+      description: Updates can be made to description, reference, and any fields in
+        credentials or test_credentials.
+      operationId: carrier_account#update
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - description: A CarrierAccount encapsulates your credentials with the carrier.
+          The CarrierAccount object provides CRUD operations for all CarrierAccounts.
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateCarrierAccountPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostCarrier_accounts'
+      schemes:
+      - http
+      summary: update carrier_account
+      tags:
+      - carrier_account
+  /carrier_types:
+    get:
+      description: List carrier types.
+      operationId: carrier_types#show
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostCarrier_typesCollection'
+      schemes:
+      - http
+      summary: show carrier_types
+      tags:
+      - carrier_types
+produces:
+- application/json
+responses:
+  NotFound:
+    description: Not Found
+  OK:
+    description: OK
+    schema:
+      $ref: '#/definitions/EasypostCarrier_accounts'
+schemes:
+- http
+swagger: "2.0"

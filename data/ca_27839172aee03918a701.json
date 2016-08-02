@@ -1,0 +1,73 @@
+{
+  "id": "ca_27839172aee03918a701",
+  "object": "CarrierAccount",
+  "type": "AsendiaAccount",
+  "clone": false,
+  "created_at": "2016-01-13T01:00:01Z",
+  "updated_at": "2016-01-13T01:00:01Z",
+  "description": "Roswell",
+  "reference": "my_custom_carrier",
+  "readable": "Asendia USA",
+  "logo": null,
+  "fields": {
+    "credentials": {
+      "account_number": {
+        "visibility": "visible",
+        "label": "Asendia Account Number",
+        "value": "12345"
+      },
+      "company_name": {
+        "visibility": "visible",
+        "label": "Company Name",
+        "value": "CarryMe"
+      },
+      "ftp_username": {
+        "visibility": "visible",
+        "label": "FTP Username",
+        "value": "foouser"
+      },
+      "ftp_password": {
+        "visibility": "password",
+        "label": "FTP Password",
+        "value": "********"
+      },
+      "prioritytracked": {
+        "visibility": "checkbox",
+        "label": "Priority Tracked",
+        "value": "1"
+      },
+      "pmi": {
+        "visibility": "checkbox",
+        "label": "PMI",
+        "value": "0"
+      },
+      "epacket": {
+        "visibility": "checkbox",
+        "label": "ePacket",
+        "value": "1"
+      },
+      "ipa": {
+        "visibility": "checkbox",
+        "label": "IPA",
+        "value": "0"
+      },
+      "isal": {
+        "visibility": "checkbox",
+        "label": "ISAL",
+        "value": "0"
+      }
+    }
+  },
+  "credentials": {
+    "account_number": "12345",
+    "company_name": "CarryMe",
+    "ftp_username": "foouser",
+    "ftp_password": "********",
+    "prioritytracked": "1",
+    "pmi": "0",
+    "epacket": "1",
+    "ipa": "0",
+    "isal": "0"
+  },
+  "test_credentials": null
+}

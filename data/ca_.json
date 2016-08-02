@@ -1,0 +1,43 @@
+{
+  "id": "ca_27839172aee03918a701",
+  "object": "CarrierAccount",
+  "type": "UpsAccount",
+  "description": "NY Location UPS Account",
+  "clone": false,
+  "created_at": "2016-01-13T01:00:01Z",
+  "updated_at": "2016-01-13T01:00:01Z",
+  "reference": "my-reference",
+  "readable": "UPS",
+  "logo": null,
+  "fields": {
+    "credentials": {
+      "account_number": {
+        "visibility": "visible",
+        "label": "UPS Account Number",
+        "value": "A1A1A1"
+      },
+      "access_license_number": {
+        "visibility": "visible",
+        "label": "UPS Access License Number",
+        "value": "ALN"
+      },
+      "user_id": {
+        "visibility": "visible",
+        "label": "UPS.com User ID",
+        "value": "USERID"
+      },
+      "password": {
+        "visibility": "password",
+        "label": "UPS.com Password",
+        "value": "********"
+      }
+    }
+  },
+  "credentials": {
+    "account_number": "A1A1A1",
+    "user_id": "USERID",
+    "password": "********",
+    "access_license_number": "ALN"
+  },
+  "test_credentials": null
+}

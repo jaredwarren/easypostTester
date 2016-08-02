@@ -231,7 +231,7 @@ func NewListCarrierAccountContext(ctx context.Context, service *goa.Service) (*L
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ListCarrierAccountContext) OK(r *EasypostCarrierAccounts) error {
+func (ctx *ListCarrierAccountContext) OK(r []*EasypostCarrierAccounts) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/easypost.carrier_accounts+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

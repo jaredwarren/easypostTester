@@ -18,7 +18,7 @@ var _ = Resource("carrier_account", func() {
 	Action("list", func() {
 		Description("Retrieve an unpaginated list of all CarrierAccounts available to the authenticated account. Only Production API keys may be used to retrieve this list, as there is no test mode equivalent.")
 		Routing(GET("/"))
-		Response(OK)
+		Response(OK, ArrayOf(CarrierAccount))
 	})
 
 	Action("show", func() {

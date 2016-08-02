@@ -38,9 +38,8 @@ func (c *CarrierAccountController) Careate(ctx *app.CareateCarrierAccountContext
 func (c *CarrierAccountController) Delete(ctx *app.DeleteCarrierAccountContext) error {
 	// CarrierAccountController_Delete: start_implement
 
-	// Put your logic here
+	// Delete file
 	err := os.Remove("./data/" + ctx.ID + ".json")
-
 	if err != nil {
 		return err
 	}
@@ -54,21 +53,32 @@ func (c *CarrierAccountController) Delete(ctx *app.DeleteCarrierAccountContext) 
 func (c *CarrierAccountController) List(ctx *app.ListCarrierAccountContext) error {
 	// CarrierAccountController_List: start_implement
 
-	// Put your logic here
-	//TODO: search for each file with ca_*.json
+	// Get All Files
 	files, err := ioutil.ReadDir("./data")
 	if err != nil {
 		return err
 	}
+	accounts := make([]*app.EasypostCarrierAccounts, 0)
 
-	for _, file := range files {
-		matched, err := regexp.MatchString("^ca_(.+?)\\.json$", file.Name())
-		//fmt.Println(file.Name())
+	// Find account file and add to list
+	for _, fileInfo := range files {
+		matched, _ := regexp.MatchString("^ca_(.+?)\\.json$", fileInfo.Name())
+		if matched {
+			resJson := &app.EasypostCarrierAccounts{}
+			file, e := ioutil.ReadFile("./data/" + fileInfo.Name())
+			if e != nil {
+				return e
+			}
+			e = json.Unmarshal(file, resJson)
+			if e != nil {
+				return e
+			}
+			accounts = append(accounts, resJson)
+		}
 	}
 
 	// CarrierAccountController_List: end_implement
-	res := &app.EasypostCarrierAccounts{}
-	return ctx.OK(res)
+	return ctx.OK(accounts)
 }
 
 // Show runs the show action.

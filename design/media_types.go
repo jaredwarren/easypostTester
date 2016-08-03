@@ -9,19 +9,22 @@ var CarrierAccount = MediaType("application/easypost.carrier_accounts+json", fun
 	Reference(CarrierAccountPayload)
 	Description("A CarrierAccount encapsulates your credentials with the carrier. The CarrierAccount object provides CRUD operations for all CarrierAccounts.")
 	Attributes(func() {
-		Attribute("id")
-		Attribute("object")
+		Attribute("id", String, "Unique, begins with \"ca_\"")
+		Attribute("object", String, "Always: \"CarrierAccount\"", func() {
+			Pattern("^CarrierAccount$")
+			Default("CarrierAccount")
+		})
 		Attribute("type")
 		Attribute("fields")
 		Attribute("clone")
 		Attribute("description")
 		Attribute("reference")
 		Attribute("readable")
-		//Attribute("logo") // Not supported yet
+		Attribute("logo", String, "url to logo") // Not supported yet
 		Attribute("credentials")
 		Attribute("test_credentials")
-		Attribute("created_at")
-		Attribute("updated_at")
+		Attribute("created_at", String, "The name used when displaying a readable value for the type of the account")
+		Attribute("updated_at", String, "The name used when displaying a readable value for the type of the account")
 
 		Required("id", "object")
 	})
@@ -105,11 +108,7 @@ var CarrierTypes = MediaType("application/easypost.carrier_types+json", func() {
 // payloads
 var CarrierAccountPayload = Type("CarrierAccountPayload", func() {
 	Description("A CarrierAccount encapsulates your credentials with the carrier. The CarrierAccount object provides CRUD operations for all CarrierAccounts.")
-	Attribute("id", String, "Unique, begins with \"ca_\"")
-	Attribute("object", String, "Always: \"CarrierAccount\"", func() {
-		Pattern("^CarrierAccount$")
-		Default("CarrierAccount")
-	})
+
 	Attribute("type", String, "The name of the carrier type. Note that \"EndiciaAccount\" is the current USPS integration account type")
 	Attribute("fields", FieldsObjectPayload, "Contains \"credentials\" and/or \"test_credentials\", or may be empty")
 	Attribute("clone", Boolean, "If clone is true, only the reference and description are possible to update", func() {
@@ -118,11 +117,8 @@ var CarrierAccountPayload = Type("CarrierAccountPayload", func() {
 	Attribute("description", String, "An optional, user-readable field to help distinguish accounts")
 	Attribute("reference", String, "An optional field that may be used in place of carrier_account_id in other API endpoints")
 	Attribute("readable", String, "The name used when displaying a readable value for the type of the account")
-	//Attribute("logo", String, "The name used when displaying a readable value for the type of the account") // Not supported yet
 	Attribute("credentials", Any, "Unlike the \"credentials\" object contained in \"fields\", this nullable object contains just raw credential pairs for client library consumption")
 	Attribute("test_credentials", Any, "Unlike the \"test_credentials\" object contained in \"fields\", this nullable object contains just raw test_credential pairs for client library consumption")
-	Attribute("created_at", String, "The name used when displaying a readable value for the type of the account")
-	Attribute("updated_at", String, "The name used when displaying a readable value for the type of the account")
 
 	Required("type")
 })
@@ -141,14 +137,22 @@ var FieldsObjectPayload = Type("FieldsObjectPayload", func() {
 
 /**
 * Address
- */
+**/
 
 var Address = MediaType("application/easypost.address+json", func() {
 	Reference(AddressPayload)
 	Attributes(func() {
-		Attribute("id")
-		Attribute("object")
-		Attribute("mode")
+		Attribute("id", String, "Unique, begins with \"adr_\"", func() {
+			Pattern("^adr_")
+		})
+		Attribute("object", String, "Always: \"Address\"", func() {
+			Pattern("^Address$")
+			Default("Address")
+		})
+		Attribute("mode", String, "Set based on which api-key you used, either \"test\" or \"production\"", func() {
+			Enum("test", "production")
+			Default("test")
+		})
 		Attribute("street1")
 		Attribute("street2")
 		Attribute("city")
@@ -163,7 +167,9 @@ var Address = MediaType("application/easypost.address+json", func() {
 		Attribute("email")
 		Attribute("federal_tax_id")
 		Attribute("state_tax_id")
-		Attribute("verifications")
+		Attribute("created_at", String, "Time Created")
+		Attribute("updated_at", String, "Time Last Updated")
+		Attribute("verifications", Verifications, "The result of any verifications requested")
 
 		Required("id", "object")
 	})
@@ -185,16 +191,17 @@ var Address = MediaType("application/easypost.address+json", func() {
 		Attribute("email")
 		Attribute("federal_tax_id")
 		Attribute("state_tax_id")
+		Attribute("created_at")
+		Attribute("updated_at")
 		Attribute("verifications")
 	})
 })
 
-/*// Verifications ...
+// Verifications ...
 var Verifications = MediaType("application/easypost.address_verifications+json", func() {
-	Reference(VerificationsPayload)
 	Attributes(func() {
-		Attribute("zip4")
-		Attribute("delivery")
+		Attribute("zip4", Verification, "Only applicable to US addresses - checks and sets the ZIP+4.")
+		Attribute("delivery", Verification, "Checks that the address is deliverable and makes minor corrections to spelling/format. US addresses will also have their \"residential\" status checked and set.")
 	})
 	View("default", func() {
 		Attribute("zip4")
@@ -204,10 +211,9 @@ var Verifications = MediaType("application/easypost.address_verifications+json",
 
 // Verification ...
 var Verification = MediaType("application/easypost.address_verification+json", func() {
-	Reference(VerificationPayload)
 	Attributes(func() {
-		Attribute("success")
-		Attribute("errors")
+		Attribute("success", Boolean, "The success of the verification")
+		Attribute("errors", ArrayOf(FieldError), "All errors that caused the verification to fail")
 	})
 	View("default", func() {
 		Attribute("success")
@@ -215,20 +221,15 @@ var Verification = MediaType("application/easypost.address_verification+json", f
 	})
 })
 
-
-*/
+// FieldError ...
+var FieldError = Type("application/easypost.gield_error+json", func() {
+	Attribute("field", String, "Field of the request that the error describes")
+	Attribute("message", String, "Human readable description of the problem")
+})
 
 var AddressPayload = Type("AddressPayload", func() {
 	Description("Address objects are used to represent people, places, and organizations in a number of contexts. For example, a Shipment requires a to_address and from_address to accurately calculate rates and generate postage.")
-	Attribute("id", String, "Unique, begins with \"adr_\"", func() {
-		Pattern("^adr_")
-	})
-	Attribute("object", String, "Always: \"Address\"", func() {
-		Pattern("^Address$")
-		Default("Address")
-	})
 
-	Attribute("mode", String, "Set based on which api-key you used, either \"test\" or \"production\"")
 	Attribute("street1", String, "First line of the address")
 	Attribute("street2", String, "Second line of the address")
 	Attribute("city", String, "City the address is located in")
@@ -243,23 +244,13 @@ var AddressPayload = Type("AddressPayload", func() {
 	Attribute("email", String, "Email to reach the person or organization")
 	Attribute("federal_tax_id", String, "Federal tax identifier of the person or organization")
 	Attribute("state_tax_id", String, "	State tax identifier of the person or organization")
-	Attribute("verifications", VerificationsPayload, "The result of any verifications requested")
 
-	Required("id", "object")
+	Attribute("verify", ArrayOf(String), "The verifications to perform when creating. verify_strict takes precedence")
+	Attribute("verify_strict", ArrayOf(String), "The verifications to perform when creating. The failure of any of these verifications causes the whole request to fail")
+
+	Required("street1", "city", "state", "zip", "country")
 })
 
-var VerificationsPayload = Type("VerificationsPayload", func() {
-	Attribute("zip4", VerificationPayload, "Only applicable to US addresses - checks and sets the ZIP+4.")
-	Attribute("delivery", VerificationPayload, "Checks that the address is deliverable and makes minor corrections to spelling/format. US addresses will also have their \"residential\" status checked and set.")
-})
-
-var VerificationPayload = Type("VerificationPayload", func() {
-	Attribute("success", Boolean, "The success of the verification")
-	Attribute("errors", ArrayOf(FieldError), "All errors that caused the verification to fail")
-})
-
-// FieldError ...
-var FieldError = Type("application/easypost.gield_error+json", func() {
-	Attribute("field", String, "Field of the request that the error describes")
-	Attribute("message", String, "Human readable description of the problem")
-})
+/**
+* Parcels
+**/

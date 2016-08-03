@@ -30,13 +30,14 @@ func NewCarrierAccountController(service *goa.Service) *CarrierAccountController
 func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) error {
 	// CarrierAccountController_Create: start_implement
 
+	account := &app.EasypostCarrierAccounts{}
 	payload := ctx.Payload
 
 	// Clone
 	if payload.Clone {
 		// TODO: copy everything, then override reference and description.
-		payload.Clone = false // for now
 	}
+	account.Clone = false // for now
 
 	// Type
 	if payload.Type == "EndiciaAccount" {
@@ -80,17 +81,12 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 		return err
 	}
 	defer fileHandler.Close()
-	payload.ID = &id
+	account.ID = id
 
 	// Readable
 	if payload.Readable == nil {
-		payload.Readable = sourceType.Readable
+		account.Readable = sourceType.Readable
 	}
-
-	// Time
-	now := time.Now().UTC().Format("2006-01-02T15:04:05Z")
-	payload.CreatedAt = &now
-	payload.UpdatedAt = &now
 
 	// Credentials & Fields
 	if payload.Fields == nil {
@@ -118,7 +114,7 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 			fields := &app.FieldsObjectPayload{
 				Credentials: &f,
 			}
-			payload.Fields = fields
+			account.Fields = fields
 		}
 	} else {
 		if payload.Fields.Credentials != nil {
@@ -137,7 +133,7 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 			if err != nil {
 				return err
 			}
-			payload.Credentials = &f
+			account.Credentials = &f
 		}
 	}
 
@@ -167,7 +163,7 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 			fields := &app.FieldsObjectPayload{
 				TestCredentials: &f,
 			}
-			payload.Fields = fields
+			account.Fields = fields
 		}
 	} else {
 		if payload.Fields.TestCredentials != nil {
@@ -186,14 +182,14 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 			if err != nil {
 				return err
 			}
-			payload.TestCredentials = &f
+			account.TestCredentials = &f
 		}
 	}
 
 	// TODO: make sure account fields and account_type fields match
 
 	// marshall to string
-	b, err := json.Marshal(payload)
+	b, err := json.Marshal(account)
 	if err != nil {
 		return err
 	}
@@ -203,20 +199,8 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 		return err
 	}
 
-	// Unmarshall to EasypostCarrierAccounts
-	fileData, e := ioutil.ReadFile(filepath)
-	if e != nil {
-		return e
-	}
-
-	resJson := &app.EasypostCarrierAccounts{}
-	e = json.Unmarshal(fileData, resJson)
-	if e != nil {
-		return e
-	}
-
 	// CarrierAccountController_Create: end_implement
-	return ctx.OK(resJson)
+	return ctx.OK(account)
 }
 
 // Delete runs the delete action.

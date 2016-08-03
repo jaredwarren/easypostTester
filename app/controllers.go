@@ -84,7 +84,6 @@ func unmarshalCreateAddressPayload(ctx context.Context, service *goa.Service, re
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
-	payload.Finalize()
 	if err := payload.Validate(); err != nil {
 		return err
 	}

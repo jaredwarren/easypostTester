@@ -12,18 +12,12 @@ import (
 type CreateCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
 	Clone bool `form:"clone" json:"clone" xml:"clone"`
-	// The name used when displaying a readable value for the type of the account
-	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
 	Credentials *interface{} `form:"credentials,omitempty" json:"credentials,omitempty" xml:"credentials,omitempty"`
 	// An optional, user-readable field to help distinguish accounts
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	// Contains "credentials" and/or "test_credentials", or may be empty
 	Fields *FieldsObjectPayload `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
-	// Unique, begins with "ca_"
-	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	// Always: "CarrierAccount"
-	Object string `form:"object" json:"object" xml:"object"`
 	// The name used when displaying a readable value for the type of the account
 	Readable *string `form:"readable,omitempty" json:"readable,omitempty" xml:"readable,omitempty"`
 	// An optional field that may be used in place of carrier_account_id in other API endpoints
@@ -32,8 +26,6 @@ type CreateCarrierAccountPayload struct {
 	TestCredentials *interface{} `form:"test_credentials,omitempty" json:"test_credentials,omitempty" xml:"test_credentials,omitempty"`
 	// The name of the carrier type. Note that "EndiciaAccount" is the current USPS integration account type
 	Type string `form:"type" json:"type" xml:"type"`
-	// The name used when displaying a readable value for the type of the account
-	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
 // CreateCarrierAccountPath computes a request path to the create action of carrier_account.
@@ -164,18 +156,12 @@ func (c *Client) NewShowCarrierAccountRequest(ctx context.Context, path string) 
 type UpdateCarrierAccountPayload struct {
 	// If clone is true, only the reference and description are possible to update
 	Clone bool `form:"clone" json:"clone" xml:"clone"`
-	// The name used when displaying a readable value for the type of the account
-	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
 	Credentials *interface{} `form:"credentials,omitempty" json:"credentials,omitempty" xml:"credentials,omitempty"`
 	// An optional, user-readable field to help distinguish accounts
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	// Contains "credentials" and/or "test_credentials", or may be empty
 	Fields *FieldsObjectPayload `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
-	// Unique, begins with "ca_"
-	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	// Always: "CarrierAccount"
-	Object string `form:"object" json:"object" xml:"object"`
 	// The name used when displaying a readable value for the type of the account
 	Readable *string `form:"readable,omitempty" json:"readable,omitempty" xml:"readable,omitempty"`
 	// An optional field that may be used in place of carrier_account_id in other API endpoints
@@ -184,8 +170,6 @@ type UpdateCarrierAccountPayload struct {
 	TestCredentials *interface{} `form:"test_credentials,omitempty" json:"test_credentials,omitempty" xml:"test_credentials,omitempty"`
 	// The name of the carrier type. Note that "EndiciaAccount" is the current USPS integration account type
 	Type string `form:"type" json:"type" xml:"type"`
-	// The name used when displaying a readable value for the type of the account
-	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
 // UpdateCarrierAccountPath computes a request path to the update action of carrier_account.

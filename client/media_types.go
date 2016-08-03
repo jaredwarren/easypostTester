@@ -29,6 +29,8 @@ type EasypostAddress struct {
 	Company *string `form:"company,omitempty" json:"company,omitempty" xml:"company,omitempty"`
 	// ISO 3166 country code for the country the address is located in
 	Country *string `form:"country,omitempty" json:"country,omitempty" xml:"country,omitempty"`
+	// Time Created
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Email to reach the person or organization
 	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 	// Federal tax identifier of the person or organization
@@ -36,7 +38,7 @@ type EasypostAddress struct {
 	// Unique, begins with "adr_"
 	ID string `form:"id" json:"id" xml:"id"`
 	// Set based on which api-key you used, either "test" or "production"
-	Mode *string `form:"mode,omitempty" json:"mode,omitempty" xml:"mode,omitempty"`
+	Mode string `form:"mode" json:"mode" xml:"mode"`
 	// Name of the person. Both name and company can be included
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// Always: "Address"
@@ -53,8 +55,10 @@ type EasypostAddress struct {
 	Street1 *string `form:"street1,omitempty" json:"street1,omitempty" xml:"street1,omitempty"`
 	// Second line of the address
 	Street2 *string `form:"street2,omitempty" json:"street2,omitempty" xml:"street2,omitempty"`
+	// Time Last Updated
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 	// The result of any verifications requested
-	Verifications *VerificationsPayload `form:"verifications,omitempty" json:"verifications,omitempty" xml:"verifications,omitempty"`
+	Verifications *EasypostAddressVerifications `form:"verifications,omitempty" json:"verifications,omitempty" xml:"verifications,omitempty"`
 	// ZIP or postal code the address is located in
 	Zip *string `form:"zip,omitempty" json:"zip,omitempty" xml:"zip,omitempty"`
 }
@@ -71,6 +75,9 @@ func (mt *EasypostAddress) Validate() (err error) {
 	if ok := goa.ValidatePattern(`^adr_`, mt.ID); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, mt.ID, `^adr_`))
 	}
+	if !(mt.Mode == "test" || mt.Mode == "production") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.mode`, mt.Mode, []interface{}{"test", "production"}))
+	}
 	if ok := goa.ValidatePattern(`^Address$`, mt.Object); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.object`, mt.Object, `^Address$`))
 	}
@@ -80,6 +87,40 @@ func (mt *EasypostAddress) Validate() (err error) {
 // DecodeEasypostAddress decodes the EasypostAddress instance encoded in resp body.
 func (c *Client) DecodeEasypostAddress(resp *http.Response) (*EasypostAddress, error) {
 	var decoded EasypostAddress
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// EasypostAddress_verification media type (default view)
+//
+// Identifier: application/easypost.address_verification+json
+type EasypostAddressVerification struct {
+	// All errors that caused the verification to fail
+	Errors []*ApplicationEasypostGieldErrorJSON `form:"errors,omitempty" json:"errors,omitempty" xml:"errors,omitempty"`
+	// The success of the verification
+	Success *bool `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// DecodeEasypostAddressVerification decodes the EasypostAddressVerification instance encoded in resp body.
+func (c *Client) DecodeEasypostAddressVerification(resp *http.Response) (*EasypostAddressVerification, error) {
+	var decoded EasypostAddressVerification
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// EasypostAddress_verifications media type (default view)
+//
+// Identifier: application/easypost.address_verifications+json
+type EasypostAddressVerifications struct {
+	// Checks that the address is deliverable and makes minor corrections to spelling/format. US addresses will also have their "residential" status checked and set.
+	Delivery *EasypostAddressVerification `form:"delivery,omitempty" json:"delivery,omitempty" xml:"delivery,omitempty"`
+	// Only applicable to US addresses - checks and sets the ZIP+4.
+	Zip4 *EasypostAddressVerification `form:"zip4,omitempty" json:"zip4,omitempty" xml:"zip4,omitempty"`
+}
+
+// DecodeEasypostAddressVerifications decodes the EasypostAddressVerifications instance encoded in resp body.
+func (c *Client) DecodeEasypostAddressVerifications(resp *http.Response) (*EasypostAddressVerifications, error) {
+	var decoded EasypostAddressVerifications
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }

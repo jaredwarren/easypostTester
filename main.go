@@ -18,12 +18,15 @@ func main() {
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
+	// Mount "address" controller
+	c := NewAddressController(service)
+	app.MountAddressController(service, c)
 	// Mount "carrier_account" controller
-	c := NewCarrierAccountController(service)
-	app.MountCarrierAccountController(service, c)
+	c2 := NewCarrierAccountController(service)
+	app.MountCarrierAccountController(service, c2)
 	// Mount "carrier_types" controller
-	c2 := NewCarrierTypesController(service)
-	app.MountCarrierTypesController(service, c2)
+	c3 := NewCarrierTypesController(service)
+	app.MountCarrierTypesController(service, c3)
 
 	// Start service
 	if err := service.ListenAndServe(":8080"); err != nil {

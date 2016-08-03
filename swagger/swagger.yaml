@@ -27,20 +27,8 @@ definitions:
       federal_tax_id:
         description: Federal tax identifier of the person or organization
         type: string
-      id:
-        description: Unique, begins with "adr_"
-        pattern: ^adr_
-        type: string
-      mode:
-        description: Set based on which api-key you used, either "test" or "production"
-        type: string
       name:
         description: Name of the person. Both name and company can be included
-        type: string
-      object:
-        default: Address
-        description: 'Always: "Address"'
-        pattern: ^Address$
         type: string
       phone:
         description: Phone number to reach the person or organization
@@ -60,14 +48,27 @@ definitions:
       street2:
         description: Second line of the address
         type: string
-      verifications:
-        $ref: '#/definitions/VerificationsPayload'
+      verify:
+        description: The verifications to perform when creating. verify_strict takes
+          precedence
+        items:
+          type: string
+        type: array
+      verify_strict:
+        description: The verifications to perform when creating. The failure of any
+          of these verifications causes the whole request to fail
+        items:
+          type: string
+        type: array
       zip:
         description: ZIP or postal code the address is located in
         type: string
     required:
-    - id
-    - object
+    - street1
+    - city
+    - state
+    - zip
+    - country
     title: CreateAddressPayload
     type: object
   CreateCarrierAccountPayload:
@@ -79,10 +80,6 @@ definitions:
         description: If clone is true, only the reference and description are possible
           to update
         type: boolean
-      created_at:
-        description: The name used when displaying a readable value for the type of
-          the account
-        type: string
       credentials:
         description: Unlike the "credentials" object contained in "fields", this nullable
           object contains just raw credential pairs for client library consumption
@@ -92,14 +89,6 @@ definitions:
         type: string
       fields:
         $ref: '#/definitions/FieldsObjectPayload'
-      id:
-        description: Unique, begins with "ca_"
-        type: string
-      object:
-        default: CarrierAccount
-        description: 'Always: "CarrierAccount"'
-        pattern: ^CarrierAccount$
-        type: string
       readable:
         description: The name used when displaying a readable value for the type of
           the account
@@ -117,10 +106,6 @@ definitions:
         description: The name of the carrier type. Note that "EndiciaAccount" is the
           current USPS integration account type
         type: string
-      updated_at:
-        description: The name used when displaying a readable value for the type of
-          the account
-        type: string
     required:
     - type
     title: CreateCarrierAccountPayload
@@ -132,34 +117,36 @@ definitions:
       city: Blanditiis consectetur aut vero tempore quibusdam ullam.
       company: Blanditiis minus.
       country: Et sequi maiores voluptates sunt corporis ut.
-      email: Aut eligendi.
-      federal_tax_id: Architecto praesentium.
+      created_at: Aut eligendi.
+      email: Architecto praesentium.
+      federal_tax_id: Tenetur unde eveniet aliquam ut est.
       id: adr_
-      mode: Tenetur unde eveniet aliquam ut est.
-      name: Quos vel qui quibusdam dolor est dicta.
+      mode: production
+      name: Vel qui quibusdam dolor est dicta nesciunt.
       object: Address
-      phone: Nisi id.
-      residential: false
-      state: Inventore quia.
-      state_tax_id: Veritatis neque occaecati.
-      street1: Sint nobis sed similique sequi corporis.
-      street2: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+      phone: Id deleniti nostrum inventore quia ea.
+      residential: true
+      state: Occaecati esse sint.
+      state_tax_id: Sed similique sequi corporis.
+      street1: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+      street2: Quis autem amet cupiditate eius voluptas magni.
+      updated_at: Natus eos facere consequuntur.
       verifications:
         delivery:
           errors:
-          - field: Autem amet cupiditate eius voluptas magni optio.
-            message: Eos facere consequuntur ut cupiditate corrupti.
-          - field: Autem amet cupiditate eius voluptas magni optio.
-            message: Eos facere consequuntur ut cupiditate corrupti.
+          - field: Corrupti similique quo id omnis fugit.
+            message: Temporibus laudantium ipsam.
+          - field: Corrupti similique quo id omnis fugit.
+            message: Temporibus laudantium ipsam.
           success: false
         zip4:
           errors:
-          - field: Autem amet cupiditate eius voluptas magni optio.
-            message: Eos facere consequuntur ut cupiditate corrupti.
-          - field: Autem amet cupiditate eius voluptas magni optio.
-            message: Eos facere consequuntur ut cupiditate corrupti.
+          - field: Corrupti similique quo id omnis fugit.
+            message: Temporibus laudantium ipsam.
+          - field: Corrupti similique quo id omnis fugit.
+            message: Temporibus laudantium ipsam.
           success: false
-      zip: Id omnis.
+      zip: Ex at tenetur delectus enim.
     properties:
       carrier_facility:
         description: The specific designation for the address (only relevant if the
@@ -179,13 +166,17 @@ definitions:
           in
         example: Et sequi maiores voluptates sunt corporis ut.
         type: string
+      created_at:
+        description: Time Created
+        example: Aut eligendi.
+        type: string
       email:
         description: Email to reach the person or organization
-        example: Aut eligendi.
+        example: Architecto praesentium.
         type: string
       federal_tax_id:
         description: Federal tax identifier of the person or organization
-        example: Architecto praesentium.
+        example: Tenetur unde eveniet aliquam ut est.
         type: string
       id:
         description: Unique, begins with "adr_"
@@ -193,12 +184,16 @@ definitions:
         pattern: ^adr_
         type: string
       mode:
+        default: test
         description: Set based on which api-key you used, either "test" or "production"
-        example: Tenetur unde eveniet aliquam ut est.
+        enum:
+        - test
+        - production
+        example: production
         type: string
       name:
         description: Name of the person. Both name and company can be included
-        example: Quos vel qui quibusdam dolor est dicta.
+        example: Vel qui quibusdam dolor est dicta nesciunt.
         type: string
       object:
         default: Address
@@ -208,38 +203,70 @@ definitions:
         type: string
       phone:
         description: Phone number to reach the person or organization
-        example: Nisi id.
+        example: Id deleniti nostrum inventore quia ea.
         type: string
       residential:
         description: Whether or not this address would be considered residential
-        example: false
+        example: true
         type: boolean
       state:
         description: State or province the address is located in
-        example: Inventore quia.
+        example: Occaecati esse sint.
         type: string
       state_tax_id:
         description: "\tState tax identifier of the person or organization"
-        example: Veritatis neque occaecati.
+        example: Sed similique sequi corporis.
         type: string
       street1:
         description: First line of the address
-        example: Sint nobis sed similique sequi corporis.
+        example: Quisquam reiciendis sunt deserunt vel culpa veritatis.
         type: string
       street2:
         description: Second line of the address
-        example: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+        example: Quis autem amet cupiditate eius voluptas magni.
+        type: string
+      updated_at:
+        description: Time Last Updated
+        example: Natus eos facere consequuntur.
         type: string
       verifications:
-        $ref: '#/definitions/VerificationsPayload'
+        $ref: '#/definitions/EasypostAddress_verifications'
       zip:
         description: ZIP or postal code the address is located in
-        example: Id omnis.
+        example: Ex at tenetur delectus enim.
         type: string
     required:
     - id
     - object
     title: 'Mediatype identifier: application/easypost.address+json'
+    type: object
+  EasypostAddress_verification:
+    description: EasypostAddress_verification media type (default view)
+    properties:
+      errors:
+        description: All errors that caused the verification to fail
+        example:
+        - field: Corrupti similique quo id omnis fugit.
+          message: Temporibus laudantium ipsam.
+        - field: Corrupti similique quo id omnis fugit.
+          message: Temporibus laudantium ipsam.
+        items:
+          $ref: '#/definitions/application/easypost.gield_error+json'
+        type: array
+      success:
+        description: The success of the verification
+        example: false
+        type: boolean
+    title: 'Mediatype identifier: application/easypost.address_verification+json'
+    type: object
+  EasypostAddress_verifications:
+    description: EasypostAddress_verifications media type (default view)
+    properties:
+      delivery:
+        $ref: '#/definitions/EasypostAddress_verification'
+      zip4:
+        $ref: '#/definitions/EasypostAddress_verification'
+    title: 'Mediatype identifier: application/easypost.address_verifications+json'
     type: object
   EasypostCarrier_accounts:
     description: A CarrierAccount encapsulates your credentials with the carrier.
@@ -247,21 +274,22 @@ definitions:
       (default view)
     example:
       clone: true
-      created_at: Temporibus laudantium ipsam.
-      credentials: 1992-10-20T21:51:24-06:00
-      description: At tenetur delectus.
+      created_at: Delectus voluptatem.
+      credentials: 1.8787144e+18
+      description: Culpa itaque laborum.
       fields:
         auto_link: true
-        credentials: 1995-07-25T09:21:00-06:00
-        custom_workflow: true
-        test_credentials: false
-      id: Dolorem quia molestiae autem.
+        credentials: 0.6844517
+        custom_workflow: false
+        test_credentials: 6.091365e+17
+      id: Et hic consequatur optio ut cupiditate maxime.
+      logo: Ab eos alias quasi.
       object: CarrierAccount
-      readable: Amet eum beatae.
-      reference: Delectus voluptatem.
-      test_credentials: 1.8787144e+18
-      type: Culpa itaque laborum.
-      updated_at: Aut qui iure earum repudiandae possimus et.
+      readable: Velit ullam ut.
+      reference: Impedit aliquam hic.
+      test_credentials: 2.8149617e+18
+      type: Corporis quaerat.
+      updated_at: Alias perspiciatis modi.
     properties:
       clone:
         default: false
@@ -272,22 +300,22 @@ definitions:
       created_at:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Temporibus laudantium ipsam.
+        example: Delectus voluptatem.
         type: string
       credentials:
         description: Unlike the "credentials" object contained in "fields", this nullable
           object contains just raw credential pairs for client library consumption
-        example: 1992-10-20T21:51:24-06:00
+        example: 1.8787144e+18
         type: any
       description:
         description: An optional, user-readable field to help distinguish accounts
-        example: At tenetur delectus.
+        example: Culpa itaque laborum.
         type: string
       fields:
         $ref: '#/definitions/FieldsObjectPayload'
       id:
         description: Unique, begins with "ca_"
-        example: Dolorem quia molestiae autem.
+        example: Et hic consequatur optio ut cupiditate maxime.
         type: string
       object:
         default: CarrierAccount
@@ -298,28 +326,28 @@ definitions:
       readable:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Amet eum beatae.
+        example: Velit ullam ut.
         type: string
       reference:
         description: An optional field that may be used in place of carrier_account_id
           in other API endpoints
-        example: Delectus voluptatem.
+        example: Impedit aliquam hic.
         type: string
       test_credentials:
         description: Unlike the "test_credentials" object contained in "fields", this
           nullable object contains just raw test_credential pairs for client library
           consumption
-        example: 1.8787144e+18
+        example: 2.8149617e+18
         type: any
       type:
         description: The name of the carrier type. Note that "EndiciaAccount" is the
           current USPS integration account type
-        example: Culpa itaque laborum.
+        example: Corporis quaerat.
         type: string
       updated_at:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Aut qui iure earum repudiandae possimus et.
+        example: Alias perspiciatis modi.
         type: string
     required:
     - id
@@ -333,12 +361,12 @@ definitions:
     example:
       fields:
         auto_link: false
-        credentials: 3.16106e+18
+        credentials: 2007-04-03T15:35:34-06:00
         custom_workflow: false
-        test_credentials: false
+        test_credentials: true
       object: CarrierType
-      readable: Ab eos alias quasi.
-      type: Velit ullam ut.
+      readable: Vel nostrum.
+      type: Et reiciendis consequuntur.
     properties:
       fields:
         $ref: '#/definitions/EasypostFields_object'
@@ -351,12 +379,12 @@ definitions:
       readable:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Ab eos alias quasi.
+        example: Vel nostrum.
         type: string
       type:
         description: The name of the carrier type. Note that "EndiciaAccount" is the
           current USPS integration account type
-        example: Velit ullam ut.
+        example: Et reiciendis consequuntur.
         type: string
     required:
     - type
@@ -370,20 +398,28 @@ definitions:
     example:
     - fields:
         auto_link: false
-        credentials: 3.16106e+18
+        credentials: 2007-04-03T15:35:34-06:00
         custom_workflow: false
-        test_credentials: false
+        test_credentials: true
       object: CarrierType
-      readable: Ab eos alias quasi.
-      type: Velit ullam ut.
+      readable: Vel nostrum.
+      type: Et reiciendis consequuntur.
     - fields:
         auto_link: false
-        credentials: 3.16106e+18
+        credentials: 2007-04-03T15:35:34-06:00
         custom_workflow: false
-        test_credentials: false
+        test_credentials: true
       object: CarrierType
-      readable: Ab eos alias quasi.
-      type: Velit ullam ut.
+      readable: Vel nostrum.
+      type: Et reiciendis consequuntur.
+    - fields:
+        auto_link: false
+        credentials: 2007-04-03T15:35:34-06:00
+        custom_workflow: false
+        test_credentials: true
+      object: CarrierType
+      readable: Vel nostrum.
+      type: Et reiciendis consequuntur.
     items:
       $ref: '#/definitions/EasypostCarrier_types'
     title: 'Mediatype identifier: application/easypost.carrier_types+json; type=collection'
@@ -398,7 +434,7 @@ definitions:
         type: boolean
       credentials:
         description: Credentials used in the production environment.
-        example: 3.16106e+18
+        example: 2007-04-03T15:35:34-06:00
         type: any
       custom_workflow:
         description: When present, a seperate authentication process will be required
@@ -407,7 +443,7 @@ definitions:
         type: boolean
       test_credentials:
         description: Credentials used in the test environment.
-        example: false
+        example: true
         type: any
     required:
     - credentials
@@ -423,17 +459,17 @@ definitions:
         type: boolean
       credentials:
         description: Credentials used in the production environment.
-        example: 1995-07-25T09:21:00-06:00
+        example: 0.6844517
         type: any
       custom_workflow:
         default: false
         description: When present, a seperate authentication process will be required
           through the UI to link this account type.
-        example: true
+        example: false
         type: boolean
       test_credentials:
         description: Credentials used in the test environment.
-        example: false
+        example: 6.091365e+17
         type: any
     title: FieldsObjectPayload
     type: object
@@ -446,10 +482,6 @@ definitions:
         description: If clone is true, only the reference and description are possible
           to update
         type: boolean
-      created_at:
-        description: The name used when displaying a readable value for the type of
-          the account
-        type: string
       credentials:
         description: Unlike the "credentials" object contained in "fields", this nullable
           object contains just raw credential pairs for client library consumption
@@ -459,14 +491,6 @@ definitions:
         type: string
       fields:
         $ref: '#/definitions/FieldsObjectPayload'
-      id:
-        description: Unique, begins with "ca_"
-        type: string
-      object:
-        default: CarrierAccount
-        description: 'Always: "CarrierAccount"'
-        pattern: ^CarrierAccount$
-        type: string
       readable:
         description: The name used when displaying a readable value for the type of
           the account
@@ -484,49 +508,19 @@ definitions:
         description: The name of the carrier type. Note that "EndiciaAccount" is the
           current USPS integration account type
         type: string
-      updated_at:
-        description: The name used when displaying a readable value for the type of
-          the account
-        type: string
     required:
     - type
     title: UpdateCarrierAccountPayload
-    type: object
-  VerificationPayload:
-    properties:
-      errors:
-        description: All errors that caused the verification to fail
-        example:
-        - field: Autem amet cupiditate eius voluptas magni optio.
-          message: Eos facere consequuntur ut cupiditate corrupti.
-        - field: Autem amet cupiditate eius voluptas magni optio.
-          message: Eos facere consequuntur ut cupiditate corrupti.
-        items:
-          $ref: '#/definitions/application/easypost.gield_error+json'
-        type: array
-      success:
-        description: The success of the verification
-        example: false
-        type: boolean
-    title: VerificationPayload
-    type: object
-  VerificationsPayload:
-    properties:
-      delivery:
-        $ref: '#/definitions/VerificationPayload'
-      zip4:
-        $ref: '#/definitions/VerificationPayload'
-    title: VerificationsPayload
     type: object
   application/easypost.gield_error+json:
     properties:
       field:
         description: Field of the request that the error describes
-        example: Autem amet cupiditate eius voluptas magni optio.
+        example: Corrupti similique quo id omnis fugit.
         type: string
       message:
         description: Human readable description of the problem
-        example: Eos facere consequuntur ut cupiditate corrupti.
+        example: Temporibus laudantium ipsam.
         type: string
     title: application/easypost.gield_error+json
     type: object

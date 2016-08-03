@@ -13,39 +13,35 @@ type CreateAddressPayload struct {
 	// The specific designation for the address (only relevant if the address is a carrier facility)
 	CarrierFacility *string `form:"carrier_facility,omitempty" json:"carrier_facility,omitempty" xml:"carrier_facility,omitempty"`
 	// City the address is located in
-	City *string `form:"city,omitempty" json:"city,omitempty" xml:"city,omitempty"`
+	City string `form:"city" json:"city" xml:"city"`
 	// Name of the organization. Both name and company can be included
 	Company *string `form:"company,omitempty" json:"company,omitempty" xml:"company,omitempty"`
 	// ISO 3166 country code for the country the address is located in
-	Country *string `form:"country,omitempty" json:"country,omitempty" xml:"country,omitempty"`
+	Country string `form:"country" json:"country" xml:"country"`
 	// Email to reach the person or organization
 	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 	// Federal tax identifier of the person or organization
 	FederalTaxID *string `form:"federal_tax_id,omitempty" json:"federal_tax_id,omitempty" xml:"federal_tax_id,omitempty"`
-	// Unique, begins with "adr_"
-	ID string `form:"id" json:"id" xml:"id"`
-	// Set based on which api-key you used, either "test" or "production"
-	Mode *string `form:"mode,omitempty" json:"mode,omitempty" xml:"mode,omitempty"`
 	// Name of the person. Both name and company can be included
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// Always: "Address"
-	Object string `form:"object" json:"object" xml:"object"`
 	// Phone number to reach the person or organization
 	Phone *string `form:"phone,omitempty" json:"phone,omitempty" xml:"phone,omitempty"`
 	// Whether or not this address would be considered residential
 	Residential *bool `form:"residential,omitempty" json:"residential,omitempty" xml:"residential,omitempty"`
 	// State or province the address is located in
-	State *string `form:"state,omitempty" json:"state,omitempty" xml:"state,omitempty"`
+	State string `form:"state" json:"state" xml:"state"`
 	// 	State tax identifier of the person or organization
 	StateTaxID *string `form:"state_tax_id,omitempty" json:"state_tax_id,omitempty" xml:"state_tax_id,omitempty"`
 	// First line of the address
-	Street1 *string `form:"street1,omitempty" json:"street1,omitempty" xml:"street1,omitempty"`
+	Street1 string `form:"street1" json:"street1" xml:"street1"`
 	// Second line of the address
 	Street2 *string `form:"street2,omitempty" json:"street2,omitempty" xml:"street2,omitempty"`
-	// The result of any verifications requested
-	Verifications *VerificationsPayload `form:"verifications,omitempty" json:"verifications,omitempty" xml:"verifications,omitempty"`
+	// The verifications to perform when creating. verify_strict takes precedence
+	Verify []string `form:"verify,omitempty" json:"verify,omitempty" xml:"verify,omitempty"`
+	// The verifications to perform when creating. The failure of any of these verifications causes the whole request to fail
+	VerifyStrict []string `form:"verify_strict,omitempty" json:"verify_strict,omitempty" xml:"verify_strict,omitempty"`
 	// ZIP or postal code the address is located in
-	Zip *string `form:"zip,omitempty" json:"zip,omitempty" xml:"zip,omitempty"`
+	Zip string `form:"zip" json:"zip" xml:"zip"`
 }
 
 // CreateAddressPath computes a request path to the create action of address.

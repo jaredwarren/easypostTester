@@ -2,6 +2,74 @@ basePath: /v2
 consumes:
 - application/json
 definitions:
+  CreateAddressPayload:
+    description: Address objects are used to represent people, places, and organizations
+      in a number of contexts. For example, a Shipment requires a to_address and from_address
+      to accurately calculate rates and generate postage.
+    properties:
+      carrier_facility:
+        description: The specific designation for the address (only relevant if the
+          address is a carrier facility)
+        type: string
+      city:
+        description: City the address is located in
+        type: string
+      company:
+        description: Name of the organization. Both name and company can be included
+        type: string
+      country:
+        description: ISO 3166 country code for the country the address is located
+          in
+        type: string
+      email:
+        description: Email to reach the person or organization
+        type: string
+      federal_tax_id:
+        description: Federal tax identifier of the person or organization
+        type: string
+      id:
+        description: Unique, begins with "adr_"
+        pattern: ^adr_
+        type: string
+      mode:
+        description: Set based on which api-key you used, either "test" or "production"
+        type: string
+      name:
+        description: Name of the person. Both name and company can be included
+        type: string
+      object:
+        default: Address
+        description: 'Always: "Address"'
+        pattern: ^Address$
+        type: string
+      phone:
+        description: Phone number to reach the person or organization
+        type: string
+      residential:
+        description: Whether or not this address would be considered residential
+        type: boolean
+      state:
+        description: State or province the address is located in
+        type: string
+      state_tax_id:
+        description: "\tState tax identifier of the person or organization"
+        type: string
+      street1:
+        description: First line of the address
+        type: string
+      street2:
+        description: Second line of the address
+        type: string
+      verifications:
+        $ref: '#/definitions/VerificationsPayload'
+      zip:
+        description: ZIP or postal code the address is located in
+        type: string
+    required:
+    - id
+    - object
+    title: CreateAddressPayload
+    type: object
   CreateCarrierAccountPayload:
     description: A CarrierAccount encapsulates your credentials with the carrier.
       The CarrierAccount object provides CRUD operations for all CarrierAccounts.
@@ -57,85 +125,169 @@ definitions:
     - type
     title: CreateCarrierAccountPayload
     type: object
+  EasypostAddress:
+    description: EasypostAddress media type (default view)
+    example:
+      carrier_facility: Id eos.
+      city: Blanditiis consectetur aut vero tempore quibusdam ullam.
+      company: Blanditiis minus.
+      country: Et sequi maiores voluptates sunt corporis ut.
+      email: Aut eligendi.
+      federal_tax_id: Architecto praesentium.
+      id: adr_
+      mode: Tenetur unde eveniet aliquam ut est.
+      name: Quos vel qui quibusdam dolor est dicta.
+      object: Address
+      phone: Nisi id.
+      residential: false
+      state: Inventore quia.
+      state_tax_id: Veritatis neque occaecati.
+      street1: Sint nobis sed similique sequi corporis.
+      street2: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+      verifications:
+        delivery:
+          errors:
+          - field: Autem amet cupiditate eius voluptas magni optio.
+            message: Eos facere consequuntur ut cupiditate corrupti.
+          - field: Autem amet cupiditate eius voluptas magni optio.
+            message: Eos facere consequuntur ut cupiditate corrupti.
+          success: false
+        zip4:
+          errors:
+          - field: Autem amet cupiditate eius voluptas magni optio.
+            message: Eos facere consequuntur ut cupiditate corrupti.
+          - field: Autem amet cupiditate eius voluptas magni optio.
+            message: Eos facere consequuntur ut cupiditate corrupti.
+          success: false
+      zip: Id omnis.
+    properties:
+      carrier_facility:
+        description: The specific designation for the address (only relevant if the
+          address is a carrier facility)
+        example: Id eos.
+        type: string
+      city:
+        description: City the address is located in
+        example: Blanditiis consectetur aut vero tempore quibusdam ullam.
+        type: string
+      company:
+        description: Name of the organization. Both name and company can be included
+        example: Blanditiis minus.
+        type: string
+      country:
+        description: ISO 3166 country code for the country the address is located
+          in
+        example: Et sequi maiores voluptates sunt corporis ut.
+        type: string
+      email:
+        description: Email to reach the person or organization
+        example: Aut eligendi.
+        type: string
+      federal_tax_id:
+        description: Federal tax identifier of the person or organization
+        example: Architecto praesentium.
+        type: string
+      id:
+        description: Unique, begins with "adr_"
+        example: adr_
+        pattern: ^adr_
+        type: string
+      mode:
+        description: Set based on which api-key you used, either "test" or "production"
+        example: Tenetur unde eveniet aliquam ut est.
+        type: string
+      name:
+        description: Name of the person. Both name and company can be included
+        example: Quos vel qui quibusdam dolor est dicta.
+        type: string
+      object:
+        default: Address
+        description: 'Always: "Address"'
+        example: Address
+        pattern: ^Address$
+        type: string
+      phone:
+        description: Phone number to reach the person or organization
+        example: Nisi id.
+        type: string
+      residential:
+        description: Whether or not this address would be considered residential
+        example: false
+        type: boolean
+      state:
+        description: State or province the address is located in
+        example: Inventore quia.
+        type: string
+      state_tax_id:
+        description: "\tState tax identifier of the person or organization"
+        example: Veritatis neque occaecati.
+        type: string
+      street1:
+        description: First line of the address
+        example: Sint nobis sed similique sequi corporis.
+        type: string
+      street2:
+        description: Second line of the address
+        example: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+        type: string
+      verifications:
+        $ref: '#/definitions/VerificationsPayload'
+      zip:
+        description: ZIP or postal code the address is located in
+        example: Id omnis.
+        type: string
+    required:
+    - id
+    - object
+    title: 'Mediatype identifier: application/easypost.address+json'
+    type: object
   EasypostCarrier_accounts:
     description: A CarrierAccount encapsulates your credentials with the carrier.
       The CarrierAccount object provides CRUD operations for all CarrierAccounts.
       (default view)
     example:
-      clone: false
-      created_at: Non excepturi tenetur.
-      credentials:
-      - 35
-      - 96
-      - 147
-      - 69
-      - 217
-      - 203
-      - 78
-      - 24
-      - 189
-      - 143
-      - 95
-      - 202
-      - 176
-      - 209
-      - 17
-      - 105
-      description: Et saepe.
+      clone: true
+      created_at: Temporibus laudantium ipsam.
+      credentials: 1992-10-20T21:51:24-06:00
+      description: At tenetur delectus.
       fields:
         auto_link: true
-        credentials: 1970-02-20T19:43:19-07:00
+        credentials: 1995-07-25T09:21:00-06:00
         custom_workflow: true
-        test_credentials: 2000-05-16T17:07:22-06:00
-      id: ca_
+        test_credentials: false
+      id: Dolorem quia molestiae autem.
       object: CarrierAccount
-      readable: Placeat ducimus doloribus voluptates iusto.
-      reference: Labore voluptatem omnis consequuntur voluptatibus odit.
-      test_credentials: 0.08249953
-      type: Corporis doloremque voluptates esse magnam ut consequatur.
-      updated_at: Quo rerum et ut omnis praesentium non.
+      readable: Amet eum beatae.
+      reference: Delectus voluptatem.
+      test_credentials: 1.8787144e+18
+      type: Culpa itaque laborum.
+      updated_at: Aut qui iure earum repudiandae possimus et.
     properties:
       clone:
+        default: false
         description: If clone is true, only the reference and description are possible
           to update
-        example: false
+        example: true
         type: boolean
       created_at:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Non excepturi tenetur.
+        example: Temporibus laudantium ipsam.
         type: string
       credentials:
         description: Unlike the "credentials" object contained in "fields", this nullable
           object contains just raw credential pairs for client library consumption
-        example:
-        - 35
-        - 96
-        - 147
-        - 69
-        - 217
-        - 203
-        - 78
-        - 24
-        - 189
-        - 143
-        - 95
-        - 202
-        - 176
-        - 209
-        - 17
-        - 105
+        example: 1992-10-20T21:51:24-06:00
         type: any
       description:
         description: An optional, user-readable field to help distinguish accounts
-        example: Et saepe.
+        example: At tenetur delectus.
         type: string
       fields:
-        $ref: '#/definitions/EasypostFields_object'
+        $ref: '#/definitions/FieldsObjectPayload'
       id:
         description: Unique, begins with "ca_"
-        example: ca_
-        pattern: ^ca_
+        example: Dolorem quia molestiae autem.
         type: string
       object:
         default: CarrierAccount
@@ -146,28 +298,28 @@ definitions:
       readable:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Placeat ducimus doloribus voluptates iusto.
+        example: Amet eum beatae.
         type: string
       reference:
         description: An optional field that may be used in place of carrier_account_id
           in other API endpoints
-        example: Labore voluptatem omnis consequuntur voluptatibus odit.
+        example: Delectus voluptatem.
         type: string
       test_credentials:
         description: Unlike the "test_credentials" object contained in "fields", this
           nullable object contains just raw test_credential pairs for client library
           consumption
-        example: 0.08249953
+        example: 1.8787144e+18
         type: any
       type:
         description: The name of the carrier type. Note that "EndiciaAccount" is the
           current USPS integration account type
-        example: Corporis doloremque voluptates esse magnam ut consequatur.
+        example: Culpa itaque laborum.
         type: string
       updated_at:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Quo rerum et ut omnis praesentium non.
+        example: Aut qui iure earum repudiandae possimus et.
         type: string
     required:
     - id
@@ -180,13 +332,13 @@ definitions:
       when a new carrier is added to EasyPost. (default view)
     example:
       fields:
-        auto_link: true
-        credentials: 1970-02-20T19:43:19-07:00
-        custom_workflow: true
-        test_credentials: 2000-05-16T17:07:22-06:00
+        auto_link: false
+        credentials: 3.16106e+18
+        custom_workflow: false
+        test_credentials: false
       object: CarrierType
-      readable: Rerum explicabo laboriosam.
-      type: Delectus doloribus vero est mollitia eos.
+      readable: Ab eos alias quasi.
+      type: Velit ullam ut.
     properties:
       fields:
         $ref: '#/definitions/EasypostFields_object'
@@ -199,12 +351,12 @@ definitions:
       readable:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Rerum explicabo laboriosam.
+        example: Ab eos alias quasi.
         type: string
       type:
         description: The name of the carrier type. Note that "EndiciaAccount" is the
           current USPS integration account type
-        example: Delectus doloribus vero est mollitia eos.
+        example: Velit ullam ut.
         type: string
     required:
     - type
@@ -217,13 +369,21 @@ definitions:
       EasypostCarrier_types (default view)
     example:
     - fields:
-        auto_link: true
-        credentials: 1970-02-20T19:43:19-07:00
-        custom_workflow: true
-        test_credentials: 2000-05-16T17:07:22-06:00
+        auto_link: false
+        credentials: 3.16106e+18
+        custom_workflow: false
+        test_credentials: false
       object: CarrierType
-      readable: Rerum explicabo laboriosam.
-      type: Delectus doloribus vero est mollitia eos.
+      readable: Ab eos alias quasi.
+      type: Velit ullam ut.
+    - fields:
+        auto_link: false
+        credentials: 3.16106e+18
+        custom_workflow: false
+        test_credentials: false
+      object: CarrierType
+      readable: Ab eos alias quasi.
+      type: Velit ullam ut.
     items:
       $ref: '#/definitions/EasypostCarrier_types'
     title: 'Mediatype identifier: application/easypost.carrier_types+json; type=collection'
@@ -234,20 +394,20 @@ definitions:
     properties:
       auto_link:
         description: For USPS this designates that no credentials are required.
-        example: true
+        example: false
         type: boolean
       credentials:
         description: Credentials used in the production environment.
-        example: 1970-02-20T19:43:19-07:00
+        example: 3.16106e+18
         type: any
       custom_workflow:
         description: When present, a seperate authentication process will be required
           through the UI to link this account type.
-        example: true
+        example: false
         type: boolean
       test_credentials:
         description: Credentials used in the test environment.
-        example: 2000-05-16T17:07:22-06:00
+        example: false
         type: any
     required:
     - credentials
@@ -259,17 +419,21 @@ definitions:
       auto_link:
         default: false
         description: For USPS this designates that no credentials are required.
+        example: true
         type: boolean
       credentials:
         description: Credentials used in the production environment.
+        example: 1995-07-25T09:21:00-06:00
         type: any
       custom_workflow:
         default: false
         description: When present, a seperate authentication process will be required
           through the UI to link this account type.
+        example: true
         type: boolean
       test_credentials:
         description: Credentials used in the test environment.
+        example: false
         type: any
     title: FieldsObjectPayload
     type: object
@@ -328,15 +492,104 @@ definitions:
     - type
     title: UpdateCarrierAccountPayload
     type: object
+  VerificationPayload:
+    properties:
+      errors:
+        description: All errors that caused the verification to fail
+        example:
+        - field: Autem amet cupiditate eius voluptas magni optio.
+          message: Eos facere consequuntur ut cupiditate corrupti.
+        - field: Autem amet cupiditate eius voluptas magni optio.
+          message: Eos facere consequuntur ut cupiditate corrupti.
+        items:
+          $ref: '#/definitions/application/easypost.gield_error+json'
+        type: array
+      success:
+        description: The success of the verification
+        example: false
+        type: boolean
+    title: VerificationPayload
+    type: object
+  VerificationsPayload:
+    properties:
+      delivery:
+        $ref: '#/definitions/VerificationPayload'
+      zip4:
+        $ref: '#/definitions/VerificationPayload'
+    title: VerificationsPayload
+    type: object
+  application/easypost.gield_error+json:
+    properties:
+      field:
+        description: Field of the request that the error describes
+        example: Autem amet cupiditate eius voluptas magni optio.
+        type: string
+      message:
+        description: Human readable description of the problem
+        example: Eos facere consequuntur ut cupiditate corrupti.
+        type: string
+    title: application/easypost.gield_error+json
+    type: object
 host: localhost:8080
 info:
   description: A simple goa service
   license:
     name: Apache License Version 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0
-  title: The virtual wine cellar
+  title: Easy Post tester
   version: "2.0"
 paths:
+  /addresses:
+    post:
+      description: Depending on your use case an Address can be used in many different
+        ways. Certain carriers allow rating between two zip codes, but full addresses
+        are required to purchase postage. It is recommended to provide as much information
+        as possible during creation and to reuse these objects whenever possible.
+      operationId: address#create
+      parameters:
+      - description: Address objects are used to represent people, places, and organizations
+          in a number of contexts. For example, a Shipment requires a to_address and
+          from_address to accurately calculate rates and generate postage.
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateAddressPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostAddress'
+      schemes:
+      - http
+      summary: create address
+      tags:
+      - address
+  /addresses/{id}:
+    get:
+      description: An Address can be retrieved by either its id or reference. However
+        it is recommended to use EasyPost's provided identifiers because uniqueness
+        on reference is not enforced.
+      operationId: address#show
+      parameters:
+      - description: Address ID
+        in: path
+        name: id
+        pattern: ^adr_
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostAddress'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show address
+      tags:
+      - address
   /carrier_accounts:
     get:
       description: Retrieve an unpaginated list of all CarrierAccounts available to
@@ -385,7 +638,6 @@ paths:
       - description: Carrier ID
         in: path
         name: id
-        pattern: ^ca_
         required: true
         type: string
       responses:
@@ -407,7 +659,6 @@ paths:
       - description: Carrier ID
         in: path
         name: id
-        pattern: ^ca_
         required: true
         type: string
       responses:
@@ -470,7 +721,7 @@ responses:
   OK:
     description: OK
     schema:
-      $ref: '#/definitions/EasypostCarrier_accounts'
+      $ref: '#/definitions/EasypostAddress'
 schemes:
 - http
 swagger: "2.0"

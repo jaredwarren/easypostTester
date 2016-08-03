@@ -5,8 +5,9 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var _ = API("cellar", func() {
-	Title("The virtual wine cellar")
+// build with: goagen bootstrap -d github.com/jaredwarren/easypostTester/design
+var _ = API("easypost", func() {
+	Title("Easy Post tester")
 	Description("A simple goa service")
 	Version("2.0")
 	Scheme("http")

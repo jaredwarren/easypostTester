@@ -1,5 +1,5 @@
 //************************************************************************//
-// API "cellar": Application Media Types
+// API "easypost": Application Media Types
 //
 // Generated with goagen v0.2.dev, command line:
 // $ goagen
@@ -14,12 +14,72 @@ package app
 
 import "github.com/goadesign/goa"
 
+// EasypostAddress media type (default view)
+//
+// Identifier: application/easypost.address+json
+type EasypostAddress struct {
+	// The specific designation for the address (only relevant if the address is a carrier facility)
+	CarrierFacility *string `form:"carrier_facility,omitempty" json:"carrier_facility,omitempty" xml:"carrier_facility,omitempty"`
+	// City the address is located in
+	City *string `form:"city,omitempty" json:"city,omitempty" xml:"city,omitempty"`
+	// Name of the organization. Both name and company can be included
+	Company *string `form:"company,omitempty" json:"company,omitempty" xml:"company,omitempty"`
+	// ISO 3166 country code for the country the address is located in
+	Country *string `form:"country,omitempty" json:"country,omitempty" xml:"country,omitempty"`
+	// Email to reach the person or organization
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	// Federal tax identifier of the person or organization
+	FederalTaxID *string `form:"federal_tax_id,omitempty" json:"federal_tax_id,omitempty" xml:"federal_tax_id,omitempty"`
+	// Unique, begins with "adr_"
+	ID string `form:"id" json:"id" xml:"id"`
+	// Set based on which api-key you used, either "test" or "production"
+	Mode *string `form:"mode,omitempty" json:"mode,omitempty" xml:"mode,omitempty"`
+	// Name of the person. Both name and company can be included
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Always: "Address"
+	Object string `form:"object" json:"object" xml:"object"`
+	// Phone number to reach the person or organization
+	Phone *string `form:"phone,omitempty" json:"phone,omitempty" xml:"phone,omitempty"`
+	// Whether or not this address would be considered residential
+	Residential *bool `form:"residential,omitempty" json:"residential,omitempty" xml:"residential,omitempty"`
+	// State or province the address is located in
+	State *string `form:"state,omitempty" json:"state,omitempty" xml:"state,omitempty"`
+	// 	State tax identifier of the person or organization
+	StateTaxID *string `form:"state_tax_id,omitempty" json:"state_tax_id,omitempty" xml:"state_tax_id,omitempty"`
+	// First line of the address
+	Street1 *string `form:"street1,omitempty" json:"street1,omitempty" xml:"street1,omitempty"`
+	// Second line of the address
+	Street2 *string `form:"street2,omitempty" json:"street2,omitempty" xml:"street2,omitempty"`
+	// The result of any verifications requested
+	Verifications *VerificationsPayload `form:"verifications,omitempty" json:"verifications,omitempty" xml:"verifications,omitempty"`
+	// ZIP or postal code the address is located in
+	Zip *string `form:"zip,omitempty" json:"zip,omitempty" xml:"zip,omitempty"`
+}
+
+// Validate validates the EasypostAddress media type instance.
+func (mt *EasypostAddress) Validate() (err error) {
+	if mt.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	}
+	if mt.Object == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "object"))
+	}
+
+	if ok := goa.ValidatePattern(`^adr_`, mt.ID); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, mt.ID, `^adr_`))
+	}
+	if ok := goa.ValidatePattern(`^Address$`, mt.Object); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.object`, mt.Object, `^Address$`))
+	}
+	return
+}
+
 // A CarrierAccount encapsulates your credentials with the carrier. The CarrierAccount object provides CRUD operations for all CarrierAccounts. (default view)
 //
 // Identifier: application/easypost.carrier_accounts+json
 type EasypostCarrierAccounts struct {
 	// If clone is true, only the reference and description are possible to update
-	Clone *bool `form:"clone,omitempty" json:"clone,omitempty" xml:"clone,omitempty"`
+	Clone bool `form:"clone" json:"clone" xml:"clone"`
 	// The name used when displaying a readable value for the type of the account
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Unlike the "credentials" object contained in "fields", this nullable object contains just raw credential pairs for client library consumption
@@ -27,7 +87,7 @@ type EasypostCarrierAccounts struct {
 	// An optional, user-readable field to help distinguish accounts
 	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	// Contains "credentials" and/or "test_credentials", or may be empty
-	Fields *EasypostFieldsObject `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
+	Fields *FieldsObjectPayload `form:"fields,omitempty" json:"fields,omitempty" xml:"fields,omitempty"`
 	// Unique, begins with "ca_"
 	ID string `form:"id" json:"id" xml:"id"`
 	// Always: "CarrierAccount"
@@ -53,9 +113,6 @@ func (mt *EasypostCarrierAccounts) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "object"))
 	}
 
-	if ok := goa.ValidatePattern(`^ca_`, mt.ID); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, mt.ID, `^ca_`))
-	}
 	if ok := goa.ValidatePattern(`^CarrierAccount$`, mt.Object); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.object`, mt.Object, `^CarrierAccount$`))
 	}
@@ -123,13 +180,9 @@ func (mt EasypostCarrierTypesCollection) Validate() (err error) {
 //
 // Identifier: application/easypost.field_object+json
 type EasypostFieldObject struct {
-	// Each key in the sub-objects of a CarrierAccount's fields is the name of a settable field
-	Key string `form:"key" json:"key" xml:"key"`
-	// The label value is used in form rendering to display a more precise field name
-	Label string `form:"label" json:"label" xml:"label"`
-	// Checkbox fields use "0" and "1" as False and True, all other field types present plaintext, partly-masked, or masked credential data for reference
-	Value string `form:"value" json:"value" xml:"value"`
-	// The visibility value is used to control form field types, and is discussed in the CarrierType section
+	Key        string `form:"key" json:"key" xml:"key"`
+	Label      string `form:"label" json:"label" xml:"label"`
+	Value      string `form:"value" json:"value" xml:"value"`
 	Visibility string `form:"visibility" json:"visibility" xml:"visibility"`
 }
 

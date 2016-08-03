@@ -1,5 +1,5 @@
 //************************************************************************//
-// API "cellar": Application Contexts
+// API "easypost": Application Contexts
 //
 // Generated with goagen v0.2.dev, command line:
 // $ goagen
@@ -16,6 +16,258 @@ import (
 	"github.com/goadesign/goa"
 	"golang.org/x/net/context"
 )
+
+// CreateAddressContext provides the address create action context.
+type CreateAddressContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *CreateAddressPayload
+}
+
+// NewCreateAddressContext parses the incoming request URL and body, performs validations and creates the
+// context used by the address controller create action.
+func NewCreateAddressContext(ctx context.Context, service *goa.Service) (*CreateAddressContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	rctx := CreateAddressContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// createAddressPayload is the address create action payload.
+type createAddressPayload struct {
+	// The specific designation for the address (only relevant if the address is a carrier facility)
+	CarrierFacility *string `form:"carrier_facility,omitempty" json:"carrier_facility,omitempty" xml:"carrier_facility,omitempty"`
+	// City the address is located in
+	City *string `form:"city,omitempty" json:"city,omitempty" xml:"city,omitempty"`
+	// Name of the organization. Both name and company can be included
+	Company *string `form:"company,omitempty" json:"company,omitempty" xml:"company,omitempty"`
+	// ISO 3166 country code for the country the address is located in
+	Country *string `form:"country,omitempty" json:"country,omitempty" xml:"country,omitempty"`
+	// Email to reach the person or organization
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	// Federal tax identifier of the person or organization
+	FederalTaxID *string `form:"federal_tax_id,omitempty" json:"federal_tax_id,omitempty" xml:"federal_tax_id,omitempty"`
+	// Unique, begins with "adr_"
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Set based on which api-key you used, either "test" or "production"
+	Mode *string `form:"mode,omitempty" json:"mode,omitempty" xml:"mode,omitempty"`
+	// Name of the person. Both name and company can be included
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Always: "Address"
+	Object *string `form:"object,omitempty" json:"object,omitempty" xml:"object,omitempty"`
+	// Phone number to reach the person or organization
+	Phone *string `form:"phone,omitempty" json:"phone,omitempty" xml:"phone,omitempty"`
+	// Whether or not this address would be considered residential
+	Residential *bool `form:"residential,omitempty" json:"residential,omitempty" xml:"residential,omitempty"`
+	// State or province the address is located in
+	State *string `form:"state,omitempty" json:"state,omitempty" xml:"state,omitempty"`
+	// 	State tax identifier of the person or organization
+	StateTaxID *string `form:"state_tax_id,omitempty" json:"state_tax_id,omitempty" xml:"state_tax_id,omitempty"`
+	// First line of the address
+	Street1 *string `form:"street1,omitempty" json:"street1,omitempty" xml:"street1,omitempty"`
+	// Second line of the address
+	Street2 *string `form:"street2,omitempty" json:"street2,omitempty" xml:"street2,omitempty"`
+	// The result of any verifications requested
+	Verifications *verificationsPayload `form:"verifications,omitempty" json:"verifications,omitempty" xml:"verifications,omitempty"`
+	// ZIP or postal code the address is located in
+	Zip *string `form:"zip,omitempty" json:"zip,omitempty" xml:"zip,omitempty"`
+}
+
+// Finalize sets the default values defined in the design.
+func (payload *createAddressPayload) Finalize() {
+	var defaultObject = "Address"
+	if payload.Object == nil {
+		payload.Object = &defaultObject
+	}
+}
+
+// Validate runs the validation rules defined in the design.
+func (payload *createAddressPayload) Validate() (err error) {
+	if payload.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "id"))
+	}
+	if payload.Object == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "object"))
+	}
+
+	if payload.ID != nil {
+		if ok := goa.ValidatePattern(`^adr_`, *payload.ID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.id`, *payload.ID, `^adr_`))
+		}
+	}
+	if payload.Object != nil {
+		if ok := goa.ValidatePattern(`^Address$`, *payload.Object); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.object`, *payload.Object, `^Address$`))
+		}
+	}
+	return
+}
+
+// Publicize creates CreateAddressPayload from createAddressPayload
+func (payload *createAddressPayload) Publicize() *CreateAddressPayload {
+	var pub CreateAddressPayload
+	if payload.CarrierFacility != nil {
+		pub.CarrierFacility = payload.CarrierFacility
+	}
+	if payload.City != nil {
+		pub.City = payload.City
+	}
+	if payload.Company != nil {
+		pub.Company = payload.Company
+	}
+	if payload.Country != nil {
+		pub.Country = payload.Country
+	}
+	if payload.Email != nil {
+		pub.Email = payload.Email
+	}
+	if payload.FederalTaxID != nil {
+		pub.FederalTaxID = payload.FederalTaxID
+	}
+	if payload.ID != nil {
+		pub.ID = *payload.ID
+	}
+	if payload.Mode != nil {
+		pub.Mode = payload.Mode
+	}
+	if payload.Name != nil {
+		pub.Name = payload.Name
+	}
+	if payload.Object != nil {
+		pub.Object = *payload.Object
+	}
+	if payload.Phone != nil {
+		pub.Phone = payload.Phone
+	}
+	if payload.Residential != nil {
+		pub.Residential = payload.Residential
+	}
+	if payload.State != nil {
+		pub.State = payload.State
+	}
+	if payload.StateTaxID != nil {
+		pub.StateTaxID = payload.StateTaxID
+	}
+	if payload.Street1 != nil {
+		pub.Street1 = payload.Street1
+	}
+	if payload.Street2 != nil {
+		pub.Street2 = payload.Street2
+	}
+	if payload.Verifications != nil {
+		pub.Verifications = payload.Verifications.Publicize()
+	}
+	if payload.Zip != nil {
+		pub.Zip = payload.Zip
+	}
+	return &pub
+}
+
+// CreateAddressPayload is the address create action payload.
+type CreateAddressPayload struct {
+	// The specific designation for the address (only relevant if the address is a carrier facility)
+	CarrierFacility *string `form:"carrier_facility,omitempty" json:"carrier_facility,omitempty" xml:"carrier_facility,omitempty"`
+	// City the address is located in
+	City *string `form:"city,omitempty" json:"city,omitempty" xml:"city,omitempty"`
+	// Name of the organization. Both name and company can be included
+	Company *string `form:"company,omitempty" json:"company,omitempty" xml:"company,omitempty"`
+	// ISO 3166 country code for the country the address is located in
+	Country *string `form:"country,omitempty" json:"country,omitempty" xml:"country,omitempty"`
+	// Email to reach the person or organization
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	// Federal tax identifier of the person or organization
+	FederalTaxID *string `form:"federal_tax_id,omitempty" json:"federal_tax_id,omitempty" xml:"federal_tax_id,omitempty"`
+	// Unique, begins with "adr_"
+	ID string `form:"id" json:"id" xml:"id"`
+	// Set based on which api-key you used, either "test" or "production"
+	Mode *string `form:"mode,omitempty" json:"mode,omitempty" xml:"mode,omitempty"`
+	// Name of the person. Both name and company can be included
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Always: "Address"
+	Object string `form:"object" json:"object" xml:"object"`
+	// Phone number to reach the person or organization
+	Phone *string `form:"phone,omitempty" json:"phone,omitempty" xml:"phone,omitempty"`
+	// Whether or not this address would be considered residential
+	Residential *bool `form:"residential,omitempty" json:"residential,omitempty" xml:"residential,omitempty"`
+	// State or province the address is located in
+	State *string `form:"state,omitempty" json:"state,omitempty" xml:"state,omitempty"`
+	// 	State tax identifier of the person or organization
+	StateTaxID *string `form:"state_tax_id,omitempty" json:"state_tax_id,omitempty" xml:"state_tax_id,omitempty"`
+	// First line of the address
+	Street1 *string `form:"street1,omitempty" json:"street1,omitempty" xml:"street1,omitempty"`
+	// Second line of the address
+	Street2 *string `form:"street2,omitempty" json:"street2,omitempty" xml:"street2,omitempty"`
+	// The result of any verifications requested
+	Verifications *VerificationsPayload `form:"verifications,omitempty" json:"verifications,omitempty" xml:"verifications,omitempty"`
+	// ZIP or postal code the address is located in
+	Zip *string `form:"zip,omitempty" json:"zip,omitempty" xml:"zip,omitempty"`
+}
+
+// Validate runs the validation rules defined in the design.
+func (payload *CreateAddressPayload) Validate() (err error) {
+	if payload.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "id"))
+	}
+	if payload.Object == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "object"))
+	}
+
+	if ok := goa.ValidatePattern(`^adr_`, payload.ID); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.id`, payload.ID, `^adr_`))
+	}
+	if ok := goa.ValidatePattern(`^Address$`, payload.Object); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.object`, payload.Object, `^Address$`))
+	}
+	return
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *CreateAddressContext) OK(r *EasypostAddress) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/easypost.address+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// ShowAddressContext provides the address show action context.
+type ShowAddressContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ID string
+}
+
+// NewShowAddressContext parses the incoming request URL and body, performs validations and creates the
+// context used by the address controller show action.
+func NewShowAddressContext(ctx context.Context, service *goa.Service) (*ShowAddressContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	rctx := ShowAddressContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramID := req.Params["id"]
+	if len(paramID) > 0 {
+		rawID := paramID[0]
+		rctx.ID = rawID
+		if ok := goa.ValidatePattern(`^adr_`, rctx.ID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`id`, rctx.ID, `^adr_`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ShowAddressContext) OK(r *EasypostAddress) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/easypost.address+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *ShowAddressContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
 
 // CreateCarrierAccountContext provides the carrier_account create action context.
 type CreateCarrierAccountContext struct {
@@ -208,9 +460,6 @@ func NewDeleteCarrierAccountContext(ctx context.Context, service *goa.Service) (
 	if len(paramID) > 0 {
 		rawID := paramID[0]
 		rctx.ID = rawID
-		if ok := goa.ValidatePattern(`^ca_`, rctx.ID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`id`, rctx.ID, `^ca_`))
-		}
 	}
 	return &rctx, err
 }
@@ -265,9 +514,6 @@ func NewShowCarrierAccountContext(ctx context.Context, service *goa.Service) (*S
 	if len(paramID) > 0 {
 		rawID := paramID[0]
 		rctx.ID = rawID
-		if ok := goa.ValidatePattern(`^ca_`, rctx.ID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`id`, rctx.ID, `^ca_`))
-		}
 	}
 	return &rctx, err
 }

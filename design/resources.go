@@ -68,3 +68,26 @@ var _ = Resource("carrier_types", func() {
 		//Response(NotFound)
 	})
 })
+
+// Address ...
+var _ = Resource("address", func() {
+	BasePath("/addresses")
+	DefaultMedia(Address)
+
+	Action("show", func() {
+		Description("An Address can be retrieved by either its id or reference. However it is recommended to use EasyPost's provided identifiers because uniqueness on reference is not enforced.")
+		Routing(GET("/:id"))
+		Params(func() {
+			Param("id", String, "Address ID")
+		})
+		Response(OK)
+		Response(NotFound)
+	})
+
+	Action("create", func() {
+		Routing(POST("/"))
+		Payload(AddressPayload)
+		Description("Depending on your use case an Address can be used in many different ways. Certain carriers allow rating between two zip codes, but full addresses are required to purchase postage. It is recommended to provide as much information as possible during creation and to reuse these objects whenever possible.")
+		Response(OK)
+	})
+})

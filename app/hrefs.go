@@ -1,5 +1,5 @@
 //************************************************************************//
-// API "cellar": Application Resource Href Factories
+// API "easypost": Application Resource Href Factories
 //
 // Generated with goagen v0.2.dev, command line:
 // $ goagen
@@ -13,6 +13,11 @@
 package app
 
 import "fmt"
+
+// AddressHref returns the resource href.
+func AddressHref(id interface{}) string {
+	return fmt.Sprintf("/v2/addresses/%v", id)
+}
 
 // CarrierAccountHref returns the resource href.
 func CarrierAccountHref(id interface{}) string {

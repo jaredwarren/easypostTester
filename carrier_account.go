@@ -345,7 +345,7 @@ func (c *CarrierAccountController) Update(ctx *app.UpdateCarrierAccountContext) 
 				return err
 			}
 
-			fields := &app.EasypostFieldsObject{
+			fields := &app.FieldsObjectPayload{
 				Credentials: &f,
 			}
 			resJson.Fields = fields
@@ -372,7 +372,7 @@ func (c *CarrierAccountController) Update(ctx *app.UpdateCarrierAccountContext) 
 				return err
 			}
 
-			fields := &app.EasypostFieldsObject{
+			fields := &app.FieldsObjectPayload{
 				TestCredentials: &f,
 			}
 			resJson.Fields = fields

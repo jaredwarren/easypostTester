@@ -1,5 +1,5 @@
 //************************************************************************//
-// API "cellar": Application User Types
+// API "easypost": Application User Types
 //
 // Generated with goagen v0.2.dev, command line:
 // $ goagen
@@ -13,6 +13,194 @@
 package client
 
 import "github.com/goadesign/goa"
+
+// Address objects are used to represent people, places, and organizations in a number of contexts. For example, a Shipment requires a to_address and from_address to accurately calculate rates and generate postage.
+type addressPayload struct {
+	// The specific designation for the address (only relevant if the address is a carrier facility)
+	CarrierFacility *string `form:"carrier_facility,omitempty" json:"carrier_facility,omitempty" xml:"carrier_facility,omitempty"`
+	// City the address is located in
+	City *string `form:"city,omitempty" json:"city,omitempty" xml:"city,omitempty"`
+	// Name of the organization. Both name and company can be included
+	Company *string `form:"company,omitempty" json:"company,omitempty" xml:"company,omitempty"`
+	// ISO 3166 country code for the country the address is located in
+	Country *string `form:"country,omitempty" json:"country,omitempty" xml:"country,omitempty"`
+	// Email to reach the person or organization
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	// Federal tax identifier of the person or organization
+	FederalTaxID *string `form:"federal_tax_id,omitempty" json:"federal_tax_id,omitempty" xml:"federal_tax_id,omitempty"`
+	// Unique, begins with "adr_"
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Set based on which api-key you used, either "test" or "production"
+	Mode *string `form:"mode,omitempty" json:"mode,omitempty" xml:"mode,omitempty"`
+	// Name of the person. Both name and company can be included
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Always: "Address"
+	Object *string `form:"object,omitempty" json:"object,omitempty" xml:"object,omitempty"`
+	// Phone number to reach the person or organization
+	Phone *string `form:"phone,omitempty" json:"phone,omitempty" xml:"phone,omitempty"`
+	// Whether or not this address would be considered residential
+	Residential *bool `form:"residential,omitempty" json:"residential,omitempty" xml:"residential,omitempty"`
+	// State or province the address is located in
+	State *string `form:"state,omitempty" json:"state,omitempty" xml:"state,omitempty"`
+	// 	State tax identifier of the person or organization
+	StateTaxID *string `form:"state_tax_id,omitempty" json:"state_tax_id,omitempty" xml:"state_tax_id,omitempty"`
+	// First line of the address
+	Street1 *string `form:"street1,omitempty" json:"street1,omitempty" xml:"street1,omitempty"`
+	// Second line of the address
+	Street2 *string `form:"street2,omitempty" json:"street2,omitempty" xml:"street2,omitempty"`
+	// The result of any verifications requested
+	Verifications *verificationsPayload `form:"verifications,omitempty" json:"verifications,omitempty" xml:"verifications,omitempty"`
+	// ZIP or postal code the address is located in
+	Zip *string `form:"zip,omitempty" json:"zip,omitempty" xml:"zip,omitempty"`
+}
+
+// Finalize sets the default values for addressPayload type instance.
+func (ut *addressPayload) Finalize() {
+	var defaultObject = "Address"
+	if ut.Object == nil {
+		ut.Object = &defaultObject
+	}
+}
+
+// Validate validates the addressPayload type instance.
+func (ut *addressPayload) Validate() (err error) {
+	if ut.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	}
+	if ut.Object == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "object"))
+	}
+
+	if ut.ID != nil {
+		if ok := goa.ValidatePattern(`^adr_`, *ut.ID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, *ut.ID, `^adr_`))
+		}
+	}
+	if ut.Object != nil {
+		if ok := goa.ValidatePattern(`^Address$`, *ut.Object); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.object`, *ut.Object, `^Address$`))
+		}
+	}
+	return
+}
+
+// Publicize creates AddressPayload from addressPayload
+func (ut *addressPayload) Publicize() *AddressPayload {
+	var pub AddressPayload
+	if ut.CarrierFacility != nil {
+		pub.CarrierFacility = ut.CarrierFacility
+	}
+	if ut.City != nil {
+		pub.City = ut.City
+	}
+	if ut.Company != nil {
+		pub.Company = ut.Company
+	}
+	if ut.Country != nil {
+		pub.Country = ut.Country
+	}
+	if ut.Email != nil {
+		pub.Email = ut.Email
+	}
+	if ut.FederalTaxID != nil {
+		pub.FederalTaxID = ut.FederalTaxID
+	}
+	if ut.ID != nil {
+		pub.ID = *ut.ID
+	}
+	if ut.Mode != nil {
+		pub.Mode = ut.Mode
+	}
+	if ut.Name != nil {
+		pub.Name = ut.Name
+	}
+	if ut.Object != nil {
+		pub.Object = *ut.Object
+	}
+	if ut.Phone != nil {
+		pub.Phone = ut.Phone
+	}
+	if ut.Residential != nil {
+		pub.Residential = ut.Residential
+	}
+	if ut.State != nil {
+		pub.State = ut.State
+	}
+	if ut.StateTaxID != nil {
+		pub.StateTaxID = ut.StateTaxID
+	}
+	if ut.Street1 != nil {
+		pub.Street1 = ut.Street1
+	}
+	if ut.Street2 != nil {
+		pub.Street2 = ut.Street2
+	}
+	if ut.Verifications != nil {
+		pub.Verifications = ut.Verifications.Publicize()
+	}
+	if ut.Zip != nil {
+		pub.Zip = ut.Zip
+	}
+	return &pub
+}
+
+// Address objects are used to represent people, places, and organizations in a number of contexts. For example, a Shipment requires a to_address and from_address to accurately calculate rates and generate postage.
+type AddressPayload struct {
+	// The specific designation for the address (only relevant if the address is a carrier facility)
+	CarrierFacility *string `form:"carrier_facility,omitempty" json:"carrier_facility,omitempty" xml:"carrier_facility,omitempty"`
+	// City the address is located in
+	City *string `form:"city,omitempty" json:"city,omitempty" xml:"city,omitempty"`
+	// Name of the organization. Both name and company can be included
+	Company *string `form:"company,omitempty" json:"company,omitempty" xml:"company,omitempty"`
+	// ISO 3166 country code for the country the address is located in
+	Country *string `form:"country,omitempty" json:"country,omitempty" xml:"country,omitempty"`
+	// Email to reach the person or organization
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	// Federal tax identifier of the person or organization
+	FederalTaxID *string `form:"federal_tax_id,omitempty" json:"federal_tax_id,omitempty" xml:"federal_tax_id,omitempty"`
+	// Unique, begins with "adr_"
+	ID string `form:"id" json:"id" xml:"id"`
+	// Set based on which api-key you used, either "test" or "production"
+	Mode *string `form:"mode,omitempty" json:"mode,omitempty" xml:"mode,omitempty"`
+	// Name of the person. Both name and company can be included
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Always: "Address"
+	Object string `form:"object" json:"object" xml:"object"`
+	// Phone number to reach the person or organization
+	Phone *string `form:"phone,omitempty" json:"phone,omitempty" xml:"phone,omitempty"`
+	// Whether or not this address would be considered residential
+	Residential *bool `form:"residential,omitempty" json:"residential,omitempty" xml:"residential,omitempty"`
+	// State or province the address is located in
+	State *string `form:"state,omitempty" json:"state,omitempty" xml:"state,omitempty"`
+	// 	State tax identifier of the person or organization
+	StateTaxID *string `form:"state_tax_id,omitempty" json:"state_tax_id,omitempty" xml:"state_tax_id,omitempty"`
+	// First line of the address
+	Street1 *string `form:"street1,omitempty" json:"street1,omitempty" xml:"street1,omitempty"`
+	// Second line of the address
+	Street2 *string `form:"street2,omitempty" json:"street2,omitempty" xml:"street2,omitempty"`
+	// The result of any verifications requested
+	Verifications *VerificationsPayload `form:"verifications,omitempty" json:"verifications,omitempty" xml:"verifications,omitempty"`
+	// ZIP or postal code the address is located in
+	Zip *string `form:"zip,omitempty" json:"zip,omitempty" xml:"zip,omitempty"`
+}
+
+// Validate validates the AddressPayload type instance.
+func (ut *AddressPayload) Validate() (err error) {
+	if ut.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	}
+	if ut.Object == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "object"))
+	}
+
+	if ok := goa.ValidatePattern(`^adr_`, ut.ID); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, ut.ID, `^adr_`))
+	}
+	if ok := goa.ValidatePattern(`^Address$`, ut.Object); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.object`, ut.Object, `^Address$`))
+	}
+	return
+}
 
 // bottlePayload user type.
 type bottlePayload struct {
@@ -242,4 +430,91 @@ type FieldsObjectPayload struct {
 	CustomWorkflow bool `form:"custom_workflow" json:"custom_workflow" xml:"custom_workflow"`
 	// Credentials used in the test environment.
 	TestCredentials *interface{} `form:"test_credentials,omitempty" json:"test_credentials,omitempty" xml:"test_credentials,omitempty"`
+}
+
+// verificationPayload user type.
+type verificationPayload struct {
+	// All errors that caused the verification to fail
+	Errors []*applicationEasypostGieldErrorJSON `form:"errors,omitempty" json:"errors,omitempty" xml:"errors,omitempty"`
+	// The success of the verification
+	Success *bool `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// Publicize creates VerificationPayload from verificationPayload
+func (ut *verificationPayload) Publicize() *VerificationPayload {
+	var pub VerificationPayload
+	if ut.Errors != nil {
+		pub.Errors = make([]*ApplicationEasypostGieldErrorJSON, len(ut.Errors))
+		for i2, elem2 := range ut.Errors {
+			pub.Errors[i2] = elem2.Publicize()
+		}
+	}
+	if ut.Success != nil {
+		pub.Success = ut.Success
+	}
+	return &pub
+}
+
+// VerificationPayload user type.
+type VerificationPayload struct {
+	// All errors that caused the verification to fail
+	Errors []*ApplicationEasypostGieldErrorJSON `form:"errors,omitempty" json:"errors,omitempty" xml:"errors,omitempty"`
+	// The success of the verification
+	Success *bool `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// verificationsPayload user type.
+type verificationsPayload struct {
+	// Checks that the address is deliverable and makes minor corrections to spelling/format. US addresses will also have their "residential" status checked and set.
+	Delivery *verificationPayload `form:"delivery,omitempty" json:"delivery,omitempty" xml:"delivery,omitempty"`
+	// Only applicable to US addresses - checks and sets the ZIP+4.
+	Zip4 *verificationPayload `form:"zip4,omitempty" json:"zip4,omitempty" xml:"zip4,omitempty"`
+}
+
+// Publicize creates VerificationsPayload from verificationsPayload
+func (ut *verificationsPayload) Publicize() *VerificationsPayload {
+	var pub VerificationsPayload
+	if ut.Delivery != nil {
+		pub.Delivery = ut.Delivery.Publicize()
+	}
+	if ut.Zip4 != nil {
+		pub.Zip4 = ut.Zip4.Publicize()
+	}
+	return &pub
+}
+
+// VerificationsPayload user type.
+type VerificationsPayload struct {
+	// Checks that the address is deliverable and makes minor corrections to spelling/format. US addresses will also have their "residential" status checked and set.
+	Delivery *VerificationPayload `form:"delivery,omitempty" json:"delivery,omitempty" xml:"delivery,omitempty"`
+	// Only applicable to US addresses - checks and sets the ZIP+4.
+	Zip4 *VerificationPayload `form:"zip4,omitempty" json:"zip4,omitempty" xml:"zip4,omitempty"`
+}
+
+// applicationEasypostGieldErrorJSON user type.
+type applicationEasypostGieldErrorJSON struct {
+	// Field of the request that the error describes
+	Field *string `form:"field,omitempty" json:"field,omitempty" xml:"field,omitempty"`
+	// Human readable description of the problem
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+}
+
+// Publicize creates ApplicationEasypostGieldErrorJSON from applicationEasypostGieldErrorJSON
+func (ut *applicationEasypostGieldErrorJSON) Publicize() *ApplicationEasypostGieldErrorJSON {
+	var pub ApplicationEasypostGieldErrorJSON
+	if ut.Field != nil {
+		pub.Field = ut.Field
+	}
+	if ut.Message != nil {
+		pub.Message = ut.Message
+	}
+	return &pub
+}
+
+// ApplicationEasypostGieldErrorJSON user type.
+type ApplicationEasypostGieldErrorJSON struct {
+	// Field of the request that the error describes
+	Field *string `form:"field,omitempty" json:"field,omitempty" xml:"field,omitempty"`
+	// Human readable description of the problem
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
 }

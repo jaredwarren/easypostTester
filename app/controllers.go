@@ -1,5 +1,5 @@
 //************************************************************************//
-// API "cellar": Application Controllers
+// API "easypost": Application Controllers
 //
 // Generated with goagen v0.2.dev, command line:
 // $ goagen
@@ -27,6 +27,69 @@ func initService(service *goa.Service) {
 	// Setup default encoder and decoder
 	service.Encoder.Register(goa.NewJSONEncoder, "*/*")
 	service.Decoder.Register(goa.NewJSONDecoder, "*/*")
+}
+
+// AddressController is the controller interface for the Address actions.
+type AddressController interface {
+	goa.Muxer
+	Create(*CreateAddressContext) error
+	Show(*ShowAddressContext) error
+}
+
+// MountAddressController "mounts" a Address resource controller on the given service.
+func MountAddressController(service *goa.Service, ctrl AddressController) {
+	initService(service)
+	var h goa.Handler
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewCreateAddressContext(ctx, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*CreateAddressPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Create(rctx)
+	}
+	service.Mux.Handle("POST", "/v2/addresses", ctrl.MuxHandler("Create", h, unmarshalCreateAddressPayload))
+	service.LogInfo("mount", "ctrl", "Address", "action", "Create", "route", "POST /v2/addresses")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewShowAddressContext(ctx, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Show(rctx)
+	}
+	service.Mux.Handle("GET", "/v2/addresses/:id", ctrl.MuxHandler("Show", h, nil))
+	service.LogInfo("mount", "ctrl", "Address", "action", "Show", "route", "GET /v2/addresses/:id")
+}
+
+// unmarshalCreateAddressPayload unmarshals the request body into the context request data Payload field.
+func unmarshalCreateAddressPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &createAddressPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	payload.Finalize()
+	if err := payload.Validate(); err != nil {
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }
 
 // CarrierAccountController is the controller interface for the CarrierAccount actions.

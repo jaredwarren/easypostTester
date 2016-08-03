@@ -5,7 +5,7 @@ import (
 	goaclient "github.com/goadesign/goa/client"
 )
 
-// Client is the cellar service client.
+// Client is the easypost service client.
 type Client struct {
 	*goaclient.Client
 	Encoder *goa.HTTPEncoder

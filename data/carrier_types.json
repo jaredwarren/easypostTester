@@ -1,72 +1,93 @@
-[
-  {
-    "object": "CarrierType",
-    "type": "EndiciaAccount",
-    "readable": "USPS",
-    "logo": null,
-    "fields": {
-      "auto_link": true
-    }
-  },
-  {
-    "object": "CarrierType",
-    "type": "AramexAccount",
-    "readable": "Aramex",
-    "logo": null,
-    "fields": {
-      "credentials": {
-        "username": {
-          "visibility": "visible",
-          "label": "ARAMEX Username"
-        },
-        "password": {
-          "visibility": "password",
-          "label": "ARAMEX Password"
-        },
-        "account_number": {
-          "visibility": "visible",
-          "label": "ARAMEX Account Number"
-        },
-        "account_entity": {
-          "visibility": "visible",
-          "label": "ARAMEX Account Entity"
-        },
-        "account_pin": {
-          "visibility": "visible",
-          "label": "ARAMEX Account Pin"
-        },
-        "account_country": {
-          "visibility": "visible",
-          "label": "ARAMEX Account Country"
-        }
+[{
+  "object": "CarrierType",
+  "type": "EndiciaAccount",
+  "readable": "USPS",
+  "logo": null,
+  "fields": {
+    "auto_link": true
+  }
+}, {
+  "object": "CarrierType",
+  "type": "AramexAccount",
+  "readable": "Aramex",
+  "logo": null,
+  "fields": {
+    "credentials": {
+      "username": {
+        "visibility": "visible",
+        "label": "ARAMEX Username"
+      },
+      "password": {
+        "visibility": "password",
+        "label": "ARAMEX Password"
+      },
+      "account_number": {
+        "visibility": "visible",
+        "label": "ARAMEX Account Number"
+      },
+      "account_entity": {
+        "visibility": "visible",
+        "label": "ARAMEX Account Entity"
+      },
+      "account_pin": {
+        "visibility": "visible",
+        "label": "ARAMEX Account Pin"
+      },
+      "account_country": {
+        "visibility": "visible",
+        "label": "ARAMEX Account Country"
       }
     }
-  },
-  {
-    "object": "CarrierType",
-    "type": "CanadaPostAccount",
-    "readable": "Canada Post",
-    "logo": null,
-    "fields": {
-      "credentials": {
-        "api_key": {
-          "visibility": "masked",
-          "label": "CanadaPost API Key"
-        },
-        "contract_id": {
-          "visibility": "visible",
-          "label": "CanadaPost Contract ID"
-        },
-        "customer_number": {
-          "visibility": "visible",
-          "label": "CanadaPost Customer Number"
-        },
-        "has_credit_card": {
-          "visibility": "checkbox",
-          "label": "CanadaPost account has credit card?"
-        }
+  }
+}, {
+  "object": "CarrierType",
+  "type": "UpsAccount",
+  "readable": "UPS",
+  "logo": null,
+  "fields": {
+    "credentials": {
+      "account_number": {
+        "visibility": "visible",
+        "label": "UPS Account Number"
       },
-      "custom_workflow": true
+      "access_license_number": {
+        "visibility": "visible",
+        "label": "UPS Access License Number"
+      },
+      "user_id": {
+        "visibility": "visible",
+        "label": "UPS.com User ID"
+      },
+      "password": {
+        "visibility": "password",
+        "label": "UPS.com Password"
+      }
     }
   }
-]
+}, {
+  "object": "CarrierType",
+  "type": "CanadaPostAccount",
+  "readable": "Canada Post",
+  "logo": null,
+  "fields": {
+    "credentials": {
+      "api_key": {
+        "visibility": "masked",
+        "label": "CanadaPost API Key"
+      },
+      "contract_id": {
+        "visibility": "visible",
+        "label": "CanadaPost Contract ID"
+      },
+      "customer_number": {
+        "visibility": "visible",
+        "label": "CanadaPost Customer Number"
+      },
+      "has_credit_card": {
+        "visibility": "checkbox",
+        "label": "CanadaPost account has credit card?"
+      }
+    },
+    "custom_workflow": true
+  }
+}]

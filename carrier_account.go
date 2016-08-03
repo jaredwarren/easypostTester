@@ -30,19 +30,11 @@ func NewCarrierAccountController(service *goa.Service) *CarrierAccountController
 func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) error {
 	// CarrierAccountController_Create: start_implement
 
-	// Put your logic here
-	//TODO: write file here...
-	//randomly generate id
-	//"./data/" + ctx.ID + ".json"
-
-	// Validation
-	//// make sure type matches a type
-
 	payload := ctx.Payload
 
 	// Clone
 	if payload.Clone {
-		// TODO: copy everything, then override reference and description
+		// TODO: copy everything, then override reference and description.
 		payload.Clone = false // for now
 	}
 
@@ -72,6 +64,7 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 	if sourceType == nil {
 		return errors.New("Invalid Carrier Type:" + payload.Type)
 	}
+	// TODO: get list of credential fields
 
 	// ID
 	uuid := make([]byte, 10)
@@ -81,6 +74,12 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 	}
 	id := fmt.Sprintf("ca_%x", uuid)
 	// TODO: make sure id is unique, and touch file
+	filepath := "./data/" + id + ".json"
+	fileHandler, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer fileHandler.Close()
 	payload.ID = &id
 
 	// Readable
@@ -89,15 +88,13 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 	}
 
 	// Time
-	now := time.Now().UTC().Format("2006-01-02T15:04:05-0700")
+	now := time.Now().UTC().Format("2006-01-02T15:04:05Z")
 	payload.CreatedAt = &now
 	payload.UpdatedAt = &now
 
 	// Credentials & Fields
 	if payload.Fields == nil {
-		if payload.Credentials == nil {
-			return errors.New("Missing Credentials")
-		} else {
+		if payload.Credentials != nil {
 			// update fields with credentials
 			a := reflect.ValueOf(*payload.Credentials).Interface().(map[string]interface{})
 			fieldJsons := make([]string, len(a))
@@ -124,9 +121,7 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 			payload.Fields = fields
 		}
 	} else {
-		if payload.Fields.Credentials == nil {
-			return errors.New("Missing Fields Credentials")
-		} else {
+		if payload.Fields.Credentials != nil {
 			// update credentials with fields. Fields override credentials
 			a := reflect.ValueOf(*payload.Fields.Credentials).Interface().(map[string]interface{})
 			fieldJsons := make([]string, len(a))
@@ -135,7 +130,6 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 				// Assume val is a (map[string]interface{}) for now
 				a := reflect.ValueOf(val).Interface().(map[string]interface{})
 				fieldJsons[i] = fmt.Sprintf("\"%s\": \"%s\"", key, a["value"])
-
 				i += 1
 			}
 			var f interface{}
@@ -146,15 +140,83 @@ func (c *CarrierAccountController) Create(ctx *app.CreateCarrierAccountContext) 
 			payload.Credentials = &f
 		}
 	}
-	// TODO: do same for test_credentials and fields.test_credentials
+
+	// TestCredentials
+	if payload.Fields == nil {
+		if payload.TestCredentials != nil {
+			// update fields with credentials
+			a := reflect.ValueOf(*payload.TestCredentials).Interface().(map[string]interface{})
+			fieldJsons := make([]string, len(a))
+			i := 0
+			for key, val := range a {
+				visibility := "visible"
+				matched, _ := regexp.MatchString(`(?i)password`, key)
+				if matched {
+					visibility = "password"
+				}
+				fieldJsons[i] = fmt.Sprintf("\"%s\": {\"visibility\": \"%s\", \"label\": \"\", \"value\": \"%s\"}", key, visibility, val)
+				i += 1
+			}
+
+			var f interface{}
+			err := json.Unmarshal([]byte("{"+strings.Join(fieldJsons, ", ")+"}"), &f)
+			if err != nil {
+				return err
+			}
+
+			fields := &app.FieldsObjectPayload{
+				TestCredentials: &f,
+			}
+			payload.Fields = fields
+		}
+	} else {
+		if payload.Fields.TestCredentials != nil {
+			// update credentials with fields. Fields override credentials
+			a := reflect.ValueOf(*payload.Fields.TestCredentials).Interface().(map[string]interface{})
+			fieldJsons := make([]string, len(a))
+			i := 0
+			for key, val := range a {
+				// Assume val is a (map[string]interface{}) for now
+				a := reflect.ValueOf(val).Interface().(map[string]interface{})
+				fieldJsons[i] = fmt.Sprintf("\"%s\": \"%s\"", key, a["value"])
+				i += 1
+			}
+			var f interface{}
+			err := json.Unmarshal([]byte("{"+strings.Join(fieldJsons, ", ")+"}"), &f)
+			if err != nil {
+				return err
+			}
+			payload.TestCredentials = &f
+		}
+	}
 
 	// TODO: make sure account fields and account_type fields match
 
-	fmt.Printf("%+v\n", id)
+	// marshall to string
+	b, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+	// write file
+	_, err = fileHandler.Write(b)
+	if err != nil {
+		return err
+	}
+
+	// Unmarshall to EasypostCarrierAccounts
+	fileData, e := ioutil.ReadFile(filepath)
+	if e != nil {
+		return e
+	}
+
+	resJson := &app.EasypostCarrierAccounts{}
+	e = json.Unmarshal(fileData, resJson)
+	if e != nil {
+		return e
+	}
 
 	// CarrierAccountController_Create: end_implement
-	res := &app.EasypostCarrierAccounts{}
-	return ctx.OK(res)
+	return ctx.OK(resJson)
 }
 
 // Delete runs the delete action.
@@ -179,6 +241,7 @@ func (c *CarrierAccountController) List(ctx *app.ListCarrierAccountContext) erro
 	// Get All Files
 	files, err := ioutil.ReadDir("./data")
 	if err != nil {
+		fmt.Println("Error Reading Directory")
 		return err
 	}
 	accounts := make([]*app.EasypostCarrierAccounts, 0)
@@ -190,10 +253,12 @@ func (c *CarrierAccountController) List(ctx *app.ListCarrierAccountContext) erro
 			resJson := &app.EasypostCarrierAccounts{}
 			file, e := ioutil.ReadFile("./data/" + fileInfo.Name())
 			if e != nil {
+				fmt.Println("Error Reading File:", fileInfo.Name())
 				return e
 			}
 			e = json.Unmarshal(file, resJson)
 			if e != nil {
+				fmt.Println("Error Parsing File:", fileInfo.Name())
 				return e
 			}
 			accounts = append(accounts, resJson)
@@ -208,11 +273,12 @@ func (c *CarrierAccountController) List(ctx *app.ListCarrierAccountContext) erro
 func (c *CarrierAccountController) Show(ctx *app.ShowCarrierAccountContext) error {
 	// CarrierAccountController_Show: start_implement
 
+	// Get File
 	file, e := ioutil.ReadFile("./data/" + ctx.ID + ".json")
 	if e != nil {
 		return e
 	}
-
+	// Unmarshal
 	resJson := &app.EasypostCarrierAccounts{}
 	e = json.Unmarshal(file, resJson)
 	if e != nil {
@@ -227,11 +293,146 @@ func (c *CarrierAccountController) Show(ctx *app.ShowCarrierAccountContext) erro
 func (c *CarrierAccountController) Update(ctx *app.UpdateCarrierAccountContext) error {
 	// CarrierAccountController_Update: start_implement
 
-	// Put your logic here
-	//TODO: update ONLY: description, reference, and any fields in credentials or test_credentials.
-	//TODO: update file "./data/" + ctx.ID + ".json"
+	payload := ctx.Payload
 
-	//payload.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05-0700")
+	filepath := "./data/" + ctx.ID + ".json"
+	// Get File
+	fileData, e := ioutil.ReadFile(filepath)
+	if e != nil {
+		return e
+	}
+	// Unmarshal
+	resJson := &app.EasypostCarrierAccounts{}
+	e = json.Unmarshal(fileData, resJson)
+	if e != nil {
+		return e
+	}
+
+	// UpdatedAt
+	now := time.Now().UTC().Format("2006-01-02T15:04:05Z")
+	resJson.UpdatedAt = &now
+
+	// Description
+	if payload.Description != nil {
+		resJson.Description = payload.Description
+	}
+
+	// Reference
+	if payload.Reference != nil {
+		resJson.Reference = payload.Reference
+	}
+
+	// Credentials & Fields
+	if payload.Fields == nil {
+		if payload.Credentials != nil {
+			// update fields with credentials
+			a := reflect.ValueOf(*payload.Credentials).Interface().(map[string]interface{})
+			fieldJsons := make([]string, len(a))
+			i := 0
+			for key, val := range a {
+				visibility := "visible"
+				matched, _ := regexp.MatchString(`(?i)password`, key)
+				if matched {
+					visibility = "password"
+				}
+				fieldJsons[i] = fmt.Sprintf("\"%s\": {\"visibility\": \"%s\", \"label\": \"\", \"value\": \"%s\"}", key, visibility, val)
+				i += 1
+			}
+
+			var f interface{}
+			err := json.Unmarshal([]byte("{"+strings.Join(fieldJsons, ", ")+"}"), &f)
+			if err != nil {
+				return err
+			}
+
+			fields := &app.EasypostFieldsObject{
+				Credentials: &f,
+			}
+			resJson.Fields = fields
+		}
+		// TestCredentials
+		if payload.TestCredentials != nil {
+			// update fields with TestCredentials
+			a := reflect.ValueOf(*payload.TestCredentials).Interface().(map[string]interface{})
+			fieldJsons := make([]string, len(a))
+			i := 0
+			for key, val := range a {
+				visibility := "visible"
+				matched, _ := regexp.MatchString(`(?i)password`, key)
+				if matched {
+					visibility = "password"
+				}
+				fieldJsons[i] = fmt.Sprintf("\"%s\": {\"visibility\": \"%s\", \"label\": \"\", \"value\": \"%s\"}", key, visibility, val)
+				i += 1
+			}
+
+			var f interface{}
+			err := json.Unmarshal([]byte("{"+strings.Join(fieldJsons, ", ")+"}"), &f)
+			if err != nil {
+				return err
+			}
+
+			fields := &app.EasypostFieldsObject{
+				TestCredentials: &f,
+			}
+			resJson.Fields = fields
+		}
+	} else {
+		if payload.Fields.Credentials != nil {
+			// update credentials with fields. Fields override credentials
+			a := reflect.ValueOf(*payload.Fields.Credentials).Interface().(map[string]interface{})
+			fieldJsons := make([]string, len(a))
+			i := 0
+			for key, val := range a {
+				// Assume val is a (map[string]interface{}) for now
+				a := reflect.ValueOf(val).Interface().(map[string]interface{})
+				fieldJsons[i] = fmt.Sprintf("\"%s\": \"%s\"", key, a["value"])
+				i += 1
+			}
+			var f interface{}
+			err := json.Unmarshal([]byte("{"+strings.Join(fieldJsons, ", ")+"}"), &f)
+			if err != nil {
+				return err
+			}
+			resJson.Credentials = &f
+		}
+		// TestCredentials
+		if payload.Fields.TestCredentials != nil {
+			// update TestCredentials with fields. Fields override TestCredentials
+			a := reflect.ValueOf(*payload.Fields.TestCredentials).Interface().(map[string]interface{})
+			fieldJsons := make([]string, len(a))
+			i := 0
+			for key, val := range a {
+				// Assume val is a (map[string]interface{}) for now
+				a := reflect.ValueOf(val).Interface().(map[string]interface{})
+				fieldJsons[i] = fmt.Sprintf("\"%s\": \"%s\"", key, a["value"])
+				i += 1
+			}
+			var f interface{}
+			err := json.Unmarshal([]byte("{"+strings.Join(fieldJsons, ", ")+"}"), &f)
+			if err != nil {
+				return err
+			}
+			resJson.TestCredentials = &f
+		}
+	}
+
+	// File to string
+	b, err := json.Marshal(resJson)
+	if err != nil {
+		return err
+	}
+	// Open file
+	fileHandler, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer fileHandler.Close()
+	// Write file
+	_, err = fileHandler.Write(b)
+	if err != nil {
+		return err
+	}
 
 	// CarrierAccountController_Update: end_implement
 	res := &app.EasypostCarrierAccounts{}

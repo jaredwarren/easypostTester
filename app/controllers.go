@@ -91,6 +91,33 @@ func unmarshalCreateAddressPayload(ctx context.Context, service *goa.Service, re
 	return nil
 }
 
+// APIKeyController is the controller interface for the APIKey actions.
+type APIKeyController interface {
+	goa.Muxer
+	List(*ListAPIKeyContext) error
+}
+
+// MountAPIKeyController "mounts" a APIKey resource controller on the given service.
+func MountAPIKeyController(service *goa.Service, ctrl APIKeyController) {
+	initService(service)
+	var h goa.Handler
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListAPIKeyContext(ctx, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.List(rctx)
+	}
+	service.Mux.Handle("GET", "/v2/api_keys", ctrl.MuxHandler("List", h, nil))
+	service.LogInfo("mount", "ctrl", "APIKey", "action", "List", "route", "GET /v2/api_keys")
+}
+
 // CarrierAccountController is the controller interface for the CarrierAccount actions.
 type CarrierAccountController interface {
 	goa.Muxer
@@ -247,4 +274,63 @@ func MountCarrierTypesController(service *goa.Service, ctrl CarrierTypesControll
 	}
 	service.Mux.Handle("GET", "/v2/carrier_types", ctrl.MuxHandler("Show", h, nil))
 	service.LogInfo("mount", "ctrl", "CarrierTypes", "action", "Show", "route", "GET /v2/carrier_types")
+}
+
+// ParcelController is the controller interface for the Parcel actions.
+type ParcelController interface {
+	goa.Muxer
+	Create(*CreateParcelContext) error
+	Show(*ShowParcelContext) error
+}
+
+// MountParcelController "mounts" a Parcel resource controller on the given service.
+func MountParcelController(service *goa.Service, ctrl ParcelController) {
+	initService(service)
+	var h goa.Handler
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewCreateParcelContext(ctx, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*CreateParcelPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Create(rctx)
+	}
+	service.Mux.Handle("POST", "/v2/parcels", ctrl.MuxHandler("Create", h, unmarshalCreateParcelPayload))
+	service.LogInfo("mount", "ctrl", "Parcel", "action", "Create", "route", "POST /v2/parcels")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewShowParcelContext(ctx, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Show(rctx)
+	}
+	service.Mux.Handle("GET", "/v2/parcels/:id", ctrl.MuxHandler("Show", h, nil))
+	service.LogInfo("mount", "ctrl", "Parcel", "action", "Show", "route", "GET /v2/parcels/:id")
+}
+
+// unmarshalCreateParcelPayload unmarshals the request body into the context request data Payload field.
+func unmarshalCreateParcelPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &createParcelPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }

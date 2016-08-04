@@ -254,3 +254,550 @@ var AddressPayload = Type("AddressPayload", func() {
 /**
 * Parcels
 **/
+
+var Parcel = MediaType("application/easypost.parcel+json", func() {
+	Attributes(func() {
+		Reference(ParcelPayload)
+		Attribute("id", String, "Unique, begins with \"prcl_\"", func() {
+			Pattern("^prcl_")
+		})
+		Attribute("object", String, "Always: \"Parcel\"", func() {
+			Pattern("^Parcel$")
+			Default("Parcel")
+		})
+		Attribute("mode", String, "Set based on which api-key you used, either \"test\" or \"production\"", func() {
+			Enum("test", "production")
+			Default("test")
+		})
+		Attribute("length", Number, "Required if predefined_package is empty. float (inches)")
+		Attribute("width", Number, "Required if predefined_package is empty. float (inches)")
+		Attribute("height", Number, "Required if predefined_package is empty. float (inches)")
+		Attribute("weight", Number, "Always required. float(oz)")
+		Attribute("predefined_package", String, "Optional, one of our predefined_packages")
+		Attribute("created_at", String, "Time Created")
+		Attribute("updated_at", String, "Time Last Updated")
+
+		Required("id", "object", "weight")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("object")
+		Attribute("mode")
+		Attribute("length")
+		Attribute("width")
+		Attribute("height")
+		Attribute("weight")
+		Attribute("predefined_package")
+		Attribute("created_at")
+		Attribute("updated_at")
+	})
+})
+
+var ParcelPayload = Type("ParcelPayload", func() {
+	Description("Parcel objects represent the physical container being shipped. Dimensions can be supplied either as length, width, and height dimensions, or a predefined_package string. If you provide a carrier specific predefined_package the associated Shipment will only fetch rates from that carrier.")
+	Attribute("length", Number, "Required if predefined_package is empty. float (inches)")
+	Attribute("width", Number, "Required if predefined_package is empty. float (inches)")
+	Attribute("height", Number, "Required if predefined_package is empty. float (inches)")
+	Attribute("weight", Number, "Always required. float(oz)")
+	Attribute("predefined_package", String, "Optional, one of our predefined_packages")
+
+	Required("weight")
+})
+
+/**
+* API Keys
+**/
+var APIKeys = MediaType("application/easypost.api_keys+json", func() {
+	Attributes(func() {
+		Attribute("id", String, "The User id of the authenticated User making the API Key request", func() {
+			Pattern("^user_")
+		})
+		Attribute("children", ArrayOf(APIKeyChild), "A list of all Child Users presented with ONLY id, children, and key array structures.")
+		Attribute("keys", ArrayOf(APIKey), "The list of all API keys active for an account, both for \"test\" and \"production\" modes.")
+
+		Required("id", "children", "keys")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("children")
+		Attribute("keys")
+	})
+})
+
+var APIKeyChild = MediaType("application/easypost.api_key_child+json", func() {
+	Attributes(func() {
+		Attribute("id", String, "The User id of the authenticated User making the API Key request", func() {
+			Pattern("^user_")
+		})
+		Attribute("children", CollectionOf("application/easypost.api_key_child+json"), "A list of all Child Users presented with ONLY id, children, and key array structures.")
+		Attribute("keys", ArrayOf(APIKey), "The list of all API keys active for an account, both for \"test\" and \"production\" modes.")
+
+		Required("id", "children", "keys")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("children")
+		Attribute("keys")
+	})
+})
+
+var APIKey = MediaType("application/easypost.api_key+json", func() {
+	Attributes(func() {
+		Attribute("object", String, "Always: \"ApiKey\"", func() {
+			Pattern("^ApiKey$")
+			Default("ApiKey")
+		})
+		Attribute("mode", String, "\"test\" or \"production\"", func() {
+			Enum("test", "production")
+			Default("test")
+		})
+		Attribute("key", String, "The actual key value to use for authentication")
+		Attribute("created_at", String, "The User id of the authenticated User making the API Key request")
+
+		Required("object", "mode", "key", "created_at")
+	})
+	View("default", func() {
+		Attribute("object")
+		Attribute("mode")
+		Attribute("key")
+		Attribute("created_at")
+	})
+})
+
+/**
+* Shipment
+**/
+var Shipment = MediaType("application/easypost.shipment+json", func() {
+	Attributes(func() {
+		Reference(ShipmentPayload)
+		Attribute("id", String, "Unique, begins with \"shp_\"", func() {
+			Pattern("^shp_")
+		})
+		Attribute("object", String, "Always: \"Shipment\"", func() {
+			Pattern("^Shipment$")
+			Default("Shipment")
+		})
+		Attribute("mode", String, "Set based on which api-key you used, either \"test\" or \"production\"", func() {
+			Enum("test", "production")
+			Default("test")
+		})
+
+		Attribute("rates", ArrayOf(Rate), "All associated Rate objects")
+		Attribute("selected_rate", Rate, "The specific rate purchased for the shipment, or null if unpurchased or purchased through another mechanism")
+		Attribute("postage_label", PostageLabel, "The associated PostageLabel object")
+		Attribute("messages", ArrayOf(Message), "Any carrier errors encountered during rating, discussed in more depth below")
+		Attribute("tracking_code", String, "If purchased, the tracking code will appear here as well as within the Tracker object")
+		Attribute("status", String, "The current tracking status of the shipment")
+		Attribute("tracker", Tracker, "The associated Tracker object")
+		Attribute("fees", ArrayOf(Fee), "The associated Fee objects charged to the billing user account")
+		Attribute("refund_status", String, "The current status of the shipment refund process. Possible values are \"submitted\", \"refunded\", \"rejected\".", func() {
+			Enum("submitted", "rejected", "refunded")
+		})
+		Attribute("batch_status", String, "The current state of the associated BatchShipment")
+		Attribute("batch_message", String, "The current message of the associated BatchShipment")
+		Attribute("created_at", String, "Time Created")
+		Attribute("updated_at", String, "Time Last Updated")
+
+		Required("id", "object")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("object")
+		Attribute("mode")
+		Attribute("length")
+		Attribute("width")
+		Attribute("height")
+		Attribute("weight")
+		Attribute("predefined_package")
+		Attribute("created_at")
+		Attribute("updated_at")
+	})
+})
+
+var ShipmentPayload = Type("ShipmentPayload", func() {
+	Description("Parcel objects represent the physical container being shipped. Dimensions can be supplied either as length, width, and height dimensions, or a predefined_package string. If you provide a carrier specific predefined_package the associated Shipment will only fetch rates from that carrier.")
+
+	Attribute("to_address", Address, "The destination address")
+	Attribute("from_address", Address, "The origin address")
+	Attribute("return_address", Address, "The shipper's address, defaults to from_address")
+	Attribute("buyer_address", Address, "The buyer's address, defaults to to_address")
+	Attribute("parcel", Parcel, "The dimensions and weight of the package")
+
+	Attribute("customs_info", CustomsInfo, "Information for the processing of customs")
+	Attribute("scan_form", ScanForm, "Document created to manifest and scan multiple shipments")
+	Attribute("forms", ArrayOf(Form), "All associated Form objects")
+	Attribute("insurance", Insurance, "The associated Insurance object")
+	Attribute("options", Options, "All of the options passed to the shipment, discussed in more depth below")
+	Attribute("is_return", Boolean, "Set true to create as a return, discussed in more depth below")
+	Attribute("usps_zone", String, "The USPS zone of the shipment, if purchased with USPS")
+	Attribute("batch_id", String, "The ID of the batch that contains this shipment, if any")
+
+	//Required("to_address", "from_address", "parcel")
+})
+
+var BuyShipmentPayload = Type("BuyShipmentPayload", func() {
+	Attribute("rate", Rate, "Selected rate")
+	Attribute("insurance", String, "Additionally, insurance may be added during the purchase. To specify an amount to insure, pass the insurance attribute as a string. The currency of all insurance is USD.")
+
+	Required("rate")
+})
+
+var LabelShipmentPayload = Type("LabelShipmentPayload", func() {
+	Attribute("file_format", String, "Selected rate")
+	Required("file_format")
+})
+
+/**
+* Options
+**/
+var Options = MediaType("application/easypost.options+json", func() {
+	Reference(OptionsPayload)
+	View("default", func() {
+		Attribute("additional_handling")
+		Attribute("address_validation_level")
+		Attribute("alcohol")
+		Attribute("bill_receiver_account")
+		Attribute("bill_receiver_postal_code")
+		Attribute("bill_third_party_account")
+		Attribute("bill_third_party_country")
+		Attribute("bill_third_party_postal_code")
+		Attribute("by_drone")
+		Attribute("carbon_neutral")
+		Attribute("cod_amount")
+		Attribute("cod_method")
+		Attribute("currency")
+		Attribute("delivered_duty_paid")
+		Attribute("delivery_confirmation")
+		Attribute("dry_ice")
+		Attribute("dry_ice_medical")
+		Attribute("dry_ice_weight")
+		Attribute("freight_charge")
+		Attribute("handling_instructions")
+		Attribute("hold_for_pickup")
+		Attribute("invoice_number")
+		Attribute("label_date")
+		Attribute("label_format")
+		Attribute("machinable")
+		Attribute("print_custom_1")
+		Attribute("print_custom_2")
+		Attribute("print_custom_3")
+		Attribute("print_custom_1_barcode")
+		Attribute("print_custom_2_barcode")
+		Attribute("print_custom_3_barcode")
+		Attribute("print_custom_1_code")
+		Attribute("print_custom_2_code")
+		Attribute("print_custom_3_code")
+		Attribute("saturday_delivery")
+		Attribute("special_rates_eligibility")
+		Attribute("smartpost_hub")
+		Attribute("smartpost_manifest")
+	})
+})
+var OptionsPayload = Type("OptionsPayload", func() {
+	Description("Shipments can have a variety of additional options which you can specify when creating a shipment. The Options object can be populated with the keys below.")
+
+	Attribute("additional_handling", Boolean, "Setting this option to true, will add an additional handling charge.")
+	Attribute("address_validation_level", String, "Setting this option to \"0\", will allow the minimum amount of address information to pass the validation check. Only for USPS postage.")
+	Attribute("alcohol", Boolean, "Set this option to true if your shipment contains alcohol. UPS - only supported for US Domestic shipments. FedEx - only supported for US Domestic shipments. Canada Post - Requires adult signature 19 years or older. If you want adult signature 18 years or older, instead use delivery_confirmation: ADULT_SIGNATURE")
+	Attribute("bill_receiver_account", String, "Setting an account number of the receiver who is to receive and buy the postage. UPS - bill_receiver_postal_code is also required")
+	Attribute("bill_receiver_postal_code", String, "Setting a postal code of the receiver account you want to buy postage. UPS - bill_receiver_account also required")
+	Attribute("bill_third_party_account", String, "Setting an account number of the third party account you want to buy postage. UPS - bill_third_party_country and bill_third_party_postal_code also required")
+	Attribute("bill_third_party_country", String, "Setting a country of the third party account you want to buy postage. UPS - bill_third_party_account and bill_third_party_postal_code also required")
+	Attribute("bill_third_party_postal_code", Boolean, "Setting a postal code of the third party account you want to buy postage. UPS - bill_third_party_country and bill_third_party_account also required")
+	Attribute("by_drone", Boolean, "Setting this option to true will indicate to the carrier to prefer delivery by drone, if the carrier supports drone delivery.")
+	Attribute("carbon_neutral", Boolean, "Setting this to true will add a charge to reduce carbon emissions.")
+	Attribute("cod_amount", String, "Adding an amount will have the carrier collect the specified amount from the recipient.")
+	Attribute("cod_method", String, "Method for payment. \"CASH\", \"CHECK\", \"MONEY_ORDER\"", func() {
+		Enum("CASH", "CHECK", "MONEY_ORDER")
+	})
+	Attribute("currency", String, "Which currency this shipment will show for rates if carrier allows.")
+	Attribute("delivered_duty_paid", Boolean, "Setting this value to false will pass the cost of duties on to the recipient of the package(s).")
+	Attribute("delivery_confirmation", String, "If you want to request a signature, you can pass \"ADULT_SIGNATURE\" or \"SIGNATURE\". You may also request \"NO_SIGNATURE\" to leave the package at the door. All - some options may be limited for international shipments")
+	Attribute("dry_ice", Boolean, "Package contents contain dry ice. UPS - Need dry_ice_weight to be set. UPS MailInnovations - Need dry_ice_weight to be set. FedEx - Need dry_ice_weight to be set")
+	Attribute("dry_ice_medical", Boolean, "If the dry ice is for medical use, set this option to true. UPS - Need dry_ice_weight to be set. UPS MailInnovations - Need dry_ice_weight to be set")
+	Attribute("dry_ice_weight", String, "Weight of the dry ice in ounces. UPS - Need dry_ice to be set. UPS MailInnovations - Need dry_ice to be set. FedEx - Need dry_ice to be set")
+	Attribute("freight_charge", Number, "Additional cost to be added to the invoice of this shipment. Only applies to UPS currently.")
+	Attribute("handling_instructions", String, "This is to designate special instructions for the carrier like \"Do not drop!\".", func() {
+		Enum("ORMD", "LIMITED_QUANTITY")
+	})
+	Attribute("hold_for_pickup", Boolean, "Package will wait at carrier facility for pickup.")
+	Attribute("invoice_number", String, "This will print an invoice number on the postage label.")
+	Attribute("label_date", String, "Set the date that will appear on the postage label. Accepts ISO 8601 formatted string including time zone offset.")
+	Attribute("label_format", String, "Supported label formats include \"PNG\", \"PDF\", \"ZPL\", and \"EPL2\". \"PNG\" is the only format that allows for conversion.", func() {
+		Enum("PNG", "PDF", "ZPL", "EPL2")
+	})
+	Attribute("machinable", Boolean, "Whether or not the parcel can be processed by the carriers equipment.")
+	Attribute("print_custom_1", String, "You can optionally print custom messages on labels. The locations of these fields show up on different spots on the carrier's labels.")
+	Attribute("print_custom_2", String, "An additional message on the label. Same restrictions as print_custom_1")
+	Attribute("print_custom_3", String, "An additional message on the label. Same restrictions as print_custom_1")
+	Attribute("print_custom_1_barcode", Boolean, "Create a barcode for this custom reference if supported by carrier.")
+	Attribute("print_custom_2_barcode", Boolean, "Create a barcode for this custom reference if supported by carrier.")
+	Attribute("print_custom_3_barcode", Boolean, "Create a barcode for this custom reference if supported by carrier.")
+	Attribute("print_custom_1_code", String, "Specify the type of print_custom_1.")
+	Attribute("print_custom_2_code", String, "ASDF")
+	Attribute("print_custom_3_code", String, "ASDF")
+	Attribute("saturday_delivery", Boolean, "Set this value to true for delivery on Saturday. Can't be combined with Next Day Air. When setting the saturday_delivery option, you will only get rates for services that are eligible for saturday delivery. If no services are available for saturday delivery, then you will not be returned any rates. You may need to create 2 shipments, one with the saturday_delivery option set on one without to get all your eligible rates.")
+	Attribute("special_rates_eligibility", String, "This option allows you to request restrictive rates from USPS. Can set to 'USPS.MEDIAMAIL' or 'USPS.LIBRARYMAIL'.")
+	Attribute("smartpost_hub", String, "You can use this to override the hub ID you have on your account.")
+	Attribute("smartpost_manifest", Boolean, "The manifest ID is used to group SmartPost packages onto a manifest for each trailer.")
+})
+
+/**
+* Rate
+**/
+var Rate = MediaType("application/easypost.rate+json", func() {
+	Attributes(func() {
+		Attribute("id", String, "Unique, begins with \"rate_\"", func() {
+			Pattern("^rate_")
+		})
+		Attribute("object", String, "Always: \"Rate\"", func() {
+			Pattern("^Rate$")
+			Default("Rate")
+		})
+		Attribute("mode", String, "Set based on which api-key you used, either \"test\" or \"production\"", func() {
+			Enum("test", "production")
+			Default("test")
+		})
+
+		Attribute("service", String, "service level/name")
+		Attribute("carrier", String, "name of carrier")
+		Attribute("carrier_account_id", String, "ID of the CarrierAccount record used to generate this rate")
+		Attribute("shipment_id", String, "ID of the Shipment this rate belongs to")
+		Attribute("rate", String, "the actual rate quote for this service")
+		Attribute("currency", String, "currency for the rate")
+		Attribute("retail_rate", String, "the retail rate is the in-store rate given with no account")
+		Attribute("retail_currency", String, "currency for the retail rate")
+		Attribute("list_rate", String, "the list rate is the non-negotiated rate given for having an account with the carrier")
+		Attribute("list_currency", String, "currency for the list rate")
+		Attribute("delivery_days", Integer, "delivery days for this service")
+		Attribute("delivery_date", String, "date for delivery")
+		Attribute("delivery_date_guaranteed", Boolean, "indicates if delivery window is guaranteed (true) or not (false)")
+
+		Attribute("created_at", String, "Time Created")
+		Attribute("updated_at", String, "Time Last Updated")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("object")
+		Attribute("mode")
+		Attribute("service")
+		Attribute("carrier")
+		Attribute("carrier_account_id")
+		Attribute("shipment_id")
+		Attribute("rate")
+		Attribute("currency")
+		Attribute("retail_rate")
+		Attribute("retail_currency")
+		Attribute("list_rate")
+		Attribute("list_currency")
+		Attribute("delivery_days")
+		Attribute("delivery_date")
+		Attribute("delivery_date_guaranteed")
+		Attribute("created_at")
+		Attribute("updated_at")
+	})
+})
+
+/**
+* Message
+**/
+var Message = MediaType("Message", func() {
+	Description("When rating a Shipment or Pickup, some carriers may fail to generate rates. These failures are returned as part of the Shipment or Pickup as part of their messages attribute, and follow a common object structure.")
+	Attributes(func() {
+		Attribute("carrier", String, "the name of the carrier generating the error, e.g. \"UPS\"")
+		Attribute("type", String, "the category of error that occurred. Most frequently \"rate_error\"")
+		Attribute("message", String, "the string from the carrier explaining the problem.")
+	})
+	View("default", func() {
+		Attribute("carrier")
+		Attribute("type")
+		Attribute("message")
+	})
+})
+
+/**
+* Insurance
+**/
+var InsurancePayload = Type("InsurancePayload", func() {
+	Description("Insuring your Shipment is as simple as sending us the value of the contents. We charge 1% of the value, with a $1 minimum, and handle all the claims. All our claims are paid out within 30 days.")
+	Attribute("amount", String)
+	Required("amount")
+
+})
+
+var InsurancePayload2 = Type("InsurancePayload2", func() {
+	Description("An Insurance created via this endpoint must belong to a shipment purchased outside of EasyPost. Insurance for Shipments created within EasyPost must be created via the Shipment Buy or Insure endpoints.")
+	Attribute("to_address", Address, "The actual destination of the package to be insured")
+	Attribute("from_address", Address, "The actual origin of the package to be insured")
+	Attribute("tracking_code", String, "The tracking code associated with the non-EasyPost-purchased package you'd like to insure")
+	Attribute("reference", String, "Optional. A unique value that may be used in place of ID when doing Retrieve calls for this insurance")
+	Attribute("amount", String, "The USD value of contents you would like to insure. Currently the maximum is between $5000 and $10000 depending on insurer")
+	Attribute("carrier", String, "The carrier associated with the tracking_code you provided. The carrier will get auto-detected if none is provided")
+
+	Required("to_address", "from_address", "tracking_code", "amount")
+})
+
+/**
+* Tracking
+**/
+var Tracker = MediaType("application/easypost.tracker+json", func() {
+	Description("The Tracker object contains both the current information about the package as well as previous updates. All of the previous updates are stored in the tracking_details array. Each TrackingDetail object contains the status, the message from the carrier, and a TrackingLocation.")
+	Attributes(func() {
+		Attribute("id", String, "Unique, begins with \"trk_\"", func() {
+			Pattern("^trk_")
+		})
+		Attribute("object", String, "Always: \"Tracker\"", func() {
+			Pattern("^Tracker$")
+			Default("Tracker")
+		})
+		Attribute("mode", String, "Set based on which api-key you used, either \"test\" or \"production\"", func() {
+			Enum("test", "production")
+			Default("test")
+		})
+
+		Attribute("tracking_code", String, "The tracking code provided by the carrier")
+		Attribute("status", String, "The current status of the package, possible values are \"unknown\", \"pre_transit\", \"in_transit\", \"out_for_delivery\", \"delivered\", \"available_for_pickup\", \"return_to_sender\", \"failure\", \"cancelled\" or \"error\"", func() {
+			Enum("pre_transit", "in_transit", "out_for_delivery", "delivered", "available_for_pickup", "return_to_sender", "failure", "cancelled", "error", "unknown")
+		})
+		Attribute("signed_by", String, "The name of the person who signed for the package (if available)")
+		Attribute("weight", Number, "The weight of the package as measured by the carrier in ounces (if available)")
+		Attribute("est_delivery_date", String, "The estimated delivery date provided by the carrier (if available)")
+		Attribute("shipment_id", String, "The id of the EasyPost Shipment object associated with the Tracker (if any)")
+		Attribute("carrier", String, "The name of the carrier handling the shipment")
+		Attribute("tracking_details", ArrayOf(TrackingDetail), "Array of the associated TrackingDetail objects")
+		Attribute("carrier_detail", ArrayOf(CarrierDetail), "The associated CarrierDetail object (if available)")
+		Attribute("public_url", String, "URL to a publicly-accessible html page that shows tracking details for this tracker")
+		Attribute("fees", ArrayOf(Fee), "Array of the associated Fee objects")
+
+		Attribute("created_at", String, "Time Created")
+		Attribute("updated_at", String, "Time Last Updated")
+
+		Required("id", "object")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("object")
+		Attribute("mode")
+
+		Attribute("tracking_code")
+		Attribute("status")
+		Attribute("signed_by")
+		Attribute("weight")
+		Attribute("est_delivery_date")
+		Attribute("shipment_id")
+		Attribute("carrier")
+		Attribute("tracking_details")
+		Attribute("carrier_detail")
+		Attribute("public_url")
+		Attribute("fees")
+
+		Attribute("created_at")
+		Attribute("updated_at")
+	})
+})
+var Trackers = MediaType("application/easypost.trackers+json", func() {
+	Attribute("trackers", ArrayOf(Tracker))
+	Required("trackers")
+})
+var TrackerPayload = Type("TrackerPayload", func() {
+	Attribute("tracking_code", String, "The tracking code associated with the package you'd like to track")
+	Attribute("carrier", String, "The carrier associated with the tracking_code you provided. The carrier will get auto-detected if none is provided")
+	Required("tracking_code")
+})
+var TrackerListPayload = Type("TrackerListPayload", func() {
+	Attribute("before_id", String, "Optional pagination parameter. Only trackers created before the given ID will be included. May not be used with after_id")
+	Attribute("after_id", String, "Optional pagination parameter. Only trackers created after the given ID will be included. May not be used with before_id")
+	Attribute("start_datetime", String, "Only return Trackers created after this timestamp. Defaults to 1 month ago, or 1 month before a passed end_datetime")
+	Attribute("end_datetime", String, "Only return Trackers created before this timestamp. Defaults to end of the current day, or 1 month after a passed start_datetime")
+	Attribute("page_size", Integer, "The number of Trackers to return on each page. The maximum value is 100", func() {
+		Minimum(1)
+		Maximum(100)
+		Default(1)
+	})
+	Attribute("tracking_code", String, "Only returns Trackers with the given tracking_code. Useful for retrieving an individual Tracker by tracking_code rather than by ID")
+	Attribute("carrier", String, "Only returns Trackers with the given carrier value")
+
+	Required("tracking_code")
+})
+var TrackingDetail = Type("TrackingDetail", func() {
+	Description("Each TrackingDetail object contains the status, the message from the carrier, and a TrackingLocation.")
+	Attributes(func() {
+		Attribute("object", String, "Always: \"TrackingDetail\"", func() {
+			Pattern("^TrackingDetail$")
+			Default("TrackingDetail")
+		})
+
+		Attribute("message", String, "Description of the scan event")
+		Attribute("status", String, "The current status of the package, possible values are \"unknown\", \"pre_transit\", \"in_transit\", \"out_for_delivery\", \"delivered\", \"available_for_pickup\", \"return_to_sender\", \"failure\", \"cancelled\" or \"error\"", func() {
+			Enum("pre_transit", "in_transit", "out_for_delivery", "delivered", "available_for_pickup", "return_to_sender", "failure", "cancelled", "error", "unknown")
+		})
+		Attribute("datetime", String, "The timestamp when the tracking scan occurred")
+		Attribute("source", String, "The original source of the information for this scan event, usually the carrier")
+		Attribute("tracking_location", TrackingLocation, "The location associated with the scan event")
+
+		Required("object")
+	})
+	View("default", func() {
+		Attribute("object")
+		Attribute("message")
+		Attribute("status")
+		Attribute("datetime")
+		Attribute("source")
+		Attribute("tracking_location")
+	})
+})
+var TrackingLocation = Type("TrackingLocation", func() {
+	Description("The TrackingLocation contains city, state, country, and zip information about the location where the package was scanned. The information each carrier provides is different, so some carriers may not make use of all of these fields.")
+	Attributes(func() {
+		Attribute("object", String, "Always: \"TrackingLocation\"", func() {
+			Pattern("^TrackingLocation$")
+			Default("TrackingLocation")
+		})
+
+		Attribute("city", String, "The city where the scan event occurred (if available)")
+		Attribute("state", String, "The state where the scan event occurred (if available)")
+		Attribute("country", String, "	The country where the scan event occurred (if available)")
+		Attribute("zip", String, "The postal code where the scan event occurred (if available)")
+
+		Required("object")
+	})
+	View("default", func() {
+		Attribute("object")
+		Attribute("city")
+		Attribute("state")
+		Attribute("country")
+		Attribute("zip")
+	})
+})
+var CarrierDetail = Type("CarrierDetail", func() {
+	Description("The CarrierDetail object contains the service and container_type of the package. Additionally, it also stores the est_delivery_date_local and est_delivery_time_local, which provide information about the local delivery time.")
+	Attributes(func() {
+		Attribute("object", String, "Always: \"CarrierDetail\"", func() {
+			Pattern("^CarrierDetail$")
+			Default("CarrierDetail")
+		})
+
+		Attribute("service", String, "The service level the associated shipment was shipped with (if available)")
+		Attribute("container_type", String, "The type of container the associated shipment was shipped in (if available)")
+		Attribute("est_delivery_date_local", String, "The estimated delivery date as provided by the carrier, in the local time zone (if available)")
+		Attribute("est_delivery_time_local", String, "The estimated delivery time as provided by the carrier, in the local time zone (if available)")
+
+		Required("object")
+	})
+	View("default", func() {
+		Attribute("object")
+		Attribute("service")
+		Attribute("container_type")
+		Attribute("est_delivery_date_local")
+		Attribute("est_delivery_time_local")
+	})
+})
+
+/**
+* Other
+**/
+var CustomsInfo = Type("CustomsInfo")
+var ScanForm = Type("ScanForm")
+var Form = Type("Form")
+var PostageLabel = Type("PostageLabel")
+var Fee = Type("Fee")

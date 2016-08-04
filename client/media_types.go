@@ -125,6 +125,265 @@ func (c *Client) DecodeEasypostAddressVerifications(resp *http.Response) (*Easyp
 	return &decoded, err
 }
 
+// EasypostApi_key media type (default view)
+//
+// Identifier: application/easypost.api_key+json
+type EasypostAPIKey struct {
+	// The User id of the authenticated User making the API Key request
+	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
+	// The actual key value to use for authentication
+	Key string `form:"key" json:"key" xml:"key"`
+	// "test" or "production"
+	Mode string `form:"mode" json:"mode" xml:"mode"`
+	// Always: "ApiKey"
+	Object string `form:"object" json:"object" xml:"object"`
+}
+
+// Validate validates the EasypostAPIKey media type instance.
+func (mt *EasypostAPIKey) Validate() (err error) {
+	if mt.Object == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "object"))
+	}
+	if mt.Mode == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mode"))
+	}
+	if mt.Key == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "key"))
+	}
+	if mt.CreatedAt == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "created_at"))
+	}
+
+	if !(mt.Mode == "test" || mt.Mode == "production") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.mode`, mt.Mode, []interface{}{"test", "production"}))
+	}
+	if ok := goa.ValidatePattern(`^ApiKey$`, mt.Object); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.object`, mt.Object, `^ApiKey$`))
+	}
+	return
+}
+
+// DecodeEasypostAPIKey decodes the EasypostAPIKey instance encoded in resp body.
+func (c *Client) DecodeEasypostAPIKey(resp *http.Response) (*EasypostAPIKey, error) {
+	var decoded EasypostAPIKey
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// EasypostApi_key_child media type (default view)
+//
+// Identifier: application/easypost.api_key_child+json
+type EasypostAPIKeyChild struct {
+	// A list of all Child Users presented with ONLY id, children, and key array structures.
+	Children EasypostAPIKeyChildCollection `form:"children" json:"children" xml:"children"`
+	// The User id of the authenticated User making the API Key request
+	ID string `form:"id" json:"id" xml:"id"`
+	// The list of all API keys active for an account, both for "test" and "production" modes.
+	Keys []*EasypostAPIKey `form:"keys" json:"keys" xml:"keys"`
+}
+
+// Validate validates the EasypostAPIKeyChild media type instance.
+func (mt *EasypostAPIKeyChild) Validate() (err error) {
+	if mt.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	}
+	if mt.Children == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "children"))
+	}
+	if mt.Keys == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "keys"))
+	}
+
+	if err2 := mt.Children.Validate(); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	if ok := goa.ValidatePattern(`^user_`, mt.ID); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, mt.ID, `^user_`))
+	}
+	for _, e := range mt.Keys {
+		if e.Object == "" {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response.keys[*]`, "object"))
+		}
+		if e.Mode == "" {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response.keys[*]`, "mode"))
+		}
+		if e.Key == "" {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response.keys[*]`, "key"))
+		}
+		if e.CreatedAt == "" {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response.keys[*]`, "created_at"))
+		}
+
+		if !(e.Mode == "test" || e.Mode == "production") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.keys[*].mode`, e.Mode, []interface{}{"test", "production"}))
+		}
+		if ok := goa.ValidatePattern(`^ApiKey$`, e.Object); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.keys[*].object`, e.Object, `^ApiKey$`))
+		}
+	}
+	return
+}
+
+// DecodeEasypostAPIKeyChild decodes the EasypostAPIKeyChild instance encoded in resp body.
+func (c *Client) DecodeEasypostAPIKeyChild(resp *http.Response) (*EasypostAPIKeyChild, error) {
+	var decoded EasypostAPIKeyChild
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// EasypostApi_key_childCollection is the media type for an array of EasypostApi_key_child (default view)
+//
+// Identifier: application/easypost.api_key_child+json; type=collection
+type EasypostAPIKeyChildCollection []*EasypostAPIKeyChild
+
+// Validate validates the EasypostAPIKeyChildCollection media type instance.
+func (mt EasypostAPIKeyChildCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e.ID == "" {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response[*]`, "id"))
+		}
+		if e.Children == nil {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response[*]`, "children"))
+		}
+		if e.Keys == nil {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response[*]`, "keys"))
+		}
+
+		if err2 := e.Children.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+		if ok := goa.ValidatePattern(`^user_`, e.ID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response[*].id`, e.ID, `^user_`))
+		}
+		for _, e := range e.Keys {
+			if e.Object == "" {
+				err = goa.MergeErrors(err, goa.MissingAttributeError(`response[*].keys[*]`, "object"))
+			}
+			if e.Mode == "" {
+				err = goa.MergeErrors(err, goa.MissingAttributeError(`response[*].keys[*]`, "mode"))
+			}
+			if e.Key == "" {
+				err = goa.MergeErrors(err, goa.MissingAttributeError(`response[*].keys[*]`, "key"))
+			}
+			if e.CreatedAt == "" {
+				err = goa.MergeErrors(err, goa.MissingAttributeError(`response[*].keys[*]`, "created_at"))
+			}
+
+			if !(e.Mode == "test" || e.Mode == "production") {
+				err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response[*].keys[*].mode`, e.Mode, []interface{}{"test", "production"}))
+			}
+			if ok := goa.ValidatePattern(`^ApiKey$`, e.Object); !ok {
+				err = goa.MergeErrors(err, goa.InvalidPatternError(`response[*].keys[*].object`, e.Object, `^ApiKey$`))
+			}
+		}
+	}
+	return
+}
+
+// DecodeEasypostAPIKeyChildCollection decodes the EasypostAPIKeyChildCollection instance encoded in resp body.
+func (c *Client) DecodeEasypostAPIKeyChildCollection(resp *http.Response) (EasypostAPIKeyChildCollection, error) {
+	var decoded EasypostAPIKeyChildCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// EasypostApi_keys media type (default view)
+//
+// Identifier: application/easypost.api_keys+json
+type EasypostAPIKeys struct {
+	// A list of all Child Users presented with ONLY id, children, and key array structures.
+	Children []*EasypostAPIKeyChild `form:"children" json:"children" xml:"children"`
+	// The User id of the authenticated User making the API Key request
+	ID string `form:"id" json:"id" xml:"id"`
+	// The list of all API keys active for an account, both for "test" and "production" modes.
+	Keys []*EasypostAPIKey `form:"keys" json:"keys" xml:"keys"`
+}
+
+// Validate validates the EasypostAPIKeys media type instance.
+func (mt *EasypostAPIKeys) Validate() (err error) {
+	if mt.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	}
+	if mt.Children == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "children"))
+	}
+	if mt.Keys == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "keys"))
+	}
+
+	for _, e := range mt.Children {
+		if e.ID == "" {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response.children[*]`, "id"))
+		}
+		if e.Children == nil {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response.children[*]`, "children"))
+		}
+		if e.Keys == nil {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response.children[*]`, "keys"))
+		}
+
+		if err2 := e.Children.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+		if ok := goa.ValidatePattern(`^user_`, e.ID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.children[*].id`, e.ID, `^user_`))
+		}
+		for _, e := range e.Keys {
+			if e.Object == "" {
+				err = goa.MergeErrors(err, goa.MissingAttributeError(`response.children[*].keys[*]`, "object"))
+			}
+			if e.Mode == "" {
+				err = goa.MergeErrors(err, goa.MissingAttributeError(`response.children[*].keys[*]`, "mode"))
+			}
+			if e.Key == "" {
+				err = goa.MergeErrors(err, goa.MissingAttributeError(`response.children[*].keys[*]`, "key"))
+			}
+			if e.CreatedAt == "" {
+				err = goa.MergeErrors(err, goa.MissingAttributeError(`response.children[*].keys[*]`, "created_at"))
+			}
+
+			if !(e.Mode == "test" || e.Mode == "production") {
+				err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.children[*].keys[*].mode`, e.Mode, []interface{}{"test", "production"}))
+			}
+			if ok := goa.ValidatePattern(`^ApiKey$`, e.Object); !ok {
+				err = goa.MergeErrors(err, goa.InvalidPatternError(`response.children[*].keys[*].object`, e.Object, `^ApiKey$`))
+			}
+		}
+	}
+	if ok := goa.ValidatePattern(`^user_`, mt.ID); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, mt.ID, `^user_`))
+	}
+	for _, e := range mt.Keys {
+		if e.Object == "" {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response.keys[*]`, "object"))
+		}
+		if e.Mode == "" {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response.keys[*]`, "mode"))
+		}
+		if e.Key == "" {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response.keys[*]`, "key"))
+		}
+		if e.CreatedAt == "" {
+			err = goa.MergeErrors(err, goa.MissingAttributeError(`response.keys[*]`, "created_at"))
+		}
+
+		if !(e.Mode == "test" || e.Mode == "production") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.keys[*].mode`, e.Mode, []interface{}{"test", "production"}))
+		}
+		if ok := goa.ValidatePattern(`^ApiKey$`, e.Object); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.keys[*].object`, e.Object, `^ApiKey$`))
+		}
+	}
+	return
+}
+
+// DecodeEasypostAPIKeys decodes the EasypostAPIKeys instance encoded in resp body.
+func (c *Client) DecodeEasypostAPIKeys(resp *http.Response) (*EasypostAPIKeys, error) {
+	var decoded EasypostAPIKeys
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // A CarrierAccount encapsulates your credentials with the carrier. The CarrierAccount object provides CRUD operations for all CarrierAccounts. (default view)
 //
 // Identifier: application/easypost.carrier_accounts+json
@@ -300,6 +559,114 @@ type EasypostFieldsObject struct {
 // DecodeEasypostFieldsObject decodes the EasypostFieldsObject instance encoded in resp body.
 func (c *Client) DecodeEasypostFieldsObject(resp *http.Response) (*EasypostFieldsObject, error) {
 	var decoded EasypostFieldsObject
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// EasypostParcel media type (default view)
+//
+// Identifier: application/easypost.parcel+json
+type EasypostParcel struct {
+	// Time Created
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	// Required if predefined_package is empty. float (inches)
+	Height *float64 `form:"height,omitempty" json:"height,omitempty" xml:"height,omitempty"`
+	// Unique, begins with "prcl_"
+	ID string `form:"id" json:"id" xml:"id"`
+	// Required if predefined_package is empty. float (inches)
+	Length *float64 `form:"length,omitempty" json:"length,omitempty" xml:"length,omitempty"`
+	// Set based on which api-key you used, either "test" or "production"
+	Mode string `form:"mode" json:"mode" xml:"mode"`
+	// Always: "Parcel"
+	Object string `form:"object" json:"object" xml:"object"`
+	// Optional, one of our predefined_packages
+	PredefinedPackage *string `form:"predefined_package,omitempty" json:"predefined_package,omitempty" xml:"predefined_package,omitempty"`
+	// Time Last Updated
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	// Always required. float(oz)
+	Weight float64 `form:"weight" json:"weight" xml:"weight"`
+	// Required if predefined_package is empty. float (inches)
+	Width *float64 `form:"width,omitempty" json:"width,omitempty" xml:"width,omitempty"`
+}
+
+// Validate validates the EasypostParcel media type instance.
+func (mt *EasypostParcel) Validate() (err error) {
+	if mt.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	}
+	if mt.Object == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "object"))
+	}
+
+	if ok := goa.ValidatePattern(`^prcl_`, mt.ID); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, mt.ID, `^prcl_`))
+	}
+	if !(mt.Mode == "test" || mt.Mode == "production") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.mode`, mt.Mode, []interface{}{"test", "production"}))
+	}
+	if ok := goa.ValidatePattern(`^Parcel$`, mt.Object); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.object`, mt.Object, `^Parcel$`))
+	}
+	return
+}
+
+// DecodeEasypostParcel decodes the EasypostParcel instance encoded in resp body.
+func (c *Client) DecodeEasypostParcel(resp *http.Response) (*EasypostParcel, error) {
+	var decoded EasypostParcel
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// EasypostShipment media type (default view)
+//
+// Identifier: application/easypost.shipment+json
+type EasypostShipment struct {
+	// Time Created
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	// Required if predefined_package is empty. float (inches)
+	Height *float64 `form:"height,omitempty" json:"height,omitempty" xml:"height,omitempty"`
+	// Unique, begins with "prcl_"
+	ID string `form:"id" json:"id" xml:"id"`
+	// Required if predefined_package is empty. float (inches)
+	Length *float64 `form:"length,omitempty" json:"length,omitempty" xml:"length,omitempty"`
+	// Set based on which api-key you used, either "test" or "production"
+	Mode string `form:"mode" json:"mode" xml:"mode"`
+	// Always: "Parcel"
+	Object string `form:"object" json:"object" xml:"object"`
+	// Optional, one of our predefined_packages
+	PredefinedPackage *string `form:"predefined_package,omitempty" json:"predefined_package,omitempty" xml:"predefined_package,omitempty"`
+	// Time Last Updated
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	// Always required. float(oz)
+	Weight float64 `form:"weight" json:"weight" xml:"weight"`
+	// Required if predefined_package is empty. float (inches)
+	Width *float64 `form:"width,omitempty" json:"width,omitempty" xml:"width,omitempty"`
+}
+
+// Validate validates the EasypostShipment media type instance.
+func (mt *EasypostShipment) Validate() (err error) {
+	if mt.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	}
+	if mt.Object == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "object"))
+	}
+
+	if ok := goa.ValidatePattern(`^prcl_`, mt.ID); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, mt.ID, `^prcl_`))
+	}
+	if !(mt.Mode == "test" || mt.Mode == "production") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.mode`, mt.Mode, []interface{}{"test", "production"}))
+	}
+	if ok := goa.ValidatePattern(`^Parcel$`, mt.Object); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.object`, mt.Object, `^Parcel$`))
+	}
+	return
+}
+
+// DecodeEasypostShipment decodes the EasypostShipment instance encoded in resp body.
+func (c *Client) DecodeEasypostShipment(resp *http.Response) (*EasypostShipment, error) {
+	var decoded EasypostShipment
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }

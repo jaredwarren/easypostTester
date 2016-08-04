@@ -28,6 +28,11 @@ type (
 		PrettyPrint bool
 	}
 
+	// ListAPIKeyCommand is the command line data structure for the list action of api_key
+	ListAPIKeyCommand struct {
+		PrettyPrint bool
+	}
+
 	// CreateCarrierAccountCommand is the command line data structure for the create action of carrier_account
 	CreateCarrierAccountCommand struct {
 		Payload     string
@@ -66,6 +71,20 @@ type (
 	ShowCarrierTypesCommand struct {
 		PrettyPrint bool
 	}
+
+	// CreateParcelCommand is the command line data structure for the create action of parcel
+	CreateParcelCommand struct {
+		Payload     string
+		ContentType string
+		PrettyPrint bool
+	}
+
+	// ShowParcelCommand is the command line data structure for the show action of parcel
+	ShowParcelCommand struct {
+		// Parcel ID
+		ID          string
+		PrettyPrint bool
+	}
 )
 
 // RegisterCommands registers the resource action CLI commands.
@@ -93,14 +112,9 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 	tmp2.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp2.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "delete",
-		Short: `CarrierAccount objects may be removed from your account when they become out of date or no longer useful.`,
-	}
-	tmp3 := new(DeleteCarrierAccountCommand)
+	tmp3 := new(CreateParcelCommand)
 	sub = &cobra.Command{
-		Use:   `carrier_account ["/v2/carrier_accounts/ID"]`,
+		Use:   `parcel ["/v2/parcels"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp3.Run(c, args) },
 	}
@@ -109,12 +123,12 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "list",
-		Short: `Retrieve an unpaginated list of all CarrierAccounts available to the authenticated account. Only Production API keys may be used to retrieve this list, as there is no test mode equivalent.`,
+		Use:   "delete",
+		Short: `CarrierAccount objects may be removed from your account when they become out of date or no longer useful.`,
 	}
-	tmp4 := new(ListCarrierAccountCommand)
+	tmp4 := new(DeleteCarrierAccountCommand)
 	sub = &cobra.Command{
-		Use:   `carrier_account ["/v2/carrier_accounts"]`,
+		Use:   `carrier_account ["/v2/carrier_accounts/ID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp4.Run(c, args) },
 	}
@@ -123,42 +137,42 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "show",
-		Short: `show action`,
+		Use:   "list",
+		Short: `list action`,
 	}
-	tmp5 := new(ShowAddressCommand)
+	tmp5 := new(ListAPIKeyCommand)
 	sub = &cobra.Command{
-		Use:   `address ["/v2/addresses/ID"]`,
+		Use:   `api_key ["/v2/api_keys"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp5.Run(c, args) },
 	}
 	tmp5.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp5.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp6 := new(ShowCarrierAccountCommand)
+	tmp6 := new(ListCarrierAccountCommand)
 	sub = &cobra.Command{
-		Use:   `carrier_account ["/v2/carrier_accounts/ID"]`,
+		Use:   `carrier_account ["/v2/carrier_accounts"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp6.Run(c, args) },
 	}
 	tmp6.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp6.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp7 := new(ShowCarrierTypesCommand)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "show",
+		Short: `show action`,
+	}
+	tmp7 := new(ShowAddressCommand)
 	sub = &cobra.Command{
-		Use:   `carrier_types ["/v2/carrier_types"]`,
+		Use:   `address ["/v2/addresses/ID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp7.Run(c, args) },
 	}
 	tmp7.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp7.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "update",
-		Short: `Updates can be made to description, reference, and any fields in credentials or test_credentials.`,
-	}
-	tmp8 := new(UpdateCarrierAccountCommand)
+	tmp8 := new(ShowCarrierAccountCommand)
 	sub = &cobra.Command{
 		Use:   `carrier_account ["/v2/carrier_accounts/ID"]`,
 		Short: ``,
@@ -166,6 +180,38 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 	}
 	tmp8.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp8.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	tmp9 := new(ShowCarrierTypesCommand)
+	sub = &cobra.Command{
+		Use:   `carrier_types ["/v2/carrier_types"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp9.Run(c, args) },
+	}
+	tmp9.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp9.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	tmp10 := new(ShowParcelCommand)
+	sub = &cobra.Command{
+		Use:   `parcel ["/v2/parcels/ID"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp10.Run(c, args) },
+	}
+	tmp10.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp10.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "update",
+		Short: `Updates can be made to description, reference, and any fields in credentials or test_credentials.`,
+	}
+	tmp11 := new(UpdateCarrierAccountCommand)
+	sub = &cobra.Command{
+		Use:   `carrier_account ["/v2/carrier_accounts/ID"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp11.Run(c, args) },
+	}
+	tmp11.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp11.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 }
@@ -264,6 +310,30 @@ func (cmd *ShowAddressCommand) Run(c *client.Client, args []string) error {
 func (cmd *ShowAddressCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var id string
 	cc.Flags().StringVar(&cmd.ID, "id", id, `Address ID`)
+}
+
+// Run makes the HTTP request corresponding to the ListAPIKeyCommand command.
+func (cmd *ListAPIKeyCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = "/v2/api_keys"
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.ListAPIKey(ctx, path)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *ListAPIKeyCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 }
 
 // Run makes the HTTP request corresponding to the CreateCarrierAccountCommand command.
@@ -432,4 +502,63 @@ func (cmd *ShowCarrierTypesCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *ShowCarrierTypesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+}
+
+// Run makes the HTTP request corresponding to the CreateParcelCommand command.
+func (cmd *CreateParcelCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = "/v2/parcels"
+	}
+	var payload client.CreateParcelPayload
+	if cmd.Payload != "" {
+		err := json.Unmarshal([]byte(cmd.Payload), &payload)
+		if err != nil {
+			return fmt.Errorf("failed to deserialize payload: %s", err)
+		}
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.CreateParcel(ctx, path, &payload, cmd.ContentType)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *CreateParcelCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
+	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
+}
+
+// Run makes the HTTP request corresponding to the ShowParcelCommand command.
+func (cmd *ShowParcelCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/v2/parcels/%v", cmd.ID)
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.ShowParcel(ctx, path)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *ShowParcelCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var id string
+	cc.Flags().StringVar(&cmd.ID, "id", id, `Parcel ID`)
 }

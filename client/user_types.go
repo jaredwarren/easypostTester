@@ -372,6 +372,122 @@ type FieldsObjectPayload struct {
 	TestCredentials *interface{} `form:"test_credentials,omitempty" json:"test_credentials,omitempty" xml:"test_credentials,omitempty"`
 }
 
+// Parcel objects represent the physical container being shipped. Dimensions can be supplied either as length, width, and height dimensions, or a predefined_package string. If you provide a carrier specific predefined_package the associated Shipment will only fetch rates from that carrier.
+type parcelPayload struct {
+	// Required if predefined_package is empty. float (inches)
+	Height *float64 `form:"height,omitempty" json:"height,omitempty" xml:"height,omitempty"`
+	// Required if predefined_package is empty. float (inches)
+	Length *float64 `form:"length,omitempty" json:"length,omitempty" xml:"length,omitempty"`
+	// Optional, one of our predefined_packages
+	PredefinedPackage *string `form:"predefined_package,omitempty" json:"predefined_package,omitempty" xml:"predefined_package,omitempty"`
+	// Always required. float(oz)
+	Weight *float64 `form:"weight,omitempty" json:"weight,omitempty" xml:"weight,omitempty"`
+	// Required if predefined_package is empty. float (inches)
+	Width *float64 `form:"width,omitempty" json:"width,omitempty" xml:"width,omitempty"`
+}
+
+// Validate validates the parcelPayload type instance.
+func (ut *parcelPayload) Validate() (err error) {
+	if ut.Weight == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "weight"))
+	}
+
+	return
+}
+
+// Publicize creates ParcelPayload from parcelPayload
+func (ut *parcelPayload) Publicize() *ParcelPayload {
+	var pub ParcelPayload
+	if ut.Height != nil {
+		pub.Height = ut.Height
+	}
+	if ut.Length != nil {
+		pub.Length = ut.Length
+	}
+	if ut.PredefinedPackage != nil {
+		pub.PredefinedPackage = ut.PredefinedPackage
+	}
+	if ut.Weight != nil {
+		pub.Weight = *ut.Weight
+	}
+	if ut.Width != nil {
+		pub.Width = ut.Width
+	}
+	return &pub
+}
+
+// Parcel objects represent the physical container being shipped. Dimensions can be supplied either as length, width, and height dimensions, or a predefined_package string. If you provide a carrier specific predefined_package the associated Shipment will only fetch rates from that carrier.
+type ParcelPayload struct {
+	// Required if predefined_package is empty. float (inches)
+	Height *float64 `form:"height,omitempty" json:"height,omitempty" xml:"height,omitempty"`
+	// Required if predefined_package is empty. float (inches)
+	Length *float64 `form:"length,omitempty" json:"length,omitempty" xml:"length,omitempty"`
+	// Optional, one of our predefined_packages
+	PredefinedPackage *string `form:"predefined_package,omitempty" json:"predefined_package,omitempty" xml:"predefined_package,omitempty"`
+	// Always required. float(oz)
+	Weight float64 `form:"weight" json:"weight" xml:"weight"`
+	// Required if predefined_package is empty. float (inches)
+	Width *float64 `form:"width,omitempty" json:"width,omitempty" xml:"width,omitempty"`
+}
+
+// Parcel objects represent the physical container being shipped. Dimensions can be supplied either as length, width, and height dimensions, or a predefined_package string. If you provide a carrier specific predefined_package the associated Shipment will only fetch rates from that carrier.
+type shipmentPayload struct {
+	// Required if predefined_package is empty. float (inches)
+	Height *float64 `form:"height,omitempty" json:"height,omitempty" xml:"height,omitempty"`
+	// Required if predefined_package is empty. float (inches)
+	Length *float64 `form:"length,omitempty" json:"length,omitempty" xml:"length,omitempty"`
+	// Optional, one of our predefined_packages
+	PredefinedPackage *string `form:"predefined_package,omitempty" json:"predefined_package,omitempty" xml:"predefined_package,omitempty"`
+	// Always required. float(oz)
+	Weight *float64 `form:"weight,omitempty" json:"weight,omitempty" xml:"weight,omitempty"`
+	// Required if predefined_package is empty. float (inches)
+	Width *float64 `form:"width,omitempty" json:"width,omitempty" xml:"width,omitempty"`
+}
+
+// Validate validates the shipmentPayload type instance.
+func (ut *shipmentPayload) Validate() (err error) {
+	if ut.Weight == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "weight"))
+	}
+
+	return
+}
+
+// Publicize creates ShipmentPayload from shipmentPayload
+func (ut *shipmentPayload) Publicize() *ShipmentPayload {
+	var pub ShipmentPayload
+	if ut.Height != nil {
+		pub.Height = ut.Height
+	}
+	if ut.Length != nil {
+		pub.Length = ut.Length
+	}
+	if ut.PredefinedPackage != nil {
+		pub.PredefinedPackage = ut.PredefinedPackage
+	}
+	if ut.Weight != nil {
+		pub.Weight = *ut.Weight
+	}
+	if ut.Width != nil {
+		pub.Width = ut.Width
+	}
+	return &pub
+}
+
+// Parcel objects represent the physical container being shipped. Dimensions can be supplied either as length, width, and height dimensions, or a predefined_package string. If you provide a carrier specific predefined_package the associated Shipment will only fetch rates from that carrier.
+type ShipmentPayload struct {
+	// Required if predefined_package is empty. float (inches)
+	Height *float64 `form:"height,omitempty" json:"height,omitempty" xml:"height,omitempty"`
+	// Required if predefined_package is empty. float (inches)
+	Length *float64 `form:"length,omitempty" json:"length,omitempty" xml:"length,omitempty"`
+	// Optional, one of our predefined_packages
+	PredefinedPackage *string `form:"predefined_package,omitempty" json:"predefined_package,omitempty" xml:"predefined_package,omitempty"`
+	// Always required. float(oz)
+	Weight float64 `form:"weight" json:"weight" xml:"weight"`
+	// Required if predefined_package is empty. float (inches)
+	Width *float64 `form:"width,omitempty" json:"width,omitempty" xml:"width,omitempty"`
+}
+
 // applicationEasypostGieldErrorJSON user type.
 type applicationEasypostGieldErrorJSON struct {
 	// Field of the request that the error describes

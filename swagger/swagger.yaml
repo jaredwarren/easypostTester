@@ -110,6 +110,35 @@ definitions:
     - type
     title: CreateCarrierAccountPayload
     type: object
+  CreateParcelPayload:
+    description: Parcel objects represent the physical container being shipped. Dimensions
+      can be supplied either as length, width, and height dimensions, or a predefined_package
+      string. If you provide a carrier specific predefined_package the associated
+      Shipment will only fetch rates from that carrier.
+    properties:
+      height:
+        description: Required if predefined_package is empty. float (inches)
+        format: double
+        type: number
+      length:
+        description: Required if predefined_package is empty. float (inches)
+        format: double
+        type: number
+      predefined_package:
+        description: Optional, one of our predefined_packages
+        type: string
+      weight:
+        description: Always required. float(oz)
+        format: double
+        type: number
+      width:
+        description: Required if predefined_package is empty. float (inches)
+        format: double
+        type: number
+    required:
+    - weight
+    title: CreateParcelPayload
+    type: object
   EasypostAddress:
     description: EasypostAddress media type (default view)
     example:
@@ -268,54 +297,273 @@ definitions:
         $ref: '#/definitions/EasypostAddress_verification'
     title: 'Mediatype identifier: application/easypost.address_verifications+json'
     type: object
+  EasypostApi_key:
+    description: EasypostApi_key media type (default view)
+    example:
+      created_at: Nostrum delectus voluptatem deserunt alias sunt.
+      key: Itaque laborum.
+      mode: test
+      object: ApiKey
+    properties:
+      created_at:
+        description: The User id of the authenticated User making the API Key request
+        example: Nostrum delectus voluptatem deserunt alias sunt.
+        type: string
+      key:
+        description: The actual key value to use for authentication
+        example: Itaque laborum.
+        type: string
+      mode:
+        default: test
+        description: '"test" or "production"'
+        enum:
+        - test
+        - production
+        example: test
+        type: string
+      object:
+        default: ApiKey
+        description: 'Always: "ApiKey"'
+        example: ApiKey
+        pattern: ^ApiKey$
+        type: string
+    required:
+    - object
+    - mode
+    - key
+    - created_at
+    title: 'Mediatype identifier: application/easypost.api_key+json'
+    type: object
+  EasypostApi_key_child:
+    description: EasypostApi_key_child media type (default view)
+    properties:
+      children:
+        $ref: '#/definitions/EasypostApi_key_childCollection'
+      id:
+        description: The User id of the authenticated User making the API Key request
+        example: user_
+        pattern: ^user_
+        type: string
+      keys:
+        description: The list of all API keys active for an account, both for "test"
+          and "production" modes.
+        example:
+        - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+          key: Itaque laborum.
+          mode: test
+          object: ApiKey
+        - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+          key: Itaque laborum.
+          mode: test
+          object: ApiKey
+        items:
+          $ref: '#/definitions/EasypostApi_key'
+        type: array
+    required:
+    - id
+    - children
+    - keys
+    title: 'Mediatype identifier: application/easypost.api_key_child+json'
+    type: object
+  EasypostApi_key_childCollection:
+    description: EasypostApi_key_childCollection is the media type for an array of
+      EasypostApi_key_child (default view)
+    items:
+      $ref: '#/definitions/EasypostApi_key_child'
+    title: 'Mediatype identifier: application/easypost.api_key_child+json; type=collection'
+    type: array
+  EasypostApi_keys:
+    description: EasypostApi_keys media type (default view)
+    example:
+      children:
+      - children:
+        - children: '-'
+          id: user_
+          keys:
+          - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+            key: Itaque laborum.
+            mode: test
+            object: ApiKey
+          - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+            key: Itaque laborum.
+            mode: test
+            object: ApiKey
+        id: user_
+        keys:
+        - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+          key: Itaque laborum.
+          mode: test
+          object: ApiKey
+        - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+          key: Itaque laborum.
+          mode: test
+          object: ApiKey
+      - children:
+        - children: '-'
+          id: user_
+          keys:
+          - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+            key: Itaque laborum.
+            mode: test
+            object: ApiKey
+          - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+            key: Itaque laborum.
+            mode: test
+            object: ApiKey
+        id: user_
+        keys:
+        - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+          key: Itaque laborum.
+          mode: test
+          object: ApiKey
+        - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+          key: Itaque laborum.
+          mode: test
+          object: ApiKey
+      id: user_
+      keys:
+      - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+        key: Itaque laborum.
+        mode: test
+        object: ApiKey
+      - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+        key: Itaque laborum.
+        mode: test
+        object: ApiKey
+      - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+        key: Itaque laborum.
+        mode: test
+        object: ApiKey
+    properties:
+      children:
+        description: A list of all Child Users presented with ONLY id, children, and
+          key array structures.
+        example:
+        - children:
+          - children: '-'
+            id: user_
+            keys:
+            - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+              key: Itaque laborum.
+              mode: test
+              object: ApiKey
+            - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+              key: Itaque laborum.
+              mode: test
+              object: ApiKey
+          id: user_
+          keys:
+          - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+            key: Itaque laborum.
+            mode: test
+            object: ApiKey
+          - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+            key: Itaque laborum.
+            mode: test
+            object: ApiKey
+        - children:
+          - children: '-'
+            id: user_
+            keys:
+            - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+              key: Itaque laborum.
+              mode: test
+              object: ApiKey
+            - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+              key: Itaque laborum.
+              mode: test
+              object: ApiKey
+          id: user_
+          keys:
+          - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+            key: Itaque laborum.
+            mode: test
+            object: ApiKey
+          - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+            key: Itaque laborum.
+            mode: test
+            object: ApiKey
+        items:
+          $ref: '#/definitions/EasypostApi_key_child'
+        type: array
+      id:
+        description: The User id of the authenticated User making the API Key request
+        example: user_
+        pattern: ^user_
+        type: string
+      keys:
+        description: The list of all API keys active for an account, both for "test"
+          and "production" modes.
+        example:
+        - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+          key: Itaque laborum.
+          mode: test
+          object: ApiKey
+        - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+          key: Itaque laborum.
+          mode: test
+          object: ApiKey
+        - created_at: Nostrum delectus voluptatem deserunt alias sunt.
+          key: Itaque laborum.
+          mode: test
+          object: ApiKey
+        items:
+          $ref: '#/definitions/EasypostApi_key'
+        type: array
+    required:
+    - id
+    - children
+    - keys
+    title: 'Mediatype identifier: application/easypost.api_keys+json'
+    type: object
   EasypostCarrier_accounts:
     description: A CarrierAccount encapsulates your credentials with the carrier.
       The CarrierAccount object provides CRUD operations for all CarrierAccounts.
       (default view)
     example:
-      clone: true
-      created_at: Delectus voluptatem.
-      credentials: 1.8787144e+18
-      description: Culpa itaque laborum.
+      clone: false
+      created_at: Optio ut cupiditate.
+      credentials: 2001-11-10T05:26:34-07:00
+      description: Eos alias.
       fields:
-        auto_link: true
-        credentials: 0.6844517
+        auto_link: false
+        credentials: false
         custom_workflow: false
-        test_credentials: 6.091365e+17
-      id: Et hic consequatur optio ut cupiditate maxime.
-      logo: Ab eos alias quasi.
+        test_credentials: true
+      id: Aliquam hic aut doloremque.
+      logo: Corporis quaerat.
       object: CarrierAccount
-      readable: Velit ullam ut.
-      reference: Impedit aliquam hic.
-      test_credentials: 2.8149617e+18
-      type: Corporis quaerat.
-      updated_at: Alias perspiciatis modi.
+      readable: Alias perspiciatis modi.
+      reference: Consequatur omnis sit vel.
+      test_credentials: 0.99748844
+      type: Nostrum voluptates et reiciendis consequuntur tenetur.
+      updated_at: Alias ipsa pariatur.
     properties:
       clone:
         default: false
         description: If clone is true, only the reference and description are possible
           to update
-        example: true
+        example: false
         type: boolean
       created_at:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Delectus voluptatem.
+        example: Optio ut cupiditate.
         type: string
       credentials:
         description: Unlike the "credentials" object contained in "fields", this nullable
           object contains just raw credential pairs for client library consumption
-        example: 1.8787144e+18
+        example: 2001-11-10T05:26:34-07:00
         type: any
       description:
         description: An optional, user-readable field to help distinguish accounts
-        example: Culpa itaque laborum.
+        example: Eos alias.
         type: string
       fields:
         $ref: '#/definitions/FieldsObjectPayload'
       id:
         description: Unique, begins with "ca_"
-        example: Et hic consequatur optio ut cupiditate maxime.
+        example: Aliquam hic aut doloremque.
         type: string
       object:
         default: CarrierAccount
@@ -326,28 +574,28 @@ definitions:
       readable:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Velit ullam ut.
+        example: Alias perspiciatis modi.
         type: string
       reference:
         description: An optional field that may be used in place of carrier_account_id
           in other API endpoints
-        example: Impedit aliquam hic.
+        example: Consequatur omnis sit vel.
         type: string
       test_credentials:
         description: Unlike the "test_credentials" object contained in "fields", this
           nullable object contains just raw test_credential pairs for client library
           consumption
-        example: 2.8149617e+18
+        example: 0.99748844
         type: any
       type:
         description: The name of the carrier type. Note that "EndiciaAccount" is the
           current USPS integration account type
-        example: Corporis quaerat.
+        example: Nostrum voluptates et reiciendis consequuntur tenetur.
         type: string
       updated_at:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Alias perspiciatis modi.
+        example: Alias ipsa pariatur.
         type: string
     required:
     - id
@@ -361,12 +609,28 @@ definitions:
     example:
       fields:
         auto_link: false
-        credentials: 2007-04-03T15:35:34-06:00
-        custom_workflow: false
-        test_credentials: true
+        credentials: 4.658819e+18
+        custom_workflow: true
+        test_credentials:
+        - 151
+        - 154
+        - 133
+        - 165
+        - 84
+        - 162
+        - 67
+        - 209
+        - 186
+        - 112
+        - 4
+        - 151
+        - 45
+        - 206
+        - 215
+        - 2
       object: CarrierType
-      readable: Vel nostrum.
-      type: Et reiciendis consequuntur.
+      readable: Saepe corrupti.
+      type: Et reprehenderit vitae non atque.
     properties:
       fields:
         $ref: '#/definitions/EasypostFields_object'
@@ -379,12 +643,12 @@ definitions:
       readable:
         description: The name used when displaying a readable value for the type of
           the account
-        example: Vel nostrum.
+        example: Saepe corrupti.
         type: string
       type:
         description: The name of the carrier type. Note that "EndiciaAccount" is the
           current USPS integration account type
-        example: Et reiciendis consequuntur.
+        example: Et reprehenderit vitae non atque.
         type: string
     required:
     - type
@@ -398,28 +662,28 @@ definitions:
     example:
     - fields:
         auto_link: false
-        credentials: 2007-04-03T15:35:34-06:00
-        custom_workflow: false
-        test_credentials: true
+        credentials: 4.658819e+18
+        custom_workflow: true
+        test_credentials:
+        - 151
+        - 154
+        - 133
+        - 165
+        - 84
+        - 162
+        - 67
+        - 209
+        - 186
+        - 112
+        - 4
+        - 151
+        - 45
+        - 206
+        - 215
+        - 2
       object: CarrierType
-      readable: Vel nostrum.
-      type: Et reiciendis consequuntur.
-    - fields:
-        auto_link: false
-        credentials: 2007-04-03T15:35:34-06:00
-        custom_workflow: false
-        test_credentials: true
-      object: CarrierType
-      readable: Vel nostrum.
-      type: Et reiciendis consequuntur.
-    - fields:
-        auto_link: false
-        credentials: 2007-04-03T15:35:34-06:00
-        custom_workflow: false
-        test_credentials: true
-      object: CarrierType
-      readable: Vel nostrum.
-      type: Et reiciendis consequuntur.
+      readable: Saepe corrupti.
+      type: Et reprehenderit vitae non atque.
     items:
       $ref: '#/definitions/EasypostCarrier_types'
     title: 'Mediatype identifier: application/easypost.carrier_types+json; type=collection'
@@ -434,20 +698,107 @@ definitions:
         type: boolean
       credentials:
         description: Credentials used in the production environment.
-        example: 2007-04-03T15:35:34-06:00
+        example: 4.658819e+18
         type: any
       custom_workflow:
         description: When present, a seperate authentication process will be required
           through the UI to link this account type.
-        example: false
+        example: true
         type: boolean
       test_credentials:
         description: Credentials used in the test environment.
-        example: true
+        example:
+        - 151
+        - 154
+        - 133
+        - 165
+        - 84
+        - 162
+        - 67
+        - 209
+        - 186
+        - 112
+        - 4
+        - 151
+        - 45
+        - 206
+        - 215
+        - 2
         type: any
     required:
     - credentials
     title: 'Mediatype identifier: application/easypost.fields_object+json'
+    type: object
+  EasypostParcel:
+    description: EasypostParcel media type (default view)
+    example:
+      created_at: Et dolore nemo rem rem consequuntur voluptatem.
+      height: 0.6427331
+      id: prcl_
+      length: 0.54780674
+      mode: production
+      object: Parcel
+      predefined_package: Dolorum quia ullam.
+      updated_at: Maxime laborum.
+      weight: 0.5287105
+      width: 0.9198236
+    properties:
+      created_at:
+        description: Time Created
+        example: Et dolore nemo rem rem consequuntur voluptatem.
+        type: string
+      height:
+        description: Required if predefined_package is empty. float (inches)
+        example: 0.6427331
+        format: double
+        type: number
+      id:
+        description: Unique, begins with "prcl_"
+        example: prcl_
+        pattern: ^prcl_
+        type: string
+      length:
+        description: Required if predefined_package is empty. float (inches)
+        example: 0.54780674
+        format: double
+        type: number
+      mode:
+        default: test
+        description: Set based on which api-key you used, either "test" or "production"
+        enum:
+        - test
+        - production
+        example: production
+        type: string
+      object:
+        default: Parcel
+        description: 'Always: "Parcel"'
+        example: Parcel
+        pattern: ^Parcel$
+        type: string
+      predefined_package:
+        description: Optional, one of our predefined_packages
+        example: Dolorum quia ullam.
+        type: string
+      updated_at:
+        description: Time Last Updated
+        example: Maxime laborum.
+        type: string
+      weight:
+        description: Always required. float(oz)
+        example: 0.5287105
+        format: double
+        type: number
+      width:
+        description: Required if predefined_package is empty. float (inches)
+        example: 0.9198236
+        format: double
+        type: number
+    required:
+    - id
+    - object
+    - weight
+    title: 'Mediatype identifier: application/easypost.parcel+json'
     type: object
   FieldsObjectPayload:
     description: Contains "credentials" and/or "test_credentials", or may be empty
@@ -455,11 +806,11 @@ definitions:
       auto_link:
         default: false
         description: For USPS this designates that no credentials are required.
-        example: true
+        example: false
         type: boolean
       credentials:
         description: Credentials used in the production environment.
-        example: 0.6844517
+        example: false
         type: any
       custom_workflow:
         default: false
@@ -469,7 +820,7 @@ definitions:
         type: boolean
       test_credentials:
         description: Credentials used in the test environment.
-        example: 6.091365e+17
+        example: true
         type: any
     title: FieldsObjectPayload
     type: object
@@ -584,6 +935,22 @@ paths:
       summary: show address
       tags:
       - address
+  /api_keys:
+    get:
+      description: Both production and test keys will be returned a User and all of
+        its children. If the request is authenticated as a Child only the API Keys
+        for that Child will be returned.
+      operationId: api_key#list
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostApi_keys'
+      schemes:
+      - http
+      summary: list api_key
+      tags:
+      - api_key
   /carrier_accounts:
     get:
       description: Retrieve an unpaginated list of all CarrierAccounts available to
@@ -707,6 +1074,57 @@ paths:
       summary: show carrier_types
       tags:
       - carrier_types
+  /parcels:
+    post:
+      description: Include the weight, and either a predefined_package or length,
+        width and height.
+      operationId: parcel#create
+      parameters:
+      - description: Parcel objects represent the physical container being shipped.
+          Dimensions can be supplied either as length, width, and height dimensions,
+          or a predefined_package string. If you provide a carrier specific predefined_package
+          the associated Shipment will only fetch rates from that carrier.
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateParcelPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostParcel'
+      schemes:
+      - http
+      summary: create parcel
+      tags:
+      - parcel
+  /parcels/{id}:
+    get:
+      description: Get a Parcel by its id. In general you should not need to use this
+        in your automated solution. A Parcel's id can be inlined into the creation
+        call to other objects. This allows you to only create one Parcel for each
+        package you will be using.
+      operationId: parcel#show
+      parameters:
+      - description: Parcel ID
+        in: path
+        name: id
+        pattern: ^prcl_
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostParcel'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show parcel
+      tags:
+      - parcel
 produces:
 - application/json
 responses:

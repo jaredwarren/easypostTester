@@ -28,3 +28,8 @@ func CarrierAccountHref(id interface{}) string {
 func CarrierTypesHref() string {
 	return fmt.Sprintf("/v2/carrier_types")
 }
+
+// ParcelHref returns the resource href.
+func ParcelHref(id interface{}) string {
+	return fmt.Sprintf("/v2/parcels/%v", id)
+}

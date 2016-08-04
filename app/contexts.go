@@ -249,6 +249,30 @@ func (ctx *ShowAddressContext) NotFound() error {
 	return nil
 }
 
+// ListAPIKeyContext provides the api_key list action context.
+type ListAPIKeyContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+}
+
+// NewListAPIKeyContext parses the incoming request URL and body, performs validations and creates the
+// context used by the api_key controller list action.
+func NewListAPIKeyContext(ctx context.Context, service *goa.Service) (*ListAPIKeyContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	rctx := ListAPIKeyContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListAPIKeyContext) OK(r []*EasypostAPIKeys) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/easypost.api_keys+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // CreateCarrierAccountContext provides the carrier_account create action context.
 type CreateCarrierAccountContext struct {
 	context.Context
@@ -629,4 +653,126 @@ func NewShowCarrierTypesContext(ctx context.Context, service *goa.Service) (*Sho
 func (ctx *ShowCarrierTypesContext) OK(r EasypostCarrierTypesCollection) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/easypost.carrier_types+json; type=collection")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// CreateParcelContext provides the parcel create action context.
+type CreateParcelContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *CreateParcelPayload
+}
+
+// NewCreateParcelContext parses the incoming request URL and body, performs validations and creates the
+// context used by the parcel controller create action.
+func NewCreateParcelContext(ctx context.Context, service *goa.Service) (*CreateParcelContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	rctx := CreateParcelContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// createParcelPayload is the parcel create action payload.
+type createParcelPayload struct {
+	// Required if predefined_package is empty. float (inches)
+	Height *float64 `form:"height,omitempty" json:"height,omitempty" xml:"height,omitempty"`
+	// Required if predefined_package is empty. float (inches)
+	Length *float64 `form:"length,omitempty" json:"length,omitempty" xml:"length,omitempty"`
+	// Optional, one of our predefined_packages
+	PredefinedPackage *string `form:"predefined_package,omitempty" json:"predefined_package,omitempty" xml:"predefined_package,omitempty"`
+	// Always required. float(oz)
+	Weight *float64 `form:"weight,omitempty" json:"weight,omitempty" xml:"weight,omitempty"`
+	// Required if predefined_package is empty. float (inches)
+	Width *float64 `form:"width,omitempty" json:"width,omitempty" xml:"width,omitempty"`
+}
+
+// Validate runs the validation rules defined in the design.
+func (payload *createParcelPayload) Validate() (err error) {
+	if payload.Weight == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "weight"))
+	}
+
+	return
+}
+
+// Publicize creates CreateParcelPayload from createParcelPayload
+func (payload *createParcelPayload) Publicize() *CreateParcelPayload {
+	var pub CreateParcelPayload
+	if payload.Height != nil {
+		pub.Height = payload.Height
+	}
+	if payload.Length != nil {
+		pub.Length = payload.Length
+	}
+	if payload.PredefinedPackage != nil {
+		pub.PredefinedPackage = payload.PredefinedPackage
+	}
+	if payload.Weight != nil {
+		pub.Weight = *payload.Weight
+	}
+	if payload.Width != nil {
+		pub.Width = payload.Width
+	}
+	return &pub
+}
+
+// CreateParcelPayload is the parcel create action payload.
+type CreateParcelPayload struct {
+	// Required if predefined_package is empty. float (inches)
+	Height *float64 `form:"height,omitempty" json:"height,omitempty" xml:"height,omitempty"`
+	// Required if predefined_package is empty. float (inches)
+	Length *float64 `form:"length,omitempty" json:"length,omitempty" xml:"length,omitempty"`
+	// Optional, one of our predefined_packages
+	PredefinedPackage *string `form:"predefined_package,omitempty" json:"predefined_package,omitempty" xml:"predefined_package,omitempty"`
+	// Always required. float(oz)
+	Weight float64 `form:"weight" json:"weight" xml:"weight"`
+	// Required if predefined_package is empty. float (inches)
+	Width *float64 `form:"width,omitempty" json:"width,omitempty" xml:"width,omitempty"`
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *CreateParcelContext) OK(r *EasypostParcel) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/easypost.parcel+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// ShowParcelContext provides the parcel show action context.
+type ShowParcelContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	ID string
+}
+
+// NewShowParcelContext parses the incoming request URL and body, performs validations and creates the
+// context used by the parcel controller show action.
+func NewShowParcelContext(ctx context.Context, service *goa.Service) (*ShowParcelContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	rctx := ShowParcelContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramID := req.Params["id"]
+	if len(paramID) > 0 {
+		rawID := paramID[0]
+		rctx.ID = rawID
+		if ok := goa.ValidatePattern(`^prcl_`, rctx.ID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`id`, rctx.ID, `^prcl_`))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ShowParcelContext) OK(r *EasypostParcel) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/easypost.parcel+json")
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *ShowParcelContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
 }

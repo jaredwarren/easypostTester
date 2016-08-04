@@ -180,7 +180,7 @@ var _ = Resource("shipment", func() {
 	Action("insure", func() {
 		Description("Insuring your Shipment is as simple as sending us the value of the contents. We charge 1% of the value, with a $1 minimum, and handle all the claims. All our claims are paid out within 30 days.")
 		Routing(POST("/:id/insure"))
-		Payload(InsurancePayload)
+		Payload(ShipmentInsurancePayload)
 		Response(OK)
 	})
 
@@ -234,31 +234,53 @@ var _ = Resource("insurance", func() {
 	BasePath("/insurances")
 	DefaultMedia(Tracker)
 
+	Action("create", func() {
+		Description("An Insurance created via this endpoint must belong to a shipment purchased outside of EasyPost. Insurance for Shipments created within EasyPost must be created via the Shipment Buy or Insure endpoints. When creating Insurance for a non-EasyPost shipment, you must provide to_address, from_address, tracking_code, and amount information. Optionally, you can provide the carrier parameter, which will help EasyPost identify the carrier the package was shipped with. If no carrier is provided, EasyPost will attempt to determine the carrier based on the tracking_code provided. Providing a carrier parameter is recommended, since some tracking_codes are ambiguous and may match with more than one carrier. In addition, not having to auto-match the carrier will significantly speed up the response time.")
+		Routing(POST("/"))
+		Payload(InsurancePayload) // TODO: handles create and return if is_return = true
+		Response(OK)
+	})
+
 	Action("list", func() {
-		Description("The Tracker List is a paginated list of all Tracker objects associated with the given API Key. It accepts a variety of parameters which can be used to modify the scope. The has_more attribute indicates whether or not additional pages can be requested. The recommended way of paginating is to use either the before_id or after_id parameter to specify where the next page begins.")
+		Description("The Insurance List is a paginated list of all Insurance objects associated with the given API Key. It accepts a variety of parameters which can be used to modify the scope. The has_more attribute indicates whether or not additional pages can be requested. The recommended way of paginating is to use either the before_id or after_id parameter to specify where the next page begins.")
 		Routing(GET("/"))
-		Payload(TrackerListPayload)
+		Payload(InsuranceListPayload)
 		Response(OK, Trackers)
 		Response(NotFound)
 	})
 
 	Action("show", func() {
-		Description("Retrieve a Tracker by id.")
+		Description("Retrieve an Insurance by id.")
 		Routing(GET("/:id"))
 		Params(func() {
-			Param("id", String, "Tracking ID")
+			Param("id", String, "Unique, starts with \"ins_\"")
 		})
 		Response(OK)
 		Response(NotFound)
 	})
+})
+
+/**
+* Customs
+**/
+var _ = Resource("customs_info", func() {
+	BasePath("/customs_infos")
+	DefaultMedia(CustomsInfo)
 
 	Action("create", func() {
-		Description("A Tracker can be created with only a tracking_code. Optionally, you can provide the carrier parameter, which indicates the carrier the package was shipped with. If no carrier is provided, EasyPost will attempt to determine the carrier based on the tracking_code provided. Providing a carrier parameter is recommended, since some tracking_codes are ambiguous and may match with more than one carrier. In addition, not having to auto-match the carrier will significantly speed up the response time.")
 		Routing(POST("/"))
-		Payload(TrackerPayload) // TODO: handles create and return if is_return = true
+		Payload(CustomsInfoPayload)
 		Response(OK)
 	})
+})
 
-	/// TESTING:   https://www.easypost.com/docs/api/curl#test-tracking-codes
+var _ = Resource("customs_item", func() {
+	BasePath("/customs_items")
+	DefaultMedia(CustomItem)
 
+	Action("create", func() {
+		Routing(POST("/"))
+		Payload(CustomItemPayload)
+		Response(OK)
+	})
 })

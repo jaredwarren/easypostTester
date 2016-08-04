@@ -448,6 +448,20 @@ var Shipment = MediaType("application/easypost.shipment+json", func() {
 			Default("test")
 		})
 
+		Attribute("to_address")
+		Attribute("from_address")
+		Attribute("return_address")
+		Attribute("buyer_address")
+		Attribute("parcel")
+		Attribute("customs_info")
+		Attribute("scan_form")
+		Attribute("forms")
+		Attribute("insurance")
+		Attribute("options")
+		Attribute("is_return")
+		Attribute("usps_zone")
+		Attribute("batch_id")
+
 		Attribute("rates", ArrayOf(Rate), "All associated Rate objects")
 		Attribute("selected_rate", Rate, "The specific rate purchased for the shipment, or null if unpurchased or purchased through another mechanism")
 		Attribute("postage_label", PostageLabel, "The associated PostageLabel object")
@@ -461,6 +475,7 @@ var Shipment = MediaType("application/easypost.shipment+json", func() {
 		})
 		Attribute("batch_status", String, "The current state of the associated BatchShipment")
 		Attribute("batch_message", String, "The current message of the associated BatchShipment")
+
 		Attribute("created_at", String, "Time Created")
 		Attribute("updated_at", String, "Time Last Updated")
 
@@ -470,13 +485,32 @@ var Shipment = MediaType("application/easypost.shipment+json", func() {
 		Attribute("id")
 		Attribute("object")
 		Attribute("mode")
-		Attribute("length")
-		Attribute("width")
-		Attribute("height")
-		Attribute("weight")
-		Attribute("predefined_package")
+		Attribute("rates")
+		Attribute("selected_rate")
+		Attribute("postage_label")
+		Attribute("messages")
+		Attribute("tracking_code")
+		Attribute("status")
+		Attribute("tracker")
+		Attribute("fees")
+		Attribute("refund_status")
+		Attribute("batch_status")
+		Attribute("batch_message")
 		Attribute("created_at")
 		Attribute("updated_at")
+		Attribute("to_address")
+		Attribute("from_address")
+		Attribute("return_address")
+		Attribute("buyer_address")
+		Attribute("parcel")
+		Attribute("customs_info")
+		Attribute("scan_form")
+		Attribute("forms")
+		Attribute("insurance")
+		Attribute("options")
+		Attribute("is_return")
+		Attribute("usps_zone")
+		Attribute("batch_id")
 	})
 })
 
@@ -491,7 +525,7 @@ var ShipmentPayload = Type("ShipmentPayload", func() {
 
 	Attribute("customs_info", CustomsInfo, "Information for the processing of customs")
 	Attribute("scan_form", ScanForm, "Document created to manifest and scan multiple shipments")
-	Attribute("forms", ArrayOf(Any), "All associated Form objects")
+	Attribute("forms", ArrayOf(Any), "All associated Form objects") // Not sure what "form" object looks like
 	Attribute("insurance", Insurance, "The associated Insurance object")
 	Attribute("options", Options, "All of the options passed to the shipment, discussed in more depth below")
 	Attribute("is_return", Boolean, "Set true to create as a return, discussed in more depth below")
@@ -520,6 +554,46 @@ var LabelShipmentPayload = Type("LabelShipmentPayload", func() {
 **/
 var Options = MediaType("application/easypost.options+json", func() {
 	Reference(OptionsPayload)
+	Attributes(func() {
+		Attribute("additional_handling")
+		Attribute("address_validation_level")
+		Attribute("alcohol")
+		Attribute("bill_receiver_account")
+		Attribute("bill_receiver_postal_code")
+		Attribute("bill_third_party_account")
+		Attribute("bill_third_party_country")
+		Attribute("bill_third_party_postal_code")
+		Attribute("by_drone")
+		Attribute("carbon_neutral")
+		Attribute("cod_amount")
+		Attribute("cod_method")
+		Attribute("currency")
+		Attribute("delivered_duty_paid")
+		Attribute("delivery_confirmation")
+		Attribute("dry_ice")
+		Attribute("dry_ice_medical")
+		Attribute("dry_ice_weight")
+		Attribute("freight_charge")
+		Attribute("handling_instructions")
+		Attribute("hold_for_pickup")
+		Attribute("invoice_number")
+		Attribute("label_date")
+		Attribute("label_format")
+		Attribute("machinable")
+		Attribute("print_custom_1")
+		Attribute("print_custom_2")
+		Attribute("print_custom_3")
+		Attribute("print_custom_1_barcode")
+		Attribute("print_custom_2_barcode")
+		Attribute("print_custom_3_barcode")
+		Attribute("print_custom_1_code")
+		Attribute("print_custom_2_code")
+		Attribute("print_custom_3_code")
+		Attribute("saturday_delivery")
+		Attribute("special_rates_eligibility")
+		Attribute("smartpost_hub")
+		Attribute("smartpost_manifest")
+	})
 	View("default", func() {
 		Attribute("additional_handling")
 		Attribute("address_validation_level")
@@ -721,11 +795,11 @@ var Insurance = MediaType("application/easypost.insurance+json", func() {
 
 		Required("id", "object")
 	})
+
 	View("default", func() {
 		Attribute("id")
 		Attribute("object")
 		Attribute("mode")
-
 		Attribute("reference")
 		Attribute("amount")
 		Attribute("provider")
@@ -738,13 +812,12 @@ var Insurance = MediaType("application/easypost.insurance+json", func() {
 		Attribute("from_address")
 		Attribute("fee")
 		Attribute("messages")
-
 		Attribute("created_at")
 		Attribute("updated_at")
 	})
 })
 
-var ShipmentInsurancePayload = Type("InsurancePayload", func() {
+var ShipmentInsurancePayload = Type("ShipmentInsurancePayload", func() {
 	Description("Insuring your Shipment is as simple as sending us the value of the contents. We charge 1% of the value, with a $1 minimum, and handle all the claims. All our claims are paid out within 30 days.")
 	Attribute("amount", String)
 	Required("amount")
@@ -770,7 +843,7 @@ var InsuranceListPayload = Type("InsuranceListPayload", func() {
 	Attribute("after_id", Address, "Optional pagination parameter. Only records created after the given ID will be included. May not be used with before_id")
 	Attribute("start_datetime", String, "Only return records created after this timestamp. Defaults to 1 month ago, or 1 month before a passed end_datetime")
 	Attribute("end_datetime", String, "Only return records created before this timestamp. Defaults to end of the current day, or 1 month after a passed start_datetime")
-	Attribute("page_size", String, "The number of records to return on each page. The maximum value is 100, and default is 20.", func() {
+	Attribute("page_size", Integer, "The number of records to return on each page. The maximum value is 100, and default is 20.", func() {
 		Minimum(1)
 		Maximum(100)
 		Default(20)
@@ -779,8 +852,13 @@ var InsuranceListPayload = Type("InsuranceListPayload", func() {
 
 var Insurances = MediaType("application/easypost.insurances+json", func() {
 	Description("The Insurance List is a paginated list of all Insurance objects associated with the given API Key. It accepts a variety of parameters which can be used to modify the scope. The has_more attribute indicates whether or not additional pages can be requested. The recommended way of paginating is to use either the before_id or after_id parameter to specify where the next page begins.")
-	Attribute("insurances", ArrayOf(Insurance))
+	Attributes(func() {
+		Attribute("insurances", ArrayOf(Insurance))
+	})
 	Required("insurances")
+	View("default", func() {
+		Attribute("insurances")
+	})
 })
 
 /**
@@ -842,8 +920,13 @@ var Tracker = MediaType("application/easypost.tracker+json", func() {
 	})
 })
 var Trackers = MediaType("application/easypost.trackers+json", func() {
-	Attribute("trackers", ArrayOf(Tracker))
+	Attributes(func() {
+		Attribute("trackers", ArrayOf(Tracker))
+	})
 	Required("trackers")
+	View("default", func() {
+		Attribute("trackers")
+	})
 })
 var TrackerPayload = Type("TrackerPayload", func() {
 	Attribute("tracking_code", String, "The tracking code associated with the package you'd like to track")
@@ -865,7 +948,7 @@ var TrackerListPayload = Type("TrackerListPayload", func() {
 
 	Required("tracking_code")
 })
-var TrackingDetail = Type("TrackingDetail", func() {
+var TrackingDetail = MediaType("application/easypost.trackingdetail+json", func() {
 	Description("Each TrackingDetail object contains the status, the message from the carrier, and a TrackingLocation.")
 	Attributes(func() {
 		Attribute("object", String, "Always: \"TrackingDetail\"", func() {
@@ -892,7 +975,7 @@ var TrackingDetail = Type("TrackingDetail", func() {
 		Attribute("tracking_location")
 	})
 })
-var TrackingLocation = Type("TrackingLocation", func() {
+var TrackingLocation = MediaType("application/easypost.trackinglocation+json", func() {
 	Description("The TrackingLocation contains city, state, country, and zip information about the location where the package was scanned. The information each carrier provides is different, so some carriers may not make use of all of these fields.")
 	Attributes(func() {
 		Attribute("object", String, "Always: \"TrackingLocation\"", func() {
@@ -915,7 +998,7 @@ var TrackingLocation = Type("TrackingLocation", func() {
 		Attribute("zip")
 	})
 })
-var CarrierDetail = Type("CarrierDetail", func() {
+var CarrierDetail = MediaType("application/easypost.carrierdetail+json", func() {
 	Description("The CarrierDetail object contains the service and container_type of the package. Additionally, it also stores the est_delivery_date_local and est_delivery_time_local, which provide information about the local delivery time.")
 	Attributes(func() {
 		Attribute("object", String, "Always: \"CarrierDetail\"", func() {
@@ -1015,6 +1098,18 @@ var CustomItem = MediaType("application/easypost.customitem+json", func() {
 		Attribute("object", String, "Always: \"CustomsItem\"", func() {
 			Pattern("^CustomsItem$")
 			Default("CustomsItem")
+		})
+
+		Attribute("description", String, "Required, description of item being shipped")
+		Attribute("quantity", String, "Required, greater than zero")
+		Attribute("value", String, "Required, greater than zero, total value (unit value * quantity)")
+		Attribute("weight", String, "Required, greater than zero, total weight (unit weight * quantity)")
+		Attribute("hs_tariff_number", String, "Harmonized Tariff Schedule, e.g. \"6109.10.0012\" for Men's T-shirts")
+		Attribute("origin_country", String, "Required, 2 char country code", func() {
+			Default("US")
+		})
+		Attribute("currency", String, "3 char currency code, default USD", func() {
+			Default("USD")
 		})
 
 		Attribute("created_at", String, "Time Created")

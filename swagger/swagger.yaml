@@ -2,6 +2,19 @@ basePath: /v2
 consumes:
 - application/json
 definitions:
+  BuyShipmentPayload:
+    properties:
+      insurance:
+        description: Additionally, insurance may be added during the purchase. To
+          specify an amount to insure, pass the insurance attribute as a string. The
+          currency of all insurance is USD.
+        type: string
+      rate:
+        $ref: '#/definitions/EasypostRate'
+    required:
+    - rate
+    title: BuyShipmentPayload
+    type: object
   CreateAddressPayload:
     description: Address objects are used to represent people, places, and organizations
       in a number of contexts. For example, a Shipment requires a to_address and from_address
@@ -110,6 +123,99 @@ definitions:
     - type
     title: CreateCarrierAccountPayload
     type: object
+  CreateCustomsInfoPayload:
+    properties:
+      contents_type:
+        type: string
+      customs_certify:
+        type: boolean
+      customs_items:
+        items:
+          $ref: '#/definitions/CustomItemPayload'
+        type: array
+      cutoms_signer:
+        type: string
+      eel_pfc:
+        type: string
+      restriction_type:
+        type: string
+    required:
+    - customs_certify
+    - cutoms_signer
+    - contents_type
+    - restriction_type
+    - eel_pfc
+    - customs_items
+    title: CreateCustomsInfoPayload
+    type: object
+  CreateCustomsItemPayload:
+    properties:
+      currency:
+        default: USD
+        description: 3 char currency code, default USD
+        type: string
+      description:
+        description: Required, description of item being shipped
+        type: string
+      hs_tariff_number:
+        description: Harmonized Tariff Schedule, e.g. "6109.10.0012" for Men's T-shirts
+        type: string
+      origin_country:
+        default: US
+        description: Required, 2 char country code
+        type: string
+      quantity:
+        description: Required, greater than zero
+        format: double
+        type: number
+      value:
+        description: Required, greater than zero, total value (unit value * quantity)
+        format: double
+        type: number
+      weight:
+        description: Required, greater than zero, total weight (unit weight * quantity)
+        format: double
+        type: number
+    required:
+    - description
+    - quantity
+    - value
+    - weight
+    - origin_country
+    title: CreateCustomsItemPayload
+    type: object
+  CreateInsurancePayload:
+    description: An Insurance created via this endpoint must belong to a shipment
+      purchased outside of EasyPost. Insurance for Shipments created within EasyPost
+      must be created via the Shipment Buy or Insure endpoints.
+    properties:
+      amount:
+        description: The USD value of contents you would like to insure. Currently
+          the maximum is between $5000 and $10000 depending on insurer
+        type: string
+      carrier:
+        description: The carrier associated with the tracking_code you provided. The
+          carrier will get auto-detected if none is provided
+        type: string
+      from_address:
+        $ref: '#/definitions/EasypostAddress'
+      reference:
+        description: Optional. A unique value that may be used in place of ID when
+          doing Retrieve calls for this insurance
+        type: string
+      to_address:
+        $ref: '#/definitions/EasypostAddress'
+      tracking_code:
+        description: The tracking code associated with the non-EasyPost-purchased
+          package you'd like to insure
+        type: string
+    required:
+    - to_address
+    - from_address
+    - tracking_code
+    - amount
+    title: CreateInsurancePayload
+    type: object
   CreateParcelPayload:
     description: Parcel objects represent the physical container being shipped. Dimensions
       can be supplied either as length, width, and height dimensions, or a predefined_package
@@ -138,6 +244,115 @@ definitions:
     required:
     - weight
     title: CreateParcelPayload
+    type: object
+  CreateShipmentPayload:
+    description: Parcel objects represent the physical container being shipped. Dimensions
+      can be supplied either as length, width, and height dimensions, or a predefined_package
+      string. If you provide a carrier specific predefined_package the associated
+      Shipment will only fetch rates from that carrier.
+    properties:
+      batch_id:
+        description: The ID of the batch that contains this shipment, if any
+        type: string
+      buyer_address:
+        $ref: '#/definitions/EasypostAddress'
+      customs_info:
+        $ref: '#/definitions/EasypostCustomsinfo'
+      forms:
+        description: All associated Form objects
+        items:
+          type: any
+        type: array
+      from_address:
+        $ref: '#/definitions/EasypostAddress'
+      insurance:
+        $ref: '#/definitions/EasypostInsurance'
+      is_return:
+        description: Set true to create as a return, discussed in more depth below
+        type: boolean
+      options:
+        $ref: '#/definitions/EasypostOptions'
+      parcel:
+        $ref: '#/definitions/EasypostParcel'
+      return_address:
+        $ref: '#/definitions/EasypostAddress'
+      scan_form:
+        $ref: '#/definitions/EasypostScanform'
+      to_address:
+        $ref: '#/definitions/EasypostAddress'
+      usps_zone:
+        description: The USPS zone of the shipment, if purchased with USPS
+        type: string
+    title: CreateShipmentPayload
+    type: object
+  CreateTrackerPayload:
+    properties:
+      carrier:
+        description: The carrier associated with the tracking_code you provided. The
+          carrier will get auto-detected if none is provided
+        type: string
+      tracking_code:
+        description: The tracking code associated with the package you'd like to track
+        type: string
+    required:
+    - tracking_code
+    title: CreateTrackerPayload
+    type: object
+  CreateUserPayload:
+    properties:
+      email:
+        type: string
+      name:
+        description: First and last name required
+        type: string
+      password:
+        type: string
+      password_confirmation:
+        type: string
+      phone_number:
+        type: string
+    required:
+    - name
+    - email
+    - password
+    - password_confirmation
+    title: CreateUserPayload
+    type: object
+  CustomItemPayload:
+    properties:
+      currency:
+        default: USD
+        description: 3 char currency code, default USD
+        type: string
+      description:
+        description: Required, description of item being shipped
+        type: string
+      hs_tariff_number:
+        description: Harmonized Tariff Schedule, e.g. "6109.10.0012" for Men's T-shirts
+        type: string
+      origin_country:
+        default: US
+        description: Required, 2 char country code
+        type: string
+      quantity:
+        description: Required, greater than zero
+        format: double
+        type: number
+      value:
+        description: Required, greater than zero, total value (unit value * quantity)
+        format: double
+        type: number
+      weight:
+        description: Required, greater than zero, total weight (unit weight * quantity)
+        format: double
+        type: number
+    required:
+    - description
+    - quantity
+    - value
+    - weight
+    - origin_country
+    title: CustomItemPayload
     type: object
   EasypostAddress:
     description: EasypostAddress media type (default view)
@@ -612,22 +827,22 @@ definitions:
         credentials: 4.658819e+18
         custom_workflow: true
         test_credentials:
-        - 151
-        - 154
-        - 133
-        - 165
-        - 84
-        - 162
-        - 67
-        - 209
-        - 186
-        - 112
-        - 4
-        - 151
+        - 125
+        - 7
+        - 199
         - 45
-        - 206
-        - 215
-        - 2
+        - 185
+        - 102
+        - 70
+        - 44
+        - 179
+        - 1
+        - 200
+        - 210
+        - 59
+        - 177
+        - 128
+        - 83
       object: CarrierType
       readable: Saepe corrupti.
       type: Et reprehenderit vitae non atque.
@@ -665,22 +880,22 @@ definitions:
         credentials: 4.658819e+18
         custom_workflow: true
         test_credentials:
-        - 151
-        - 154
-        - 133
-        - 165
-        - 84
-        - 162
-        - 67
-        - 209
-        - 186
-        - 112
-        - 4
-        - 151
+        - 125
+        - 7
+        - 199
         - 45
-        - 206
-        - 215
-        - 2
+        - 185
+        - 102
+        - 70
+        - 44
+        - 179
+        - 1
+        - 200
+        - 210
+        - 59
+        - 177
+        - 128
+        - 83
       object: CarrierType
       readable: Saepe corrupti.
       type: Et reprehenderit vitae non atque.
@@ -688,6 +903,285 @@ definitions:
       $ref: '#/definitions/EasypostCarrier_types'
     title: 'Mediatype identifier: application/easypost.carrier_types+json; type=collection'
     type: array
+  EasypostCarrierdetail:
+    description: The CarrierDetail object contains the service and container_type
+      of the package. Additionally, it also stores the est_delivery_date_local and
+      est_delivery_time_local, which provide information about the local delivery
+      time. (default view)
+    example:
+      container_type: Sunt et enim.
+      est_delivery_date_local: Optio ut deserunt.
+      est_delivery_time_local: Placeat culpa optio ea ad cupiditate est.
+      object: CarrierDetail
+      service: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+    properties:
+      container_type:
+        description: The type of container the associated shipment was shipped in
+          (if available)
+        example: Sunt et enim.
+        type: string
+      est_delivery_date_local:
+        description: The estimated delivery date as provided by the carrier, in the
+          local time zone (if available)
+        example: Optio ut deserunt.
+        type: string
+      est_delivery_time_local:
+        description: The estimated delivery time as provided by the carrier, in the
+          local time zone (if available)
+        example: Placeat culpa optio ea ad cupiditate est.
+        type: string
+      object:
+        default: CarrierDetail
+        description: 'Always: "CarrierDetail"'
+        example: CarrierDetail
+        pattern: ^CarrierDetail$
+        type: string
+      service:
+        description: The service level the associated shipment was shipped with (if
+          available)
+        example: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+        type: string
+    required:
+    - object
+    title: 'Mediatype identifier: application/easypost.carrierdetail+json'
+    type: object
+  EasypostCustomitem:
+    description: A CustomsItem object describes goods for international shipment and
+      should be created then included in a CustomsInfo object. (default view)
+    example:
+      created_at: Eum magnam molestiae at sapiente et.
+      currency: Nemo rem rem.
+      description: Voluptatem ut nisi voluptas vel dolorum.
+      hs_tariff_number: Ullam perferendis.
+      id: cstitem_
+      object: CustomsItem
+      origin_country: Laborum soluta quas tempore.
+      quantity: Quo vero.
+      updated_at: Culpa alias molestiae eum.
+      value: Distinctio reiciendis.
+      weight: Nisi exercitationem rerum eos.
+    properties:
+      created_at:
+        description: Time Created
+        example: Eum magnam molestiae at sapiente et.
+        type: string
+      currency:
+        default: USD
+        description: 3 char currency code, default USD
+        example: Nemo rem rem.
+        type: string
+      description:
+        description: Required, description of item being shipped
+        example: Voluptatem ut nisi voluptas vel dolorum.
+        type: string
+      hs_tariff_number:
+        description: Harmonized Tariff Schedule, e.g. "6109.10.0012" for Men's T-shirts
+        example: Ullam perferendis.
+        type: string
+      id:
+        description: Unique, begins with "cstitem_"
+        example: cstitem_
+        pattern: ^cstitem_
+        type: string
+      object:
+        default: CustomsItem
+        description: 'Always: "CustomsItem"'
+        example: CustomsItem
+        pattern: ^CustomsItem$
+        type: string
+      origin_country:
+        default: US
+        description: Required, 2 char country code
+        example: Laborum soluta quas tempore.
+        type: string
+      quantity:
+        description: Required, greater than zero
+        example: Quo vero.
+        type: string
+      updated_at:
+        description: Time Last Updated
+        example: Culpa alias molestiae eum.
+        type: string
+      value:
+        description: Required, greater than zero, total value (unit value * quantity)
+        example: Distinctio reiciendis.
+        type: string
+      weight:
+        description: Required, greater than zero, total weight (unit weight * quantity)
+        example: Nisi exercitationem rerum eos.
+        type: string
+    required:
+    - id
+    - object
+    - description
+    - quantity
+    - value
+    - weight
+    - origin_country
+    title: 'Mediatype identifier: application/easypost.customitem+json'
+    type: object
+  EasypostCustomsinfo:
+    description: CustomsInfo objects contain CustomsItem objects and all necessary
+      information for the generation of customs forms required for international shipping.
+      (default view)
+    properties:
+      contents_explanation:
+        description: Human readable description of content. Required for certain carriers
+          and always required if contents_type is "other"
+        example: Error ad cum ut.
+        type: string
+      contents_type:
+        description: '"documents", "gift", "merchandise", "returned_goods", "sample",
+          or "other"'
+        enum:
+        - documents
+        - gift
+        - merchandise
+        - returned_goods
+        - sample
+        - other
+        example: merchandise
+        type: string
+      created_at:
+        description: Time Created
+        example: Libero qui maxime quasi.
+        type: string
+      customs_certify:
+        description: Electronically certify the information provided
+        example: false
+        type: boolean
+      customs_items:
+        description: Describes to products being shipped
+        example:
+        - created_at: Eum magnam molestiae at sapiente et.
+          currency: Nemo rem rem.
+          description: Voluptatem ut nisi voluptas vel dolorum.
+          hs_tariff_number: Ullam perferendis.
+          id: cstitem_
+          object: CustomsItem
+          origin_country: Laborum soluta quas tempore.
+          quantity: Quo vero.
+          updated_at: Culpa alias molestiae eum.
+          value: Distinctio reiciendis.
+          weight: Nisi exercitationem rerum eos.
+        - created_at: Eum magnam molestiae at sapiente et.
+          currency: Nemo rem rem.
+          description: Voluptatem ut nisi voluptas vel dolorum.
+          hs_tariff_number: Ullam perferendis.
+          id: cstitem_
+          object: CustomsItem
+          origin_country: Laborum soluta quas tempore.
+          quantity: Quo vero.
+          updated_at: Culpa alias molestiae eum.
+          value: Distinctio reiciendis.
+          weight: Nisi exercitationem rerum eos.
+        - created_at: Eum magnam molestiae at sapiente et.
+          currency: Nemo rem rem.
+          description: Voluptatem ut nisi voluptas vel dolorum.
+          hs_tariff_number: Ullam perferendis.
+          id: cstitem_
+          object: CustomsItem
+          origin_country: Laborum soluta quas tempore.
+          quantity: Quo vero.
+          updated_at: Culpa alias molestiae eum.
+          value: Distinctio reiciendis.
+          weight: Nisi exercitationem rerum eos.
+        items:
+          $ref: '#/definitions/EasypostCustomitem'
+        type: array
+      customs_signer:
+        description: Required if customs_certify is true
+        example: Est cum optio expedita qui.
+        type: string
+      eel_pfc:
+        description: '"EEL" or "PFC" value less than $2500: "NOEEI 30.37(a)"; value
+          greater than $2500: see Customs Guide'
+        enum:
+        - EEL
+        - PFC
+        example: EEL
+        type: string
+      id:
+        description: Unique, begins with "cstinfo_"
+        example: cstinfo_
+        pattern: ^cstinfo_
+        type: string
+      non_delivery_option:
+        default: return
+        description: '"abandon" or "return", defaults to "return"'
+        enum:
+        - abandon
+        - return
+        example: return
+        type: string
+      object:
+        default: CustomsInfo
+        description: 'Always: "CustomsInfo"'
+        example: CustomsInfo
+        pattern: ^CustomsInfo$
+        type: string
+      restriction_comments:
+        description: Required if restriction_type is not "none"
+        example: Odio suscipit esse eveniet atque in quasi.
+        type: string
+      restriction_type:
+        description: '"none", "other", "quarantine", or "sanitary_phytosanitary_inspection"'
+        enum:
+        - none
+        - other
+        - quarantine
+        - sanitary_phytosanitary_inspection
+        example: other
+        type: string
+      updated_at:
+        description: Time Last Updated
+        example: Molestias qui consequatur cum vitae.
+        type: string
+    required:
+    - id
+    - object
+    title: 'Mediatype identifier: application/easypost.customsinfo+json'
+    type: object
+  EasypostFee:
+    description: EasypostFee media type (default view)
+    example:
+      amount: Enim facilis nemo dolor sunt.
+      charged: true
+      object: Fee
+      refunded: false
+      type: TrackerFee
+    properties:
+      amount:
+        description: USD value with sub-cent precision
+        example: Enim facilis nemo dolor sunt.
+        type: string
+      charged:
+        description: Whether EasyPost has successfully charged your account for the
+          fee
+        example: true
+        type: boolean
+      object:
+        default: Fee
+        description: 'Always: "Fee"'
+        example: Fee
+        pattern: ^Fee$
+        type: string
+      refunded:
+        description: Whether the Fee has been refunded successfully
+        example: false
+        type: boolean
+      type:
+        description: The name of the category of fee. Possible types are "LabelFee",
+          "PostageFee", "InsuranceFee", and "TrackerFee"
+        enum:
+        - LabelFee
+        - PostageFee
+        - InsuranceFee
+        - TrackerFee
+        example: TrackerFee
+        type: string
+    title: 'Mediatype identifier: application/easypost.fee+json'
+    type: object
   EasypostFields_object:
     description: Contains "credentials" and/or "test_credentials", or may be empty
       (default view)
@@ -708,48 +1202,476 @@ definitions:
       test_credentials:
         description: Credentials used in the test environment.
         example:
-        - 151
-        - 154
-        - 133
-        - 165
-        - 84
-        - 162
-        - 67
-        - 209
-        - 186
-        - 112
-        - 4
-        - 151
+        - 125
+        - 7
+        - 199
         - 45
-        - 206
-        - 215
-        - 2
+        - 185
+        - 102
+        - 70
+        - 44
+        - 179
+        - 1
+        - 200
+        - 210
+        - 59
+        - 177
+        - 128
+        - 83
         type: any
     required:
     - credentials
     title: 'Mediatype identifier: application/easypost.fields_object+json'
     type: object
+  EasypostInsurance:
+    description: An Insurance object represents insurance for packages purchased both
+      va the EasyPost API as well as shipments purchased through third parties and
+      later registered with EasyPost. An Insurance is created automatically whenever
+      you buy a Shipment through EasyPost and pass insurance options during the Buy
+      call or in a later call to Insure a Shipment. (default view)
+    example:
+      amount: Fugiat aut.
+      created_at: Atque provident omnis.
+      fee:
+        amount: Enim facilis nemo dolor sunt.
+        charged: true
+        object: Fee
+        refunded: false
+        type: TrackerFee
+      from_address:
+        carrier_facility: Id eos.
+        city: Blanditiis consectetur aut vero tempore quibusdam ullam.
+        company: Blanditiis minus.
+        country: Et sequi maiores voluptates sunt corporis ut.
+        created_at: Aut eligendi.
+        email: Architecto praesentium.
+        federal_tax_id: Tenetur unde eveniet aliquam ut est.
+        id: adr_
+        mode: production
+        name: Vel qui quibusdam dolor est dicta nesciunt.
+        object: Address
+        phone: Id deleniti nostrum inventore quia ea.
+        residential: true
+        state: Occaecati esse sint.
+        state_tax_id: Sed similique sequi corporis.
+        street1: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+        street2: Quis autem amet cupiditate eius voluptas magni.
+        updated_at: Natus eos facere consequuntur.
+        verifications:
+          delivery:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+          zip4:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+        zip: Ex at tenetur delectus enim.
+      id: ins_
+      messages:
+      - Ut saepe unde ipsa nulla sint.
+      mode: test
+      object: Insurance
+      provider: Animi aut fugit rerum similique.
+      provider_id: Nisi consectetur.
+      reference: Est sed in.
+      shipment_id: Dolorem consequatur officia quia.
+      status: purchased
+      to_address:
+        carrier_facility: Id eos.
+        city: Blanditiis consectetur aut vero tempore quibusdam ullam.
+        company: Blanditiis minus.
+        country: Et sequi maiores voluptates sunt corporis ut.
+        created_at: Aut eligendi.
+        email: Architecto praesentium.
+        federal_tax_id: Tenetur unde eveniet aliquam ut est.
+        id: adr_
+        mode: production
+        name: Vel qui quibusdam dolor est dicta nesciunt.
+        object: Address
+        phone: Id deleniti nostrum inventore quia ea.
+        residential: true
+        state: Occaecati esse sint.
+        state_tax_id: Sed similique sequi corporis.
+        street1: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+        street2: Quis autem amet cupiditate eius voluptas magni.
+        updated_at: Natus eos facere consequuntur.
+        verifications:
+          delivery:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+          zip4:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+        zip: Ex at tenetur delectus enim.
+      tracker:
+        carrier: Commodi omnis ut similique modi atque molestias.
+        carrier_detail:
+        - container_type: Sunt et enim.
+          est_delivery_date_local: Optio ut deserunt.
+          est_delivery_time_local: Placeat culpa optio ea ad cupiditate est.
+          object: CarrierDetail
+          service: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+        created_at: Qui labore labore ratione.
+        est_delivery_date: Aliquid necessitatibus eos.
+        fees:
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        id: trk_
+        mode: test
+        object: Tracker
+        public_url: Autem non tempore.
+        shipment_id: Non dolorum et earum.
+        signed_by: Voluptatibus numquam doloribus.
+        status: delivered
+        tracking_code: Non eos consequatur nobis nemo blanditiis sit.
+        tracking_details:
+        - datetime: Eveniet quia.
+          message: Similique quas sed sequi adipisci minima maxime.
+          object: TrackingDetail
+          source: Perferendis officiis.
+          status: out_for_delivery
+          tracking_location:
+            city: Nulla fugiat voluptatem harum ipsum.
+            country: Repudiandae vero voluptatem praesentium aut consequatur.
+            object: TrackingLocation
+            state: Beatae expedita id ea esse.
+            zip: Beatae dolores et odio aliquam omnis illo.
+        updated_at: Dignissimos cumque ut at adipisci.
+        weight: 0.94037324
+      tracking_code: Laborum autem.
+      updated_at: Dicta sint.
+    properties:
+      amount:
+        description: USD value of insured goods with sub-cent precision
+        example: Fugiat aut.
+        type: string
+      created_at:
+        description: Time Created
+        example: Atque provident omnis.
+        type: string
+      fee:
+        $ref: '#/definitions/EasypostFee'
+      from_address:
+        $ref: '#/definitions/EasypostAddress'
+      id:
+        description: Unique, begins with "ins_"
+        example: ins_
+        pattern: ^ins_
+        type: string
+      messages:
+        description: The list of errors encountered during attempted purchase of the
+          insurance
+        example:
+        - Ut saepe unde ipsa nulla sint.
+        items:
+          example: Ut saepe unde ipsa nulla sint.
+          type: string
+        type: array
+      mode:
+        default: test
+        description: Set based on which api-key you used, either "test" or "production"
+        enum:
+        - test
+        - production
+        example: test
+        type: string
+      object:
+        default: Insurance
+        description: 'Always: "Insurance"'
+        example: Insurance
+        pattern: ^Insurance$
+        type: string
+      provider:
+        description: The insurance provider used by EasyPost
+        example: Animi aut fugit rerum similique.
+        type: string
+      provider_id:
+        description: An identifying number for some insurance providers used by EasyPost
+        example: Nisi consectetur.
+        type: string
+      reference:
+        description: The unique reference for this Insurance, if any
+        example: Est sed in.
+        type: string
+      shipment_id:
+        description: The ID of the Shipment in EasyPost, if postage was purchased
+          via EasyPost
+        example: Dolorem consequatur officia quia.
+        type: string
+      status:
+        description: The current status of the insurance, possible values are "new",
+          "pending", "purchased", "failed", or "cancelled"
+        enum:
+        - cancelled
+        - failed
+        - purchased
+        - pending
+        - new
+        example: purchased
+        type: string
+      to_address:
+        $ref: '#/definitions/EasypostAddress'
+      tracker:
+        $ref: '#/definitions/EasypostTracker'
+      tracking_code:
+        description: The tracking code of either the shipment within EasyPost, or
+          provided by you during creation
+        example: Laborum autem.
+        type: string
+      updated_at:
+        description: Time Last Updated
+        example: Dicta sint.
+        type: string
+    required:
+    - id
+    - object
+    title: 'Mediatype identifier: application/easypost.insurance+json'
+    type: object
+  EasypostOptions:
+    description: EasypostOptions media type (default view)
+    properties:
+      additional_handling:
+        description: Setting this option to true, will add an additional handling
+          charge.
+        example: true
+        type: boolean
+      address_validation_level:
+        description: Setting this option to "0", will allow the minimum amount of
+          address information to pass the validation check. Only for USPS postage.
+        example: Consequatur itaque perspiciatis.
+        type: string
+      alcohol:
+        description: 'Set this option to true if your shipment contains alcohol. UPS
+          - only supported for US Domestic shipments. FedEx - only supported for US
+          Domestic shipments. Canada Post - Requires adult signature 19 years or older.
+          If you want adult signature 18 years or older, instead use delivery_confirmation:
+          ADULT_SIGNATURE'
+        example: false
+        type: boolean
+      bill_receiver_account:
+        description: Setting an account number of the receiver who is to receive and
+          buy the postage. UPS - bill_receiver_postal_code is also required
+        example: Error fuga accusantium explicabo et asperiores.
+        type: string
+      bill_receiver_postal_code:
+        description: Setting a postal code of the receiver account you want to buy
+          postage. UPS - bill_receiver_account also required
+        example: Provident numquam quo iure voluptatem.
+        type: string
+      bill_third_party_account:
+        description: Setting an account number of the third party account you want
+          to buy postage. UPS - bill_third_party_country and bill_third_party_postal_code
+          also required
+        example: Dolore vero adipisci fugiat excepturi nostrum.
+        type: string
+      bill_third_party_country:
+        description: Setting a country of the third party account you want to buy
+          postage. UPS - bill_third_party_account and bill_third_party_postal_code
+          also required
+        example: Ex nihil facere.
+        type: string
+      bill_third_party_postal_code:
+        description: Setting a postal code of the third party account you want to
+          buy postage. UPS - bill_third_party_country and bill_third_party_account
+          also required
+        example: true
+        type: boolean
+      by_drone:
+        description: Setting this option to true will indicate to the carrier to prefer
+          delivery by drone, if the carrier supports drone delivery.
+        example: false
+        type: boolean
+      carbon_neutral:
+        description: Setting this to true will add a charge to reduce carbon emissions.
+        example: false
+        type: boolean
+      cod_amount:
+        description: Adding an amount will have the carrier collect the specified
+          amount from the recipient.
+        example: Repudiandae alias impedit.
+        type: string
+      cod_method:
+        description: Method for payment. "CASH", "CHECK", "MONEY_ORDER"
+        enum:
+        - CASH
+        - CHECK
+        - MONEY_ORDER
+        example: CHECK
+        type: string
+      currency:
+        description: Which currency this shipment will show for rates if carrier allows.
+        example: Eius temporibus quasi aliquid.
+        type: string
+      delivered_duty_paid:
+        description: Setting this value to false will pass the cost of duties on to
+          the recipient of the package(s).
+        example: false
+        type: boolean
+      delivery_confirmation:
+        description: If you want to request a signature, you can pass "ADULT_SIGNATURE"
+          or "SIGNATURE". You may also request "NO_SIGNATURE" to leave the package
+          at the door. All - some options may be limited for international shipments
+        example: Voluptas non non incidunt tempore optio.
+        type: string
+      dry_ice:
+        description: Package contents contain dry ice. UPS - Need dry_ice_weight to
+          be set. UPS MailInnovations - Need dry_ice_weight to be set. FedEx - Need
+          dry_ice_weight to be set
+        example: true
+        type: boolean
+      dry_ice_medical:
+        description: If the dry ice is for medical use, set this option to true. UPS
+          - Need dry_ice_weight to be set. UPS MailInnovations - Need dry_ice_weight
+          to be set
+        example: true
+        type: boolean
+      dry_ice_weight:
+        description: Weight of the dry ice in ounces. UPS - Need dry_ice to be set.
+          UPS MailInnovations - Need dry_ice to be set. FedEx - Need dry_ice to be
+          set
+        example: Fuga mollitia.
+        type: string
+      freight_charge:
+        description: Additional cost to be added to the invoice of this shipment.
+          Only applies to UPS currently.
+        example: 0.43076178
+        format: double
+        type: number
+      handling_instructions:
+        description: This is to designate special instructions for the carrier like
+          "Do not drop!".
+        enum:
+        - ORMD
+        - LIMITED_QUANTITY
+        example: ORMD
+        type: string
+      hold_for_pickup:
+        description: Package will wait at carrier facility for pickup.
+        example: true
+        type: boolean
+      invoice_number:
+        description: This will print an invoice number on the postage label.
+        example: Eos consequatur sed rem aspernatur reprehenderit autem.
+        type: string
+      label_date:
+        description: Set the date that will appear on the postage label. Accepts ISO
+          8601 formatted string including time zone offset.
+        example: Voluptatibus voluptatem tempore.
+        type: string
+      label_format:
+        description: Supported label formats include "PNG", "PDF", "ZPL", and "EPL2".
+          "PNG" is the only format that allows for conversion.
+        enum:
+        - PNG
+        - PDF
+        - ZPL
+        - EPL2
+        example: ZPL
+        type: string
+      machinable:
+        description: Whether or not the parcel can be processed by the carriers equipment.
+        example: true
+        type: boolean
+      print_custom_1:
+        description: You can optionally print custom messages on labels. The locations
+          of these fields show up on different spots on the carrier's labels.
+        example: Error voluptate alias.
+        type: string
+      print_custom_1_barcode:
+        description: Create a barcode for this custom reference if supported by carrier.
+        example: false
+        type: boolean
+      print_custom_1_code:
+        description: Specify the type of print_custom_1.
+        example: Et vel sit cumque architecto omnis.
+        type: string
+      print_custom_2:
+        description: An additional message on the label. Same restrictions as print_custom_1
+        example: Aperiam eveniet.
+        type: string
+      print_custom_2_barcode:
+        description: Create a barcode for this custom reference if supported by carrier.
+        example: true
+        type: boolean
+      print_custom_2_code:
+        description: See print_custom_1_code.
+        example: Praesentium odit.
+        type: string
+      print_custom_3:
+        description: An additional message on the label. Same restrictions as print_custom_1
+        example: Animi esse et quam occaecati.
+        type: string
+      print_custom_3_barcode:
+        description: Create a barcode for this custom reference if supported by carrier.
+        example: true
+        type: boolean
+      print_custom_3_code:
+        description: See print_custom_1_code.
+        example: Dolores temporibus cupiditate delectus fuga reprehenderit.
+        type: string
+      saturday_delivery:
+        description: Set this value to true for delivery on Saturday. Can't be combined
+          with Next Day Air. When setting the saturday_delivery option, you will only
+          get rates for services that are eligible for saturday delivery. If no services
+          are available for saturday delivery, then you will not be returned any rates.
+          You may need to create 2 shipments, one with the saturday_delivery option
+          set on one without to get all your eligible rates.
+        example: false
+        type: boolean
+      smartpost_hub:
+        description: You can use this to override the hub ID you have on your account.
+        example: Iure voluptatem eligendi delectus rerum ut quo.
+        type: string
+      smartpost_manifest:
+        description: The manifest ID is used to group SmartPost packages onto a manifest
+          for each trailer.
+        example: true
+        type: boolean
+      special_rates_eligibility:
+        description: This option allows you to request restrictive rates from USPS.
+          Can set to 'USPS.MEDIAMAIL' or 'USPS.LIBRARYMAIL'.
+        example: Earum et tenetur voluptatibus sequi voluptatem suscipit.
+        type: string
+    title: 'Mediatype identifier: application/easypost.options+json'
+    type: object
   EasypostParcel:
     description: EasypostParcel media type (default view)
-    example:
-      created_at: Et dolore nemo rem rem consequuntur voluptatem.
-      height: 0.6427331
-      id: prcl_
-      length: 0.54780674
-      mode: production
-      object: Parcel
-      predefined_package: Dolorum quia ullam.
-      updated_at: Maxime laborum.
-      weight: 0.5287105
-      width: 0.9198236
     properties:
       created_at:
         description: Time Created
-        example: Et dolore nemo rem rem consequuntur voluptatem.
+        example: Iusto possimus vel odio.
         type: string
       height:
         description: Required if predefined_package is empty. float (inches)
-        example: 0.6427331
+        example: 0.6676809
         format: double
         type: number
       id:
@@ -759,7 +1681,7 @@ definitions:
         type: string
       length:
         description: Required if predefined_package is empty. float (inches)
-        example: 0.54780674
+        example: 0.04547782
         format: double
         type: number
       mode:
@@ -778,20 +1700,20 @@ definitions:
         type: string
       predefined_package:
         description: Optional, one of our predefined_packages
-        example: Dolorum quia ullam.
+        example: Quas recusandae.
         type: string
       updated_at:
         description: Time Last Updated
-        example: Maxime laborum.
+        example: Temporibus quas corrupti consectetur ad molestiae quae.
         type: string
       weight:
         description: Always required. float(oz)
-        example: 0.5287105
+        example: 0.07009478
         format: double
         type: number
       width:
         description: Required if predefined_package is empty. float (inches)
-        example: 0.9198236
+        example: 0.3304534
         format: double
         type: number
     required:
@@ -800,6 +1722,1589 @@ definitions:
     - weight
     title: 'Mediatype identifier: application/easypost.parcel+json'
     type: object
+  EasypostPostagelabel:
+    description: EasypostPostagelabel media type (default view)
+    example:
+      created_at: Sit laudantium ipsum quia.
+      date_advance: 5.4615535e+18
+      id: pl_
+      integrated_form: Nemo autem sint doloremque debitis et aperiam.
+      label_date: Officia perferendis architecto repellendus sapiente.
+      label_epl2_url: Corporis voluptas ut ut aut animi aut.
+      label_file_type: Repellat dolores repudiandae minima quis qui.
+      label_pdf_url: Unde sit in qui sequi molestiae.
+      label_resolution: 4.3884568e+18
+      label_size: Aut repellendus quidem quo.
+      label_type: Sint fugit qui neque.
+      label_url: Sed rerum at non.
+      label_zpl_url: Iure assumenda illum.
+      object: PostageLabel
+      updated_at: Vero dolore omnis.
+    properties:
+      created_at:
+        description: Time Created
+        example: Sit laudantium ipsum quia.
+        type: string
+      date_advance:
+        example: 5.4615535e+18
+        format: int64
+        type: integer
+      id:
+        description: Unique, begins with "pl_"
+        example: pl_
+        pattern: ^pl_
+        type: string
+      integrated_form:
+        default: none
+        example: Nemo autem sint doloremque debitis et aperiam.
+        type: string
+      label_date:
+        example: Officia perferendis architecto repellendus sapiente.
+        type: string
+      label_epl2_url:
+        example: Corporis voluptas ut ut aut animi aut.
+        type: string
+      label_file_type:
+        default: image/png
+        example: Repellat dolores repudiandae minima quis qui.
+        type: string
+      label_pdf_url:
+        example: Unde sit in qui sequi molestiae.
+        type: string
+      label_resolution:
+        default: 200
+        description: Assuming DPI
+        example: 4.3884568e+18
+        format: int64
+        type: integer
+      label_size:
+        default: PAPER_4X6
+        example: Aut repellendus quidem quo.
+        type: string
+      label_type:
+        default: default
+        example: Sint fugit qui neque.
+        type: string
+      label_url:
+        example: Sed rerum at non.
+        type: string
+      label_zpl_url:
+        example: Iure assumenda illum.
+        type: string
+      object:
+        default: PostageLabel
+        description: 'Always: "PostageLabel"'
+        example: PostageLabel
+        pattern: ^PostageLabel$
+        type: string
+      updated_at:
+        description: Time Last Updated
+        example: Vero dolore omnis.
+        type: string
+    title: 'Mediatype identifier: application/easypost.postagelabel+json'
+    type: object
+  EasypostRate:
+    description: EasypostRate media type (default view)
+    example:
+      carrier: Dolorem et.
+      carrier_account_id: Et quo est tenetur.
+      created_at: Quo vitae asperiores nihil enim.
+      currency: Consequatur repellendus ut nisi provident iusto esse.
+      delivery_date: Velit a architecto.
+      delivery_date_guaranteed: true
+      delivery_days: 2.858211e+18
+      id: rate_
+      list_currency: Odio id molestiae.
+      list_rate: Dolorum inventore ipsum natus temporibus voluptas.
+      mode: production
+      object: Rate
+      rate: Quae facilis possimus cupiditate soluta.
+      retail_currency: Quia est incidunt voluptas commodi vel.
+      retail_rate: Necessitatibus eum blanditiis excepturi et consectetur quisquam.
+      service: Vel autem quo.
+      shipment_id: Non dolores.
+      updated_at: Aut qui voluptate.
+    properties:
+      carrier:
+        description: name of carrier
+        example: Dolorem et.
+        type: string
+      carrier_account_id:
+        description: ID of the CarrierAccount record used to generate this rate
+        example: Et quo est tenetur.
+        type: string
+      created_at:
+        description: Time Created
+        example: Quo vitae asperiores nihil enim.
+        type: string
+      currency:
+        description: currency for the rate
+        example: Consequatur repellendus ut nisi provident iusto esse.
+        type: string
+      delivery_date:
+        description: date for delivery
+        example: Velit a architecto.
+        type: string
+      delivery_date_guaranteed:
+        description: indicates if delivery window is guaranteed (true) or not (false)
+        example: true
+        type: boolean
+      delivery_days:
+        description: delivery days for this service
+        example: 2.858211e+18
+        format: int64
+        type: integer
+      id:
+        description: Unique, begins with "rate_"
+        example: rate_
+        pattern: ^rate_
+        type: string
+      list_currency:
+        description: currency for the list rate
+        example: Odio id molestiae.
+        type: string
+      list_rate:
+        description: the list rate is the non-negotiated rate given for having an
+          account with the carrier
+        example: Dolorum inventore ipsum natus temporibus voluptas.
+        type: string
+      mode:
+        default: test
+        description: Set based on which api-key you used, either "test" or "production"
+        enum:
+        - test
+        - production
+        example: production
+        type: string
+      object:
+        default: Rate
+        description: 'Always: "Rate"'
+        example: Rate
+        pattern: ^Rate$
+        type: string
+      rate:
+        description: the actual rate quote for this service
+        example: Quae facilis possimus cupiditate soluta.
+        type: string
+      retail_currency:
+        description: currency for the retail rate
+        example: Quia est incidunt voluptas commodi vel.
+        type: string
+      retail_rate:
+        description: the retail rate is the in-store rate given with no account
+        example: Necessitatibus eum blanditiis excepturi et consectetur quisquam.
+        type: string
+      service:
+        description: service level/name
+        example: Vel autem quo.
+        type: string
+      shipment_id:
+        description: ID of the Shipment this rate belongs to
+        example: Non dolores.
+        type: string
+      updated_at:
+        description: Time Last Updated
+        example: Aut qui voluptate.
+        type: string
+    title: 'Mediatype identifier: application/easypost.rate+json'
+    type: object
+  EasypostScanform:
+    description: EasypostScanform media type (default view)
+    properties:
+      address:
+        $ref: '#/definitions/EasypostAddress'
+      batch_id:
+        description: The id of the associated Batch. Unique, starts with "batch_"
+        example: Voluptatem aliquid ipsa qui sed.
+        type: string
+      created_at:
+        description: Time Created
+        example: Libero delectus consequatur harum incidunt voluptatem.
+        type: string
+      form_file_type:
+        description: File format of the document
+        example: Commodi vel aliquam.
+        type: string
+      form_url:
+        description: "\tUrl of the document"
+        example: Cumque voluptas ipsam vel.
+        type: string
+      id:
+        description: Unique, begins with "sf_"
+        example: sf_
+        pattern: ^sf_
+        type: string
+      message:
+        description: Human readable message explaining any failures
+        example: A aperiam fugit eos perferendis.
+        type: string
+      object:
+        default: ScanForm
+        description: 'Always: "ScanForm"'
+        example: ScanForm
+        pattern: ^ScanForm$
+        type: string
+      status:
+        description: Current status. Possible values are "creating", "created" and
+          "failed"
+        enum:
+        - creating
+        - created
+        - failed
+        example: created
+        type: string
+      tracking_codes:
+        description: Tracking codes included on the ScanForm
+        example:
+        - Ab est distinctio itaque ea quasi.
+        items:
+          example: Ab est distinctio itaque ea quasi.
+          type: string
+        type: array
+      updated_at:
+        description: Time Last Updated
+        example: Eos non magnam consequuntur voluptatem.
+        type: string
+    title: 'Mediatype identifier: application/easypost.scanform+json'
+    type: object
+  EasypostShipment:
+    description: EasypostShipment media type (default view)
+    example:
+      batch_id: Temporibus qui repellendus.
+      batch_message: Recusandae odit veritatis et molestias.
+      batch_status: Esse et quaerat soluta qui et inventore.
+      buyer_address:
+        carrier_facility: Id eos.
+        city: Blanditiis consectetur aut vero tempore quibusdam ullam.
+        company: Blanditiis minus.
+        country: Et sequi maiores voluptates sunt corporis ut.
+        created_at: Aut eligendi.
+        email: Architecto praesentium.
+        federal_tax_id: Tenetur unde eveniet aliquam ut est.
+        id: adr_
+        mode: production
+        name: Vel qui quibusdam dolor est dicta nesciunt.
+        object: Address
+        phone: Id deleniti nostrum inventore quia ea.
+        residential: true
+        state: Occaecati esse sint.
+        state_tax_id: Sed similique sequi corporis.
+        street1: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+        street2: Quis autem amet cupiditate eius voluptas magni.
+        updated_at: Natus eos facere consequuntur.
+        verifications:
+          delivery:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+          zip4:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+        zip: Ex at tenetur delectus enim.
+      created_at: Corrupti tempore amet error et sit accusantium.
+      customs_info:
+        contents_explanation: Error ad cum ut.
+        contents_type: merchandise
+        created_at: Libero qui maxime quasi.
+        customs_certify: false
+        customs_items:
+        - created_at: Eum magnam molestiae at sapiente et.
+          currency: Nemo rem rem.
+          description: Voluptatem ut nisi voluptas vel dolorum.
+          hs_tariff_number: Ullam perferendis.
+          id: cstitem_
+          object: CustomsItem
+          origin_country: Laborum soluta quas tempore.
+          quantity: Quo vero.
+          updated_at: Culpa alias molestiae eum.
+          value: Distinctio reiciendis.
+          weight: Nisi exercitationem rerum eos.
+        - created_at: Eum magnam molestiae at sapiente et.
+          currency: Nemo rem rem.
+          description: Voluptatem ut nisi voluptas vel dolorum.
+          hs_tariff_number: Ullam perferendis.
+          id: cstitem_
+          object: CustomsItem
+          origin_country: Laborum soluta quas tempore.
+          quantity: Quo vero.
+          updated_at: Culpa alias molestiae eum.
+          value: Distinctio reiciendis.
+          weight: Nisi exercitationem rerum eos.
+        - created_at: Eum magnam molestiae at sapiente et.
+          currency: Nemo rem rem.
+          description: Voluptatem ut nisi voluptas vel dolorum.
+          hs_tariff_number: Ullam perferendis.
+          id: cstitem_
+          object: CustomsItem
+          origin_country: Laborum soluta quas tempore.
+          quantity: Quo vero.
+          updated_at: Culpa alias molestiae eum.
+          value: Distinctio reiciendis.
+          weight: Nisi exercitationem rerum eos.
+        customs_signer: Est cum optio expedita qui.
+        eel_pfc: EEL
+        id: cstinfo_
+        non_delivery_option: return
+        object: CustomsInfo
+        restriction_comments: Odio suscipit esse eveniet atque in quasi.
+        restriction_type: other
+        updated_at: Molestias qui consequatur cum vitae.
+      fees:
+      - amount: Enim facilis nemo dolor sunt.
+        charged: true
+        object: Fee
+        refunded: false
+        type: TrackerFee
+      - amount: Enim facilis nemo dolor sunt.
+        charged: true
+        object: Fee
+        refunded: false
+        type: TrackerFee
+      - amount: Enim facilis nemo dolor sunt.
+        charged: true
+        object: Fee
+        refunded: false
+        type: TrackerFee
+      forms:
+      - 5.5931623e+18
+      - 5.5931623e+18
+      from_address:
+        carrier_facility: Id eos.
+        city: Blanditiis consectetur aut vero tempore quibusdam ullam.
+        company: Blanditiis minus.
+        country: Et sequi maiores voluptates sunt corporis ut.
+        created_at: Aut eligendi.
+        email: Architecto praesentium.
+        federal_tax_id: Tenetur unde eveniet aliquam ut est.
+        id: adr_
+        mode: production
+        name: Vel qui quibusdam dolor est dicta nesciunt.
+        object: Address
+        phone: Id deleniti nostrum inventore quia ea.
+        residential: true
+        state: Occaecati esse sint.
+        state_tax_id: Sed similique sequi corporis.
+        street1: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+        street2: Quis autem amet cupiditate eius voluptas magni.
+        updated_at: Natus eos facere consequuntur.
+        verifications:
+          delivery:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+          zip4:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+        zip: Ex at tenetur delectus enim.
+      id: shp_
+      insurance:
+        amount: Fugiat aut.
+        created_at: Atque provident omnis.
+        fee:
+          amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        from_address:
+          carrier_facility: Id eos.
+          city: Blanditiis consectetur aut vero tempore quibusdam ullam.
+          company: Blanditiis minus.
+          country: Et sequi maiores voluptates sunt corporis ut.
+          created_at: Aut eligendi.
+          email: Architecto praesentium.
+          federal_tax_id: Tenetur unde eveniet aliquam ut est.
+          id: adr_
+          mode: production
+          name: Vel qui quibusdam dolor est dicta nesciunt.
+          object: Address
+          phone: Id deleniti nostrum inventore quia ea.
+          residential: true
+          state: Occaecati esse sint.
+          state_tax_id: Sed similique sequi corporis.
+          street1: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+          street2: Quis autem amet cupiditate eius voluptas magni.
+          updated_at: Natus eos facere consequuntur.
+          verifications:
+            delivery:
+              errors:
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              success: false
+            zip4:
+              errors:
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              success: false
+          zip: Ex at tenetur delectus enim.
+        id: ins_
+        messages:
+        - Ut saepe unde ipsa nulla sint.
+        mode: test
+        object: Insurance
+        provider: Animi aut fugit rerum similique.
+        provider_id: Nisi consectetur.
+        reference: Est sed in.
+        shipment_id: Dolorem consequatur officia quia.
+        status: purchased
+        to_address:
+          carrier_facility: Id eos.
+          city: Blanditiis consectetur aut vero tempore quibusdam ullam.
+          company: Blanditiis minus.
+          country: Et sequi maiores voluptates sunt corporis ut.
+          created_at: Aut eligendi.
+          email: Architecto praesentium.
+          federal_tax_id: Tenetur unde eveniet aliquam ut est.
+          id: adr_
+          mode: production
+          name: Vel qui quibusdam dolor est dicta nesciunt.
+          object: Address
+          phone: Id deleniti nostrum inventore quia ea.
+          residential: true
+          state: Occaecati esse sint.
+          state_tax_id: Sed similique sequi corporis.
+          street1: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+          street2: Quis autem amet cupiditate eius voluptas magni.
+          updated_at: Natus eos facere consequuntur.
+          verifications:
+            delivery:
+              errors:
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              success: false
+            zip4:
+              errors:
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              success: false
+          zip: Ex at tenetur delectus enim.
+        tracker:
+          carrier: Commodi omnis ut similique modi atque molestias.
+          carrier_detail:
+          - container_type: Sunt et enim.
+            est_delivery_date_local: Optio ut deserunt.
+            est_delivery_time_local: Placeat culpa optio ea ad cupiditate est.
+            object: CarrierDetail
+            service: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+          created_at: Qui labore labore ratione.
+          est_delivery_date: Aliquid necessitatibus eos.
+          fees:
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          id: trk_
+          mode: test
+          object: Tracker
+          public_url: Autem non tempore.
+          shipment_id: Non dolorum et earum.
+          signed_by: Voluptatibus numquam doloribus.
+          status: delivered
+          tracking_code: Non eos consequatur nobis nemo blanditiis sit.
+          tracking_details:
+          - datetime: Eveniet quia.
+            message: Similique quas sed sequi adipisci minima maxime.
+            object: TrackingDetail
+            source: Perferendis officiis.
+            status: out_for_delivery
+            tracking_location:
+              city: Nulla fugiat voluptatem harum ipsum.
+              country: Repudiandae vero voluptatem praesentium aut consequatur.
+              object: TrackingLocation
+              state: Beatae expedita id ea esse.
+              zip: Beatae dolores et odio aliquam omnis illo.
+          updated_at: Dignissimos cumque ut at adipisci.
+          weight: 0.94037324
+        tracking_code: Laborum autem.
+        updated_at: Dicta sint.
+      is_return: false
+      messages:
+      - carrier: Ut non exercitationem praesentium.
+        message: Optio illum.
+        type: Aut voluptatem rerum ipsum eum molestiae et.
+      mode: test
+      object: Shipment
+      options:
+        additional_handling: true
+        address_validation_level: Consequatur itaque perspiciatis.
+        alcohol: false
+        bill_receiver_account: Error fuga accusantium explicabo et asperiores.
+        bill_receiver_postal_code: Provident numquam quo iure voluptatem.
+        bill_third_party_account: Dolore vero adipisci fugiat excepturi nostrum.
+        bill_third_party_country: Ex nihil facere.
+        bill_third_party_postal_code: true
+        by_drone: false
+        carbon_neutral: false
+        cod_amount: Repudiandae alias impedit.
+        cod_method: CHECK
+        currency: Eius temporibus quasi aliquid.
+        delivered_duty_paid: false
+        delivery_confirmation: Voluptas non non incidunt tempore optio.
+        dry_ice: true
+        dry_ice_medical: true
+        dry_ice_weight: Fuga mollitia.
+        freight_charge: 0.43076178
+        handling_instructions: ORMD
+        hold_for_pickup: true
+        invoice_number: Eos consequatur sed rem aspernatur reprehenderit autem.
+        label_date: Voluptatibus voluptatem tempore.
+        label_format: ZPL
+        machinable: true
+        print_custom_1: Error voluptate alias.
+        print_custom_1_barcode: false
+        print_custom_1_code: Et vel sit cumque architecto omnis.
+        print_custom_2: Aperiam eveniet.
+        print_custom_2_barcode: true
+        print_custom_2_code: Praesentium odit.
+        print_custom_3: Animi esse et quam occaecati.
+        print_custom_3_barcode: true
+        print_custom_3_code: Dolores temporibus cupiditate delectus fuga reprehenderit.
+        saturday_delivery: false
+        smartpost_hub: Iure voluptatem eligendi delectus rerum ut quo.
+        smartpost_manifest: true
+        special_rates_eligibility: Earum et tenetur voluptatibus sequi voluptatem
+          suscipit.
+      parcel:
+        created_at: Iusto possimus vel odio.
+        height: 0.6676809
+        id: prcl_
+        length: 0.04547782
+        mode: production
+        object: Parcel
+        predefined_package: Quas recusandae.
+        updated_at: Temporibus quas corrupti consectetur ad molestiae quae.
+        weight: 0.07009478
+        width: 0.3304534
+      postage_label:
+        created_at: Sit laudantium ipsum quia.
+        date_advance: 5.4615535e+18
+        id: pl_
+        integrated_form: Nemo autem sint doloremque debitis et aperiam.
+        label_date: Officia perferendis architecto repellendus sapiente.
+        label_epl2_url: Corporis voluptas ut ut aut animi aut.
+        label_file_type: Repellat dolores repudiandae minima quis qui.
+        label_pdf_url: Unde sit in qui sequi molestiae.
+        label_resolution: 4.3884568e+18
+        label_size: Aut repellendus quidem quo.
+        label_type: Sint fugit qui neque.
+        label_url: Sed rerum at non.
+        label_zpl_url: Iure assumenda illum.
+        object: PostageLabel
+        updated_at: Vero dolore omnis.
+      rates:
+      - carrier: Dolorem et.
+        carrier_account_id: Et quo est tenetur.
+        created_at: Quo vitae asperiores nihil enim.
+        currency: Consequatur repellendus ut nisi provident iusto esse.
+        delivery_date: Velit a architecto.
+        delivery_date_guaranteed: true
+        delivery_days: 2.858211e+18
+        id: rate_
+        list_currency: Odio id molestiae.
+        list_rate: Dolorum inventore ipsum natus temporibus voluptas.
+        mode: production
+        object: Rate
+        rate: Quae facilis possimus cupiditate soluta.
+        retail_currency: Quia est incidunt voluptas commodi vel.
+        retail_rate: Necessitatibus eum blanditiis excepturi et consectetur quisquam.
+        service: Vel autem quo.
+        shipment_id: Non dolores.
+        updated_at: Aut qui voluptate.
+      - carrier: Dolorem et.
+        carrier_account_id: Et quo est tenetur.
+        created_at: Quo vitae asperiores nihil enim.
+        currency: Consequatur repellendus ut nisi provident iusto esse.
+        delivery_date: Velit a architecto.
+        delivery_date_guaranteed: true
+        delivery_days: 2.858211e+18
+        id: rate_
+        list_currency: Odio id molestiae.
+        list_rate: Dolorum inventore ipsum natus temporibus voluptas.
+        mode: production
+        object: Rate
+        rate: Quae facilis possimus cupiditate soluta.
+        retail_currency: Quia est incidunt voluptas commodi vel.
+        retail_rate: Necessitatibus eum blanditiis excepturi et consectetur quisquam.
+        service: Vel autem quo.
+        shipment_id: Non dolores.
+        updated_at: Aut qui voluptate.
+      refund_status: refunded
+      return_address:
+        carrier_facility: Id eos.
+        city: Blanditiis consectetur aut vero tempore quibusdam ullam.
+        company: Blanditiis minus.
+        country: Et sequi maiores voluptates sunt corporis ut.
+        created_at: Aut eligendi.
+        email: Architecto praesentium.
+        federal_tax_id: Tenetur unde eveniet aliquam ut est.
+        id: adr_
+        mode: production
+        name: Vel qui quibusdam dolor est dicta nesciunt.
+        object: Address
+        phone: Id deleniti nostrum inventore quia ea.
+        residential: true
+        state: Occaecati esse sint.
+        state_tax_id: Sed similique sequi corporis.
+        street1: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+        street2: Quis autem amet cupiditate eius voluptas magni.
+        updated_at: Natus eos facere consequuntur.
+        verifications:
+          delivery:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+          zip4:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+        zip: Ex at tenetur delectus enim.
+      scan_form:
+        address:
+          carrier_facility: Id eos.
+          city: Blanditiis consectetur aut vero tempore quibusdam ullam.
+          company: Blanditiis minus.
+          country: Et sequi maiores voluptates sunt corporis ut.
+          created_at: Aut eligendi.
+          email: Architecto praesentium.
+          federal_tax_id: Tenetur unde eveniet aliquam ut est.
+          id: adr_
+          mode: production
+          name: Vel qui quibusdam dolor est dicta nesciunt.
+          object: Address
+          phone: Id deleniti nostrum inventore quia ea.
+          residential: true
+          state: Occaecati esse sint.
+          state_tax_id: Sed similique sequi corporis.
+          street1: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+          street2: Quis autem amet cupiditate eius voluptas magni.
+          updated_at: Natus eos facere consequuntur.
+          verifications:
+            delivery:
+              errors:
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              success: false
+            zip4:
+              errors:
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              - field: Corrupti similique quo id omnis fugit.
+                message: Temporibus laudantium ipsam.
+              success: false
+          zip: Ex at tenetur delectus enim.
+        batch_id: Voluptatem aliquid ipsa qui sed.
+        created_at: Libero delectus consequatur harum incidunt voluptatem.
+        form_file_type: Commodi vel aliquam.
+        form_url: Cumque voluptas ipsam vel.
+        id: sf_
+        message: A aperiam fugit eos perferendis.
+        object: ScanForm
+        status: created
+        tracking_codes:
+        - Ab est distinctio itaque ea quasi.
+        updated_at: Eos non magnam consequuntur voluptatem.
+      selected_rate:
+        carrier: Dolorem et.
+        carrier_account_id: Et quo est tenetur.
+        created_at: Quo vitae asperiores nihil enim.
+        currency: Consequatur repellendus ut nisi provident iusto esse.
+        delivery_date: Velit a architecto.
+        delivery_date_guaranteed: true
+        delivery_days: 2.858211e+18
+        id: rate_
+        list_currency: Odio id molestiae.
+        list_rate: Dolorum inventore ipsum natus temporibus voluptas.
+        mode: production
+        object: Rate
+        rate: Quae facilis possimus cupiditate soluta.
+        retail_currency: Quia est incidunt voluptas commodi vel.
+        retail_rate: Necessitatibus eum blanditiis excepturi et consectetur quisquam.
+        service: Vel autem quo.
+        shipment_id: Non dolores.
+        updated_at: Aut qui voluptate.
+      status: Repudiandae repellat.
+      to_address:
+        carrier_facility: Id eos.
+        city: Blanditiis consectetur aut vero tempore quibusdam ullam.
+        company: Blanditiis minus.
+        country: Et sequi maiores voluptates sunt corporis ut.
+        created_at: Aut eligendi.
+        email: Architecto praesentium.
+        federal_tax_id: Tenetur unde eveniet aliquam ut est.
+        id: adr_
+        mode: production
+        name: Vel qui quibusdam dolor est dicta nesciunt.
+        object: Address
+        phone: Id deleniti nostrum inventore quia ea.
+        residential: true
+        state: Occaecati esse sint.
+        state_tax_id: Sed similique sequi corporis.
+        street1: Quisquam reiciendis sunt deserunt vel culpa veritatis.
+        street2: Quis autem amet cupiditate eius voluptas magni.
+        updated_at: Natus eos facere consequuntur.
+        verifications:
+          delivery:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+          zip4:
+            errors:
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            - field: Corrupti similique quo id omnis fugit.
+              message: Temporibus laudantium ipsam.
+            success: false
+        zip: Ex at tenetur delectus enim.
+      tracker:
+        carrier: Commodi omnis ut similique modi atque molestias.
+        carrier_detail:
+        - container_type: Sunt et enim.
+          est_delivery_date_local: Optio ut deserunt.
+          est_delivery_time_local: Placeat culpa optio ea ad cupiditate est.
+          object: CarrierDetail
+          service: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+        created_at: Qui labore labore ratione.
+        est_delivery_date: Aliquid necessitatibus eos.
+        fees:
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        id: trk_
+        mode: test
+        object: Tracker
+        public_url: Autem non tempore.
+        shipment_id: Non dolorum et earum.
+        signed_by: Voluptatibus numquam doloribus.
+        status: delivered
+        tracking_code: Non eos consequatur nobis nemo blanditiis sit.
+        tracking_details:
+        - datetime: Eveniet quia.
+          message: Similique quas sed sequi adipisci minima maxime.
+          object: TrackingDetail
+          source: Perferendis officiis.
+          status: out_for_delivery
+          tracking_location:
+            city: Nulla fugiat voluptatem harum ipsum.
+            country: Repudiandae vero voluptatem praesentium aut consequatur.
+            object: TrackingLocation
+            state: Beatae expedita id ea esse.
+            zip: Beatae dolores et odio aliquam omnis illo.
+        updated_at: Dignissimos cumque ut at adipisci.
+        weight: 0.94037324
+      tracking_code: Ut sapiente rerum.
+      updated_at: Perspiciatis voluptas in praesentium at.
+      usps_zone: Molestiae consequatur ut expedita dolores et tenetur.
+    properties:
+      batch_id:
+        description: The ID of the batch that contains this shipment, if any
+        example: Temporibus qui repellendus.
+        type: string
+      batch_message:
+        description: The current message of the associated BatchShipment
+        example: Recusandae odit veritatis et molestias.
+        type: string
+      batch_status:
+        description: The current state of the associated BatchShipment
+        example: Esse et quaerat soluta qui et inventore.
+        type: string
+      buyer_address:
+        $ref: '#/definitions/EasypostAddress'
+      created_at:
+        description: Time Created
+        example: Corrupti tempore amet error et sit accusantium.
+        type: string
+      customs_info:
+        $ref: '#/definitions/EasypostCustomsinfo'
+      fees:
+        description: The associated Fee objects charged to the billing user account
+        example:
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        items:
+          $ref: '#/definitions/EasypostFee'
+        type: array
+      forms:
+        description: All associated Form objects
+        example:
+        - 5.5931623e+18
+        - 5.5931623e+18
+        items:
+          example: 5.5931623e+18
+          type: any
+        type: array
+      from_address:
+        $ref: '#/definitions/EasypostAddress'
+      id:
+        description: Unique, begins with "shp_"
+        example: shp_
+        pattern: ^shp_
+        type: string
+      insurance:
+        $ref: '#/definitions/EasypostInsurance'
+      is_return:
+        description: Set true to create as a return, discussed in more depth below
+        example: false
+        type: boolean
+      messages:
+        description: Any carrier errors encountered during rating, discussed in more
+          depth below
+        example:
+        - carrier: Ut non exercitationem praesentium.
+          message: Optio illum.
+          type: Aut voluptatem rerum ipsum eum molestiae et.
+        items:
+          $ref: '#/definitions/Message'
+        type: array
+      mode:
+        default: test
+        description: Set based on which api-key you used, either "test" or "production"
+        enum:
+        - test
+        - production
+        example: test
+        type: string
+      object:
+        default: Shipment
+        description: 'Always: "Shipment"'
+        example: Shipment
+        pattern: ^Shipment$
+        type: string
+      options:
+        $ref: '#/definitions/EasypostOptions'
+      parcel:
+        $ref: '#/definitions/EasypostParcel'
+      postage_label:
+        $ref: '#/definitions/EasypostPostagelabel'
+      rates:
+        description: All associated Rate objects
+        example:
+        - carrier: Dolorem et.
+          carrier_account_id: Et quo est tenetur.
+          created_at: Quo vitae asperiores nihil enim.
+          currency: Consequatur repellendus ut nisi provident iusto esse.
+          delivery_date: Velit a architecto.
+          delivery_date_guaranteed: true
+          delivery_days: 2.858211e+18
+          id: rate_
+          list_currency: Odio id molestiae.
+          list_rate: Dolorum inventore ipsum natus temporibus voluptas.
+          mode: production
+          object: Rate
+          rate: Quae facilis possimus cupiditate soluta.
+          retail_currency: Quia est incidunt voluptas commodi vel.
+          retail_rate: Necessitatibus eum blanditiis excepturi et consectetur quisquam.
+          service: Vel autem quo.
+          shipment_id: Non dolores.
+          updated_at: Aut qui voluptate.
+        - carrier: Dolorem et.
+          carrier_account_id: Et quo est tenetur.
+          created_at: Quo vitae asperiores nihil enim.
+          currency: Consequatur repellendus ut nisi provident iusto esse.
+          delivery_date: Velit a architecto.
+          delivery_date_guaranteed: true
+          delivery_days: 2.858211e+18
+          id: rate_
+          list_currency: Odio id molestiae.
+          list_rate: Dolorum inventore ipsum natus temporibus voluptas.
+          mode: production
+          object: Rate
+          rate: Quae facilis possimus cupiditate soluta.
+          retail_currency: Quia est incidunt voluptas commodi vel.
+          retail_rate: Necessitatibus eum blanditiis excepturi et consectetur quisquam.
+          service: Vel autem quo.
+          shipment_id: Non dolores.
+          updated_at: Aut qui voluptate.
+        items:
+          $ref: '#/definitions/EasypostRate'
+        type: array
+      refund_status:
+        description: The current status of the shipment refund process. Possible values
+          are "submitted", "refunded", "rejected".
+        enum:
+        - submitted
+        - rejected
+        - refunded
+        example: refunded
+        type: string
+      return_address:
+        $ref: '#/definitions/EasypostAddress'
+      scan_form:
+        $ref: '#/definitions/EasypostScanform'
+      selected_rate:
+        $ref: '#/definitions/EasypostRate'
+      status:
+        description: The current tracking status of the shipment
+        example: Repudiandae repellat.
+        type: string
+      to_address:
+        $ref: '#/definitions/EasypostAddress'
+      tracker:
+        $ref: '#/definitions/EasypostTracker'
+      tracking_code:
+        description: If purchased, the tracking code will appear here as well as within
+          the Tracker object
+        example: Ut sapiente rerum.
+        type: string
+      updated_at:
+        description: Time Last Updated
+        example: Perspiciatis voluptas in praesentium at.
+        type: string
+      usps_zone:
+        description: The USPS zone of the shipment, if purchased with USPS
+        example: Molestiae consequatur ut expedita dolores et tenetur.
+        type: string
+    required:
+    - id
+    - object
+    title: 'Mediatype identifier: application/easypost.shipment+json'
+    type: object
+  EasypostTracker:
+    description: The Tracker object contains both the current information about the
+      package as well as previous updates. All of the previous updates are stored
+      in the tracking_details array. Each TrackingDetail object contains the status,
+      the message from the carrier, and a TrackingLocation. (default view)
+    properties:
+      carrier:
+        description: The name of the carrier handling the shipment
+        example: Commodi omnis ut similique modi atque molestias.
+        type: string
+      carrier_detail:
+        description: The associated CarrierDetail object (if available)
+        example:
+        - container_type: Sunt et enim.
+          est_delivery_date_local: Optio ut deserunt.
+          est_delivery_time_local: Placeat culpa optio ea ad cupiditate est.
+          object: CarrierDetail
+          service: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+        items:
+          $ref: '#/definitions/EasypostCarrierdetail'
+        type: array
+      created_at:
+        description: Time Created
+        example: Qui labore labore ratione.
+        type: string
+      est_delivery_date:
+        description: The estimated delivery date provided by the carrier (if available)
+        example: Aliquid necessitatibus eos.
+        type: string
+      fees:
+        description: Array of the associated Fee objects
+        example:
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        items:
+          $ref: '#/definitions/EasypostFee'
+        type: array
+      id:
+        description: Unique, begins with "trk_"
+        example: trk_
+        pattern: ^trk_
+        type: string
+      mode:
+        default: test
+        description: Set based on which api-key you used, either "test" or "production"
+        enum:
+        - test
+        - production
+        example: test
+        type: string
+      object:
+        default: Tracker
+        description: 'Always: "Tracker"'
+        example: Tracker
+        pattern: ^Tracker$
+        type: string
+      public_url:
+        description: URL to a publicly-accessible html page that shows tracking details
+          for this tracker
+        example: Autem non tempore.
+        type: string
+      shipment_id:
+        description: The id of the EasyPost Shipment object associated with the Tracker
+          (if any)
+        example: Non dolorum et earum.
+        type: string
+      signed_by:
+        description: The name of the person who signed for the package (if available)
+        example: Voluptatibus numquam doloribus.
+        type: string
+      status:
+        description: The current status of the package, possible values are "unknown",
+          "pre_transit", "in_transit", "out_for_delivery", "delivered", "available_for_pickup",
+          "return_to_sender", "failure", "cancelled" or "error"
+        enum:
+        - pre_transit
+        - in_transit
+        - out_for_delivery
+        - delivered
+        - available_for_pickup
+        - return_to_sender
+        - failure
+        - cancelled
+        - error
+        - unknown
+        example: delivered
+        type: string
+      tracking_code:
+        description: The tracking code provided by the carrier
+        example: Non eos consequatur nobis nemo blanditiis sit.
+        type: string
+      tracking_details:
+        description: Array of the associated TrackingDetail objects
+        example:
+        - datetime: Eveniet quia.
+          message: Similique quas sed sequi adipisci minima maxime.
+          object: TrackingDetail
+          source: Perferendis officiis.
+          status: out_for_delivery
+          tracking_location:
+            city: Nulla fugiat voluptatem harum ipsum.
+            country: Repudiandae vero voluptatem praesentium aut consequatur.
+            object: TrackingLocation
+            state: Beatae expedita id ea esse.
+            zip: Beatae dolores et odio aliquam omnis illo.
+        items:
+          $ref: '#/definitions/EasypostTrackingdetail'
+        type: array
+      updated_at:
+        description: Time Last Updated
+        example: Dignissimos cumque ut at adipisci.
+        type: string
+      weight:
+        description: The weight of the package as measured by the carrier in ounces
+          (if available)
+        example: 0.94037324
+        format: double
+        type: number
+    required:
+    - id
+    - object
+    title: 'Mediatype identifier: application/easypost.tracker+json'
+    type: object
+  EasypostTrackers:
+    description: EasypostTrackers media type (default view)
+    example:
+      trackers:
+      - carrier: Commodi omnis ut similique modi atque molestias.
+        carrier_detail:
+        - container_type: Sunt et enim.
+          est_delivery_date_local: Optio ut deserunt.
+          est_delivery_time_local: Placeat culpa optio ea ad cupiditate est.
+          object: CarrierDetail
+          service: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+        created_at: Qui labore labore ratione.
+        est_delivery_date: Aliquid necessitatibus eos.
+        fees:
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        id: trk_
+        mode: test
+        object: Tracker
+        public_url: Autem non tempore.
+        shipment_id: Non dolorum et earum.
+        signed_by: Voluptatibus numquam doloribus.
+        status: delivered
+        tracking_code: Non eos consequatur nobis nemo blanditiis sit.
+        tracking_details:
+        - datetime: Eveniet quia.
+          message: Similique quas sed sequi adipisci minima maxime.
+          object: TrackingDetail
+          source: Perferendis officiis.
+          status: out_for_delivery
+          tracking_location:
+            city: Nulla fugiat voluptatem harum ipsum.
+            country: Repudiandae vero voluptatem praesentium aut consequatur.
+            object: TrackingLocation
+            state: Beatae expedita id ea esse.
+            zip: Beatae dolores et odio aliquam omnis illo.
+        updated_at: Dignissimos cumque ut at adipisci.
+        weight: 0.94037324
+      - carrier: Commodi omnis ut similique modi atque molestias.
+        carrier_detail:
+        - container_type: Sunt et enim.
+          est_delivery_date_local: Optio ut deserunt.
+          est_delivery_time_local: Placeat culpa optio ea ad cupiditate est.
+          object: CarrierDetail
+          service: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+        created_at: Qui labore labore ratione.
+        est_delivery_date: Aliquid necessitatibus eos.
+        fees:
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        id: trk_
+        mode: test
+        object: Tracker
+        public_url: Autem non tempore.
+        shipment_id: Non dolorum et earum.
+        signed_by: Voluptatibus numquam doloribus.
+        status: delivered
+        tracking_code: Non eos consequatur nobis nemo blanditiis sit.
+        tracking_details:
+        - datetime: Eveniet quia.
+          message: Similique quas sed sequi adipisci minima maxime.
+          object: TrackingDetail
+          source: Perferendis officiis.
+          status: out_for_delivery
+          tracking_location:
+            city: Nulla fugiat voluptatem harum ipsum.
+            country: Repudiandae vero voluptatem praesentium aut consequatur.
+            object: TrackingLocation
+            state: Beatae expedita id ea esse.
+            zip: Beatae dolores et odio aliquam omnis illo.
+        updated_at: Dignissimos cumque ut at adipisci.
+        weight: 0.94037324
+      - carrier: Commodi omnis ut similique modi atque molestias.
+        carrier_detail:
+        - container_type: Sunt et enim.
+          est_delivery_date_local: Optio ut deserunt.
+          est_delivery_time_local: Placeat culpa optio ea ad cupiditate est.
+          object: CarrierDetail
+          service: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+        created_at: Qui labore labore ratione.
+        est_delivery_date: Aliquid necessitatibus eos.
+        fees:
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        - amount: Enim facilis nemo dolor sunt.
+          charged: true
+          object: Fee
+          refunded: false
+          type: TrackerFee
+        id: trk_
+        mode: test
+        object: Tracker
+        public_url: Autem non tempore.
+        shipment_id: Non dolorum et earum.
+        signed_by: Voluptatibus numquam doloribus.
+        status: delivered
+        tracking_code: Non eos consequatur nobis nemo blanditiis sit.
+        tracking_details:
+        - datetime: Eveniet quia.
+          message: Similique quas sed sequi adipisci minima maxime.
+          object: TrackingDetail
+          source: Perferendis officiis.
+          status: out_for_delivery
+          tracking_location:
+            city: Nulla fugiat voluptatem harum ipsum.
+            country: Repudiandae vero voluptatem praesentium aut consequatur.
+            object: TrackingLocation
+            state: Beatae expedita id ea esse.
+            zip: Beatae dolores et odio aliquam omnis illo.
+        updated_at: Dignissimos cumque ut at adipisci.
+        weight: 0.94037324
+    properties:
+      trackers:
+        example:
+        - carrier: Commodi omnis ut similique modi atque molestias.
+          carrier_detail:
+          - container_type: Sunt et enim.
+            est_delivery_date_local: Optio ut deserunt.
+            est_delivery_time_local: Placeat culpa optio ea ad cupiditate est.
+            object: CarrierDetail
+            service: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+          created_at: Qui labore labore ratione.
+          est_delivery_date: Aliquid necessitatibus eos.
+          fees:
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          id: trk_
+          mode: test
+          object: Tracker
+          public_url: Autem non tempore.
+          shipment_id: Non dolorum et earum.
+          signed_by: Voluptatibus numquam doloribus.
+          status: delivered
+          tracking_code: Non eos consequatur nobis nemo blanditiis sit.
+          tracking_details:
+          - datetime: Eveniet quia.
+            message: Similique quas sed sequi adipisci minima maxime.
+            object: TrackingDetail
+            source: Perferendis officiis.
+            status: out_for_delivery
+            tracking_location:
+              city: Nulla fugiat voluptatem harum ipsum.
+              country: Repudiandae vero voluptatem praesentium aut consequatur.
+              object: TrackingLocation
+              state: Beatae expedita id ea esse.
+              zip: Beatae dolores et odio aliquam omnis illo.
+          updated_at: Dignissimos cumque ut at adipisci.
+          weight: 0.94037324
+        - carrier: Commodi omnis ut similique modi atque molestias.
+          carrier_detail:
+          - container_type: Sunt et enim.
+            est_delivery_date_local: Optio ut deserunt.
+            est_delivery_time_local: Placeat culpa optio ea ad cupiditate est.
+            object: CarrierDetail
+            service: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+          created_at: Qui labore labore ratione.
+          est_delivery_date: Aliquid necessitatibus eos.
+          fees:
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          id: trk_
+          mode: test
+          object: Tracker
+          public_url: Autem non tempore.
+          shipment_id: Non dolorum et earum.
+          signed_by: Voluptatibus numquam doloribus.
+          status: delivered
+          tracking_code: Non eos consequatur nobis nemo blanditiis sit.
+          tracking_details:
+          - datetime: Eveniet quia.
+            message: Similique quas sed sequi adipisci minima maxime.
+            object: TrackingDetail
+            source: Perferendis officiis.
+            status: out_for_delivery
+            tracking_location:
+              city: Nulla fugiat voluptatem harum ipsum.
+              country: Repudiandae vero voluptatem praesentium aut consequatur.
+              object: TrackingLocation
+              state: Beatae expedita id ea esse.
+              zip: Beatae dolores et odio aliquam omnis illo.
+          updated_at: Dignissimos cumque ut at adipisci.
+          weight: 0.94037324
+        - carrier: Commodi omnis ut similique modi atque molestias.
+          carrier_detail:
+          - container_type: Sunt et enim.
+            est_delivery_date_local: Optio ut deserunt.
+            est_delivery_time_local: Placeat culpa optio ea ad cupiditate est.
+            object: CarrierDetail
+            service: Omnis aliquam recusandae dolores veritatis expedita reprehenderit.
+          created_at: Qui labore labore ratione.
+          est_delivery_date: Aliquid necessitatibus eos.
+          fees:
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          - amount: Enim facilis nemo dolor sunt.
+            charged: true
+            object: Fee
+            refunded: false
+            type: TrackerFee
+          id: trk_
+          mode: test
+          object: Tracker
+          public_url: Autem non tempore.
+          shipment_id: Non dolorum et earum.
+          signed_by: Voluptatibus numquam doloribus.
+          status: delivered
+          tracking_code: Non eos consequatur nobis nemo blanditiis sit.
+          tracking_details:
+          - datetime: Eveniet quia.
+            message: Similique quas sed sequi adipisci minima maxime.
+            object: TrackingDetail
+            source: Perferendis officiis.
+            status: out_for_delivery
+            tracking_location:
+              city: Nulla fugiat voluptatem harum ipsum.
+              country: Repudiandae vero voluptatem praesentium aut consequatur.
+              object: TrackingLocation
+              state: Beatae expedita id ea esse.
+              zip: Beatae dolores et odio aliquam omnis illo.
+          updated_at: Dignissimos cumque ut at adipisci.
+          weight: 0.94037324
+        items:
+          $ref: '#/definitions/EasypostTracker'
+        type: array
+    required:
+    - trackers
+    title: 'Mediatype identifier: application/easypost.trackers+json'
+    type: object
+  EasypostTrackingdetail:
+    description: Each TrackingDetail object contains the status, the message from
+      the carrier, and a TrackingLocation. (default view)
+    properties:
+      datetime:
+        description: The timestamp when the tracking scan occurred
+        example: Eveniet quia.
+        type: string
+      message:
+        description: Description of the scan event
+        example: Similique quas sed sequi adipisci minima maxime.
+        type: string
+      object:
+        default: TrackingDetail
+        description: 'Always: "TrackingDetail"'
+        example: TrackingDetail
+        pattern: ^TrackingDetail$
+        type: string
+      source:
+        description: The original source of the information for this scan event, usually
+          the carrier
+        example: Perferendis officiis.
+        type: string
+      status:
+        description: The current status of the package, possible values are "unknown",
+          "pre_transit", "in_transit", "out_for_delivery", "delivered", "available_for_pickup",
+          "return_to_sender", "failure", "cancelled" or "error"
+        enum:
+        - pre_transit
+        - in_transit
+        - out_for_delivery
+        - delivered
+        - available_for_pickup
+        - return_to_sender
+        - failure
+        - cancelled
+        - error
+        - unknown
+        example: out_for_delivery
+        type: string
+      tracking_location:
+        $ref: '#/definitions/EasypostTrackinglocation'
+    required:
+    - object
+    title: 'Mediatype identifier: application/easypost.trackingdetail+json'
+    type: object
+  EasypostTrackinglocation:
+    description: The TrackingLocation contains city, state, country, and zip information
+      about the location where the package was scanned. The information each carrier
+      provides is different, so some carriers may not make use of all of these fields.
+      (default view)
+    properties:
+      city:
+        description: The city where the scan event occurred (if available)
+        example: Nulla fugiat voluptatem harum ipsum.
+        type: string
+      country:
+        description: "\tThe country where the scan event occurred (if available)"
+        example: Repudiandae vero voluptatem praesentium aut consequatur.
+        type: string
+      object:
+        default: TrackingLocation
+        description: 'Always: "TrackingLocation"'
+        example: TrackingLocation
+        pattern: ^TrackingLocation$
+        type: string
+      state:
+        description: The state where the scan event occurred (if available)
+        example: Beatae expedita id ea esse.
+        type: string
+      zip:
+        description: The postal code where the scan event occurred (if available)
+        example: Beatae dolores et odio aliquam omnis illo.
+        type: string
+    required:
+    - object
+    title: 'Mediatype identifier: application/easypost.trackinglocation+json'
+    type: object
+  EasypostUser:
+    description: An Insurance object represents insurance for packages purchased both
+      va the EasyPost API as well as shipments purchased through third parties and
+      later registered with EasyPost. An Insurance is created automatically whenever
+      you buy a Shipment through EasyPost and pass insurance options during the Buy
+      call or in a later call to Insure a Shipment. (default view)
+    properties:
+      balance:
+        description: Formatted as string "XX.XXXXX"
+        example: Nisi et iusto rerum voluptas tempore corrupti.
+        type: string
+      children:
+        $ref: '#/definitions/EasypostUserCollection'
+      email:
+        description: Required
+        example: Quod exercitationem tempora sunt aperiam et aut.
+        type: string
+      id:
+        description: Unique, begins with "user_"
+        example: user_
+        pattern: ^user_
+        type: string
+      name:
+        description: First and last name required
+        example: Similique esse.
+        type: string
+      object:
+        default: User
+        description: 'Always: "User"'
+        example: User
+        pattern: ^User$
+        type: string
+      parent_id:
+        description: The ID of the parent user object. Top-level users are defined
+          as users with no parent
+        example: Voluptas optio velit aut eum est.
+        type: string
+      phone_number:
+        description: Optional
+        example: Consequatur quas praesentium voluptatum non facere aut.
+        type: string
+      recharge_amount:
+        description: USD formatted dollars and cents, delimited by a decimal point
+        example: Sequi et sunt architecto voluptas.
+        type: string
+      recharge_threshold:
+        description: Number of cents USD that when your balance drops below, we automatically
+          recharge your account with your primary payment method.
+        example: Possimus sed aut et cum officia.
+        type: string
+      secondary_recharge_amount:
+        description: USD formatted dollars and cents, delimited by a decimal point
+        example: Voluptatem omnis sed quod deserunt perferendis tempora.
+        type: string
+    required:
+    - id
+    - object
+    - name
+    - email
+    title: 'Mediatype identifier: application/easypost.user+json'
+    type: object
+  EasypostUserCollection:
+    description: EasypostUserCollection is the media type for an array of EasypostUser
+      (default view)
+    items:
+      $ref: '#/definitions/EasypostUser'
+    title: 'Mediatype identifier: application/easypost.user+json; type=collection'
+    type: array
   FieldsObjectPayload:
     description: Contains "credentials" and/or "test_credentials", or may be empty
     properties:
@@ -823,6 +3328,115 @@ definitions:
         example: true
         type: any
     title: FieldsObjectPayload
+    type: object
+  InsureShipmentPayload:
+    description: Insuring your Shipment is as simple as sending us the value of the
+      contents. We charge 1% of the value, with a $1 minimum, and handle all the claims.
+      All our claims are paid out within 30 days.
+    properties:
+      amount:
+        type: string
+    required:
+    - amount
+    title: InsureShipmentPayload
+    type: object
+  LabelShipmentPayload:
+    properties:
+      file_format:
+        description: Selected rate
+        enum:
+        - png
+        - zpl
+        - epl2
+        - pdf
+        type: string
+    required:
+    - file_format
+    title: LabelShipmentPayload
+    type: object
+  ListInsurancePayload:
+    description: The Insurance List is a paginated list of all Insurance objects associated
+      with the given API Key. It accepts a variety of parameters which can be used
+      to modify the scope. The has_more attribute indicates whether or not additional
+      pages can be requested. The recommended way of paginating is to use either the
+      before_id or after_id parameter to specify where the next page begins.
+    properties:
+      after_id:
+        $ref: '#/definitions/EasypostAddress'
+      before_id:
+        $ref: '#/definitions/EasypostAddress'
+      end_datetime:
+        description: Only return records created before this timestamp. Defaults to
+          end of the current day, or 1 month after a passed start_datetime
+        type: string
+      page_size:
+        default: 20
+        description: The number of records to return on each page. The maximum value
+          is 100, and default is 20.
+        maximum: 100
+        minimum: 1
+        type: integer
+      start_datetime:
+        description: Only return records created after this timestamp. Defaults to
+          1 month ago, or 1 month before a passed end_datetime
+        type: string
+    title: ListInsurancePayload
+    type: object
+  ListTrackerPayload:
+    properties:
+      after_id:
+        description: Optional pagination parameter. Only trackers created after the
+          given ID will be included. May not be used with before_id
+        type: string
+      before_id:
+        description: Optional pagination parameter. Only trackers created before the
+          given ID will be included. May not be used with after_id
+        type: string
+      carrier:
+        description: Only returns Trackers with the given carrier value
+        type: string
+      end_datetime:
+        description: Only return Trackers created before this timestamp. Defaults
+          to end of the current day, or 1 month after a passed start_datetime
+        type: string
+      page_size:
+        default: 1
+        description: The number of Trackers to return on each page. The maximum value
+          is 100
+        maximum: 100
+        minimum: 1
+        type: integer
+      start_datetime:
+        description: Only return Trackers created after this timestamp. Defaults to
+          1 month ago, or 1 month before a passed end_datetime
+        type: string
+      tracking_code:
+        description: Only returns Trackers with the given tracking_code. Useful for
+          retrieving an individual Tracker by tracking_code rather than by ID
+        type: string
+    required:
+    - tracking_code
+    title: ListTrackerPayload
+    type: object
+  Message:
+    description: When rating a Shipment or Pickup, some carriers may fail to generate
+      rates. These failures are returned as part of the Shipment or Pickup as part
+      of their messages attribute, and follow a common object structure. (default
+      view)
+    properties:
+      carrier:
+        description: the name of the carrier generating the error, e.g. "UPS"
+        example: Ut non exercitationem praesentium.
+        type: string
+      message:
+        description: the string from the carrier explaining the problem.
+        example: Optio illum.
+        type: string
+      type:
+        description: the category of error that occurred. Most frequently "rate_error"
+        example: Aut voluptatem rerum ipsum eum molestiae et.
+        type: string
+    title: 'Mediatype identifier: message'
     type: object
   UpdateCarrierAccountPayload:
     description: A CarrierAccount encapsulates your credentials with the carrier.
@@ -862,6 +3476,29 @@ definitions:
     required:
     - type
     title: UpdateCarrierAccountPayload
+    type: object
+  UpdateUserPayload:
+    properties:
+      current_password:
+        type: string
+      email:
+        type: string
+      name:
+        description: First and last name required
+        type: string
+      password:
+        type: string
+      password_confirmation:
+        type: string
+      phone_number:
+        type: string
+      recharge_amount:
+        type: string
+      recharge_threshold:
+        type: string
+      secondary_recharge_amount:
+        type: string
+    title: UpdateUserPayload
     type: object
   application/easypost.gield_error+json:
     properties:
@@ -1074,6 +3711,132 @@ paths:
       summary: show carrier_types
       tags:
       - carrier_types
+  /customs_infos:
+    post:
+      operationId: customs_info#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateCustomsInfoPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostCustomsinfo'
+      schemes:
+      - http
+      summary: create customs_info
+      tags:
+      - customs_info
+  /customs_items:
+    post:
+      operationId: customs_item#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateCustomsItemPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostCustomitem'
+      schemes:
+      - http
+      summary: create customs_item
+      tags:
+      - customs_item
+  /insurances:
+    get:
+      description: The Insurance List is a paginated list of all Insurance objects
+        associated with the given API Key. It accepts a variety of parameters which
+        can be used to modify the scope. The has_more attribute indicates whether
+        or not additional pages can be requested. The recommended way of paginating
+        is to use either the before_id or after_id parameter to specify where the
+        next page begins.
+      operationId: insurance#list
+      parameters:
+      - description: The Insurance List is a paginated list of all Insurance objects
+          associated with the given API Key. It accepts a variety of parameters which
+          can be used to modify the scope. The has_more attribute indicates whether
+          or not additional pages can be requested. The recommended way of paginating
+          is to use either the before_id or after_id parameter to specify where the
+          next page begins.
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/ListInsurancePayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostTrackers'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: list insurance
+      tags:
+      - insurance
+    post:
+      description: An Insurance created via this endpoint must belong to a shipment
+        purchased outside of EasyPost. Insurance for Shipments created within EasyPost
+        must be created via the Shipment Buy or Insure endpoints. When creating Insurance
+        for a non-EasyPost shipment, you must provide to_address, from_address, tracking_code,
+        and amount information. Optionally, you can provide the carrier parameter,
+        which will help EasyPost identify the carrier the package was shipped with.
+        If no carrier is provided, EasyPost will attempt to determine the carrier
+        based on the tracking_code provided. Providing a carrier parameter is recommended,
+        since some tracking_codes are ambiguous and may match with more than one carrier.
+        In addition, not having to auto-match the carrier will significantly speed
+        up the response time.
+      operationId: insurance#create
+      parameters:
+      - description: An Insurance created via this endpoint must belong to a shipment
+          purchased outside of EasyPost. Insurance for Shipments created within EasyPost
+          must be created via the Shipment Buy or Insure endpoints.
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateInsurancePayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostTracker'
+      schemes:
+      - http
+      summary: create insurance
+      tags:
+      - insurance
+  /insurances/{id}:
+    get:
+      description: Retrieve an Insurance by id.
+      operationId: insurance#show
+      parameters:
+      - description: Unique, starts with "ins_"
+        in: path
+        name: id
+        pattern: ^trk_
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostTracker'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show insurance
+      tags:
+      - insurance
   /parcels:
     post:
       description: Include the weight, and either a predefined_package or length,
@@ -1125,6 +3888,322 @@ paths:
       summary: show parcel
       tags:
       - parcel
+  /shipments:
+    post:
+      description: A Shipment is almost exclusively a container for other objects,
+        and thus a Shipment may reuse many of these objects. Additionally, all the
+        objects contained within a Shipment may be created at the same time.
+      operationId: shipment#create
+      parameters:
+      - description: Parcel objects represent the physical container being shipped.
+          Dimensions can be supplied either as length, width, and height dimensions,
+          or a predefined_package string. If you provide a carrier specific predefined_package
+          the associated Shipment will only fetch rates from that carrier.
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateShipmentPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostShipment'
+      schemes:
+      - http
+      summary: create shipment
+      tags:
+      - shipment
+  /shipments/{id}:
+    get:
+      description: Get a Parcel by its id. In general you should not need to use this
+        in your automated solution. A Parcel's id can be inlined into the creation
+        call to other objects. This allows you to only create one Parcel for each
+        package you will be using.
+      operationId: shipment#show
+      parameters:
+      - description: Parcel ID
+        in: path
+        name: id
+        pattern: ^shp_
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostShipment'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show shipment
+      tags:
+      - shipment
+  /shipments/{id}/buy:
+    post:
+      description: To purchase a Shipment you only need to specify the Rate to purchase.
+        This operation populates the tracking_code and postage_label attributes. The
+        default image format of the associated PostageLabel is PNG. To change this
+        default see the label_format option.
+      operationId: shipment#buy
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/BuyShipmentPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostShipment'
+      schemes:
+      - http
+      summary: buy shipment
+      tags:
+      - shipment
+  /shipments/{id}/insure:
+    post:
+      description: Insuring your Shipment is as simple as sending us the value of
+        the contents. We charge 1% of the value, with a $1 minimum, and handle all
+        the claims. All our claims are paid out within 30 days.
+      operationId: shipment#insure
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - description: Insuring your Shipment is as simple as sending us the value of
+          the contents. We charge 1% of the value, with a $1 minimum, and handle all
+          the claims. All our claims are paid out within 30 days.
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/InsureShipmentPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostShipment'
+      schemes:
+      - http
+      summary: insure shipment
+      tags:
+      - shipment
+  /shipments/{id}/label:
+    post:
+      description: A Shipment's PostageLabel can be converted from PNG to other formats.
+        If the PostageLabel was originally generated in a format other than PNG it
+        cannot be converted.
+      operationId: shipment#label
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/LabelShipmentPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostShipment'
+      schemes:
+      - http
+      summary: label shipment
+      tags:
+      - shipment
+  /shipments/{id}/rates:
+    post:
+      description: You can update the Rates of a Shipment at any time. This operation
+        respects the carrier_accounts attribute.
+      operationId: shipment#rates
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostShipment'
+      schemes:
+      - http
+      summary: rates shipment
+      tags:
+      - shipment
+  /shipments/{id}/refund:
+    post:
+      description: 'Refunding a Shipment is avaliable for many carriers supported
+        by EasyPost. Once the refund has been submitted, refund_status attribute of
+        the Shipment will be populated with one of the possible values: "submitted",
+        "refunded", "rejected". The most common initial status is "submitted". Many
+        carriers require that the refund be processed before the refund_status will
+        move to "refunded". The length of this process depends on the carrier, but
+        no greater than 30 days.'
+      operationId: shipment#refund
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostShipment'
+      schemes:
+      - http
+      summary: refund shipment
+      tags:
+      - shipment
+  /trackers:
+    get:
+      description: The Tracker List is a paginated list of all Tracker objects associated
+        with the given API Key. It accepts a variety of parameters which can be used
+        to modify the scope. The has_more attribute indicates whether or not additional
+        pages can be requested. The recommended way of paginating is to use either
+        the before_id or after_id parameter to specify where the next page begins.
+      operationId: tracker#list
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/ListTrackerPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostTrackers'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: list tracker
+      tags:
+      - tracker
+    post:
+      description: A Tracker can be created with only a tracking_code. Optionally,
+        you can provide the carrier parameter, which indicates the carrier the package
+        was shipped with. If no carrier is provided, EasyPost will attempt to determine
+        the carrier based on the tracking_code provided. Providing a carrier parameter
+        is recommended, since some tracking_codes are ambiguous and may match with
+        more than one carrier. In addition, not having to auto-match the carrier will
+        significantly speed up the response time.
+      operationId: tracker#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateTrackerPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostTracker'
+      schemes:
+      - http
+      summary: create tracker
+      tags:
+      - tracker
+  /trackers/{id}:
+    get:
+      description: Retrieve a Tracker by id.
+      operationId: tracker#show
+      parameters:
+      - description: Tracking ID
+        in: path
+        name: id
+        pattern: ^trk_
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostTracker'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show tracker
+      tags:
+      - tracker
+  /users:
+    post:
+      operationId: user#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateUserPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostUser'
+      schemes:
+      - http
+      summary: create user
+      tags:
+      - user
+  /users/{id}:
+    get:
+      operationId: user#show
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        pattern: ^user_
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostUser'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show user
+      tags:
+      - user
+    put:
+      operationId: user#update
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateUserPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EasypostUser'
+      schemes:
+      - http
+      summary: update user
+      tags:
+      - user
 produces:
 - application/json
 responses:

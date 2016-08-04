@@ -21,12 +21,36 @@ func main() {
 	// Mount "address" controller
 	c := NewAddressController(service)
 	app.MountAddressController(service, c)
+	// Mount "api_key" controller
+	c2 := NewAPIKeyController(service)
+	app.MountAPIKeyController(service, c2)
 	// Mount "carrier_account" controller
-	c2 := NewCarrierAccountController(service)
-	app.MountCarrierAccountController(service, c2)
+	c3 := NewCarrierAccountController(service)
+	app.MountCarrierAccountController(service, c3)
 	// Mount "carrier_types" controller
-	c3 := NewCarrierTypesController(service)
-	app.MountCarrierTypesController(service, c3)
+	c4 := NewCarrierTypesController(service)
+	app.MountCarrierTypesController(service, c4)
+	// Mount "customs_info" controller
+	c5 := NewCustomsInfoController(service)
+	app.MountCustomsInfoController(service, c5)
+	// Mount "customs_item" controller
+	c6 := NewCustomsItemController(service)
+	app.MountCustomsItemController(service, c6)
+	// Mount "insurance" controller
+	c7 := NewInsuranceController(service)
+	app.MountInsuranceController(service, c7)
+	// Mount "parcel" controller
+	c8 := NewParcelController(service)
+	app.MountParcelController(service, c8)
+	// Mount "shipment" controller
+	c9 := NewShipmentController(service)
+	app.MountShipmentController(service, c9)
+	// Mount "tracker" controller
+	c10 := NewTrackerController(service)
+	app.MountTrackerController(service, c10)
+	// Mount "user" controller
+	c11 := NewUserController(service)
+	app.MountUserController(service, c11)
 
 	// Start service
 	if err := service.ListenAndServe(":8080"); err != nil {

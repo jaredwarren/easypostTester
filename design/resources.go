@@ -134,6 +134,37 @@ var _ = Resource("parcel", func() {
 })
 
 /**
+* User
+**/
+
+var _ = Resource("user", func() {
+	BasePath("/users")
+	DefaultMedia(User)
+
+	Action("create", func() {
+		Routing(POST("/"))
+		Payload(UserCreatePayload) // TODO: handles create and return if is_return = true
+		Response(OK)
+	})
+
+	Action("show", func() {
+		Routing(GET("/:id"))
+		Params(func() {
+			Param("id", String, "User ID")
+		})
+		Response(OK)
+		Response(NotFound)
+	})
+
+	Action("update", func() {
+		Routing(PUT("/:id"))
+		Payload(UserUpdatePayload)
+		Response(OK)
+	})
+
+})
+
+/**
 * Shipment
 **/
 var _ = Resource("shipment", func() {

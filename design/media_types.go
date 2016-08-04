@@ -365,6 +365,72 @@ var APIKey = MediaType("application/easypost.api_key+json", func() {
 })
 
 /**
+* User
+**/
+
+var User = MediaType("application/easypost.user+json", func() {
+	Description("An Insurance object represents insurance for packages purchased both va the EasyPost API as well as shipments purchased through third parties and later registered with EasyPost. An Insurance is created automatically whenever you buy a Shipment through EasyPost and pass insurance options during the Buy call or in a later call to Insure a Shipment.")
+	Attributes(func() {
+		Attribute("id", String, "Unique, begins with \"user_\"", func() {
+			Pattern("^user_")
+		})
+		Attribute("object", String, "Always: \"User\"", func() {
+			Pattern("^User$")
+			Default("User")
+		})
+
+		Attribute("parent_id", String, "The ID of the parent user object. Top-level users are defined as users with no parent")
+		Attribute("name", String, "First and last name required")
+		Attribute("email", String, "Required")
+		Attribute("phone_number", String, "Optional")
+		Attribute("balance", String, "Formatted as string \"XX.XXXXX\"")
+		Attribute("recharge_amount", String, "USD formatted dollars and cents, delimited by a decimal point")
+		Attribute("secondary_recharge_amount", String, "USD formatted dollars and cents, delimited by a decimal point")
+		Attribute("recharge_threshold", String, "Number of cents USD that when your balance drops below, we automatically recharge your account with your primary payment method.")
+		Attribute("children", CollectionOf("application/easypost.user+json"), "All associated children")
+
+		Required("id", "object", "name", "email")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("object")
+
+		Attribute("parent_id")
+		Attribute("name")
+		Attribute("email")
+		Attribute("phone_number")
+		Attribute("balance")
+		Attribute("recharge_amount")
+		Attribute("secondary_recharge_amount")
+		Attribute("recharge_threshold")
+		Attribute("children")
+	})
+})
+
+var UserCreatePayload = Type("UserCreatePayload", func() {
+	Attribute("name", String, "First and last name required")
+	Attribute("email", String)
+	Attribute("phone_number", String)
+	Attribute("password", String)
+	Attribute("password_confirmation", String)
+
+	// Note email, password are nto required for childs
+	Required("name", "email", "password", "password_confirmation")
+})
+
+var UserUpdatePayload = Type("UserUpdatePayload", func() {
+	Attribute("name", String, "First and last name required")
+	Attribute("email", String)
+	Attribute("phone_number", String)
+	Attribute("password", String)
+	Attribute("password_confirmation", String)
+	Attribute("current_password", String)
+	Attribute("recharge_amount", String)
+	Attribute("secondary_recharge_amount", String)
+	Attribute("recharge_threshold", String)
+})
+
+/**
 * Shipment
 **/
 var Shipment = MediaType("application/easypost.shipment+json", func() {

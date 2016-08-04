@@ -15,11 +15,11 @@ import (
 	"testing"
 )
 
-// BuyShipmentOK runs the method Buy of the given controller with the given parameters and payload.
+// ConvertLabelShipmentOK runs the method ConvertLabel of the given controller with the given parameters and payload.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func BuyShipmentOK(t *testing.T, ctx context.Context, service *goa.Service, ctrl app.ShipmentController, id string, payload *app.BuyShipmentPayload) (http.ResponseWriter, *app.EasypostShipment) {
+func ConvertLabelShipmentOK(t *testing.T, ctx context.Context, service *goa.Service, ctrl app.ShipmentController, id string, payload *app.ConvertLabelShipmentPayload) (http.ResponseWriter, *app.EasypostShipment) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -53,7 +53,7 @@ func BuyShipmentOK(t *testing.T, ctx context.Context, service *goa.Service, ctrl
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/v2/shipments/%v/buy", id),
+		Path: fmt.Sprintf("/v2/shipments/%v/label", id),
 	}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
@@ -65,14 +65,14 @@ func BuyShipmentOK(t *testing.T, ctx context.Context, service *goa.Service, ctrl
 		ctx = context.Background()
 	}
 	goaCtx := goa.NewContext(goa.WithAction(ctx, "ShipmentTest"), rw, req, prms)
-	buyCtx, err := app.NewBuyShipmentContext(goaCtx, service)
+	convertLabelCtx, err := app.NewConvertLabelShipmentContext(goaCtx, service)
 	if err != nil {
 		panic("invalid test data " + err.Error()) // bug
 	}
-	buyCtx.Payload = payload
+	convertLabelCtx.Payload = payload
 
 	// Perform action
-	err = ctrl.Buy(buyCtx)
+	err = ctrl.ConvertLabel(convertLabelCtx)
 
 	// Validate response
 	if err != nil {
@@ -263,11 +263,11 @@ func InsureShipmentOK(t *testing.T, ctx context.Context, service *goa.Service, c
 	return rw, mt
 }
 
-// LabelShipmentOK runs the method Label of the given controller with the given parameters and payload.
+// PruchaseShipmentOK runs the method Pruchase of the given controller with the given parameters and payload.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func LabelShipmentOK(t *testing.T, ctx context.Context, service *goa.Service, ctrl app.ShipmentController, id string, payload *app.LabelShipmentPayload) (http.ResponseWriter, *app.EasypostShipment) {
+func PruchaseShipmentOK(t *testing.T, ctx context.Context, service *goa.Service, ctrl app.ShipmentController, id string, payload *app.PruchaseShipmentPayload) (http.ResponseWriter, *app.EasypostShipment) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -301,7 +301,7 @@ func LabelShipmentOK(t *testing.T, ctx context.Context, service *goa.Service, ct
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/v2/shipments/%v/label", id),
+		Path: fmt.Sprintf("/v2/shipments/%v/buy", id),
 	}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
@@ -313,14 +313,14 @@ func LabelShipmentOK(t *testing.T, ctx context.Context, service *goa.Service, ct
 		ctx = context.Background()
 	}
 	goaCtx := goa.NewContext(goa.WithAction(ctx, "ShipmentTest"), rw, req, prms)
-	labelCtx, err := app.NewLabelShipmentContext(goaCtx, service)
+	pruchaseCtx, err := app.NewPruchaseShipmentContext(goaCtx, service)
 	if err != nil {
 		panic("invalid test data " + err.Error()) // bug
 	}
-	labelCtx.Payload = payload
+	pruchaseCtx.Payload = payload
 
 	// Perform action
-	err = ctrl.Label(labelCtx)
+	err = ctrl.Pruchase(pruchaseCtx)
 
 	// Validate response
 	if err != nil {

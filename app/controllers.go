@@ -447,7 +447,6 @@ func unmarshalCreateInsurancePayload(ctx context.Context, service *goa.Service, 
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
-	payload.Finalize()
 	if err := payload.Validate(); err != nil {
 		return err
 	}
@@ -531,10 +530,10 @@ func unmarshalCreateParcelPayload(ctx context.Context, service *goa.Service, req
 // ShipmentController is the controller interface for the Shipment actions.
 type ShipmentController interface {
 	goa.Muxer
-	Buy(*BuyShipmentContext) error
+	ConvertLabel(*ConvertLabelShipmentContext) error
 	Create(*CreateShipmentContext) error
 	Insure(*InsureShipmentContext) error
-	Label(*LabelShipmentContext) error
+	Pruchase(*PruchaseShipmentContext) error
 	Rates(*RatesShipmentContext) error
 	Refund(*RefundShipmentContext) error
 	Show(*ShowShipmentContext) error
@@ -551,20 +550,20 @@ func MountShipmentController(service *goa.Service, ctrl ShipmentController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewBuyShipmentContext(ctx, service)
+		rctx, err := NewConvertLabelShipmentContext(ctx, service)
 		if err != nil {
 			return err
 		}
 		// Build the payload
 		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*BuyShipmentPayload)
+			rctx.Payload = rawPayload.(*ConvertLabelShipmentPayload)
 		} else {
 			return goa.MissingPayloadError()
 		}
-		return ctrl.Buy(rctx)
+		return ctrl.ConvertLabel(rctx)
 	}
-	service.Mux.Handle("POST", "/v2/shipments/:id/buy", ctrl.MuxHandler("Buy", h, unmarshalBuyShipmentPayload))
-	service.LogInfo("mount", "ctrl", "Shipment", "action", "Buy", "route", "POST /v2/shipments/:id/buy")
+	service.Mux.Handle("POST", "/v2/shipments/:id/label", ctrl.MuxHandler("ConvertLabel", h, unmarshalConvertLabelShipmentPayload))
+	service.LogInfo("mount", "ctrl", "Shipment", "action", "ConvertLabel", "route", "POST /v2/shipments/:id/label")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -614,20 +613,20 @@ func MountShipmentController(service *goa.Service, ctrl ShipmentController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewLabelShipmentContext(ctx, service)
+		rctx, err := NewPruchaseShipmentContext(ctx, service)
 		if err != nil {
 			return err
 		}
 		// Build the payload
 		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*LabelShipmentPayload)
+			rctx.Payload = rawPayload.(*PruchaseShipmentPayload)
 		} else {
 			return goa.MissingPayloadError()
 		}
-		return ctrl.Label(rctx)
+		return ctrl.Pruchase(rctx)
 	}
-	service.Mux.Handle("POST", "/v2/shipments/:id/label", ctrl.MuxHandler("Label", h, unmarshalLabelShipmentPayload))
-	service.LogInfo("mount", "ctrl", "Shipment", "action", "Label", "route", "POST /v2/shipments/:id/label")
+	service.Mux.Handle("POST", "/v2/shipments/:id/buy", ctrl.MuxHandler("Pruchase", h, unmarshalPruchaseShipmentPayload))
+	service.LogInfo("mount", "ctrl", "Shipment", "action", "Pruchase", "route", "POST /v2/shipments/:id/buy")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -675,13 +674,12 @@ func MountShipmentController(service *goa.Service, ctrl ShipmentController) {
 	service.LogInfo("mount", "ctrl", "Shipment", "action", "Show", "route", "GET /v2/shipments/:id")
 }
 
-// unmarshalBuyShipmentPayload unmarshals the request body into the context request data Payload field.
-func unmarshalBuyShipmentPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &buyShipmentPayload{}
+// unmarshalConvertLabelShipmentPayload unmarshals the request body into the context request data Payload field.
+func unmarshalConvertLabelShipmentPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &convertLabelShipmentPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
-	payload.Finalize()
 	if err := payload.Validate(); err != nil {
 		return err
 	}
@@ -716,9 +714,9 @@ func unmarshalInsureShipmentPayload(ctx context.Context, service *goa.Service, r
 	return nil
 }
 
-// unmarshalLabelShipmentPayload unmarshals the request body into the context request data Payload field.
-func unmarshalLabelShipmentPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &labelShipmentPayload{}
+// unmarshalPruchaseShipmentPayload unmarshals the request body into the context request data Payload field.
+func unmarshalPruchaseShipmentPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &pruchaseShipmentPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}

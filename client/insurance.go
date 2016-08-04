@@ -15,11 +15,11 @@ type CreateInsurancePayload struct {
 	// The carrier associated with the tracking_code you provided. The carrier will get auto-detected if none is provided
 	Carrier *string `form:"carrier,omitempty" json:"carrier,omitempty" xml:"carrier,omitempty"`
 	// The actual origin of the package to be insured
-	FromAddress *EasypostAddress `form:"from_address" json:"from_address" xml:"from_address"`
+	FromAddress *AddressPayload `form:"from_address" json:"from_address" xml:"from_address"`
 	// Optional. A unique value that may be used in place of ID when doing Retrieve calls for this insurance
 	Reference *string `form:"reference,omitempty" json:"reference,omitempty" xml:"reference,omitempty"`
 	// The actual destination of the package to be insured
-	ToAddress *EasypostAddress `form:"to_address" json:"to_address" xml:"to_address"`
+	ToAddress *AddressPayload `form:"to_address" json:"to_address" xml:"to_address"`
 	// The tracking code associated with the non-EasyPost-purchased package you'd like to insure
 	TrackingCode string `form:"tracking_code" json:"tracking_code" xml:"tracking_code"`
 }
@@ -67,9 +67,9 @@ func (c *Client) NewCreateInsuranceRequest(ctx context.Context, path string, pay
 // ListInsurancePayload is the insurance list action payload.
 type ListInsurancePayload struct {
 	// Optional pagination parameter. Only records created after the given ID will be included. May not be used with before_id
-	AfterID *EasypostAddress `form:"after_id,omitempty" json:"after_id,omitempty" xml:"after_id,omitempty"`
+	AfterID *AddressPayload `form:"after_id,omitempty" json:"after_id,omitempty" xml:"after_id,omitempty"`
 	// Optional pagination parameter. Only records created before the given ID will be included. May not be used with after_id
-	BeforeID *EasypostAddress `form:"before_id,omitempty" json:"before_id,omitempty" xml:"before_id,omitempty"`
+	BeforeID *AddressPayload `form:"before_id,omitempty" json:"before_id,omitempty" xml:"before_id,omitempty"`
 	// Only return records created before this timestamp. Defaults to end of the current day, or 1 month after a passed start_datetime
 	EndDatetime *string `form:"end_datetime,omitempty" json:"end_datetime,omitempty" xml:"end_datetime,omitempty"`
 	// The number of records to return on each page. The maximum value is 100, and default is 20.

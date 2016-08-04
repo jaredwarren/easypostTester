@@ -8,30 +8,28 @@ import (
 	"net/url"
 )
 
-// BuyShipmentPayload is the shipment buy action payload.
-type BuyShipmentPayload struct {
-	// Additionally, insurance may be added during the purchase. To specify an amount to insure, pass the insurance attribute as a string. The currency of all insurance is USD.
-	Insurance *string `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
+// ConvertLabelShipmentPayload is the shipment convertLabel action payload.
+type ConvertLabelShipmentPayload struct {
 	// Selected rate
-	Rate *EasypostRate `form:"rate" json:"rate" xml:"rate"`
+	FileFormat string `form:"file_format" json:"file_format" xml:"file_format"`
 }
 
-// BuyShipmentPath computes a request path to the buy action of shipment.
-func BuyShipmentPath(id string) string {
-	return fmt.Sprintf("/v2/shipments/%v/buy", id)
+// ConvertLabelShipmentPath computes a request path to the convertLabel action of shipment.
+func ConvertLabelShipmentPath(id string) string {
+	return fmt.Sprintf("/v2/shipments/%v/label", id)
 }
 
-// To purchase a Shipment you only need to specify the Rate to purchase. This operation populates the tracking_code and postage_label attributes. The default image format of the associated PostageLabel is PNG. To change this default see the label_format option.
-func (c *Client) BuyShipment(ctx context.Context, path string, payload *BuyShipmentPayload, contentType string) (*http.Response, error) {
-	req, err := c.NewBuyShipmentRequest(ctx, path, payload, contentType)
+// A Shipment's PostageLabel can be converted from PNG to other formats. If the PostageLabel was originally generated in a format other than PNG it cannot be converted.
+func (c *Client) ConvertLabelShipment(ctx context.Context, path string, payload *ConvertLabelShipmentPayload, contentType string) (*http.Response, error) {
+	req, err := c.NewConvertLabelShipmentRequest(ctx, path, payload, contentType)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewBuyShipmentRequest create the request corresponding to the buy action endpoint of the shipment resource.
-func (c *Client) NewBuyShipmentRequest(ctx context.Context, path string, payload *BuyShipmentPayload, contentType string) (*http.Request, error) {
+// NewConvertLabelShipmentRequest create the request corresponding to the convertLabel action endpoint of the shipment resource.
+func (c *Client) NewConvertLabelShipmentRequest(ctx context.Context, path string, payload *ConvertLabelShipmentPayload, contentType string) (*http.Request, error) {
 	var body bytes.Buffer
 	if contentType == "" {
 		contentType = "*/*" // Use default encoder
@@ -61,27 +59,25 @@ type CreateShipmentPayload struct {
 	// The ID of the batch that contains this shipment, if any
 	BatchID *string `form:"batch_id,omitempty" json:"batch_id,omitempty" xml:"batch_id,omitempty"`
 	// The buyer's address, defaults to to_address
-	BuyerAddress *EasypostAddress `form:"buyer_address,omitempty" json:"buyer_address,omitempty" xml:"buyer_address,omitempty"`
+	BuyerAddress *AddressPayload `form:"buyer_address,omitempty" json:"buyer_address,omitempty" xml:"buyer_address,omitempty"`
 	// Information for the processing of customs
-	CustomsInfo *EasypostCustomsinfo `form:"customs_info,omitempty" json:"customs_info,omitempty" xml:"customs_info,omitempty"`
+	CustomsInfo *CustomsInfoPayload `form:"customs_info,omitempty" json:"customs_info,omitempty" xml:"customs_info,omitempty"`
 	// All associated Form objects
 	Forms []interface{} `form:"forms,omitempty" json:"forms,omitempty" xml:"forms,omitempty"`
 	// The origin address
-	FromAddress *EasypostAddress `form:"from_address,omitempty" json:"from_address,omitempty" xml:"from_address,omitempty"`
+	FromAddress *AddressPayload `form:"from_address,omitempty" json:"from_address,omitempty" xml:"from_address,omitempty"`
 	// The associated Insurance object
-	Insurance *EasypostInsurance `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
+	Insurance *InsurancePayload `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
 	// Set true to create as a return, discussed in more depth below
 	IsReturn *bool `form:"is_return,omitempty" json:"is_return,omitempty" xml:"is_return,omitempty"`
 	// All of the options passed to the shipment, discussed in more depth below
-	Options *EasypostOptions `form:"options,omitempty" json:"options,omitempty" xml:"options,omitempty"`
+	Options *OptionsPayload `form:"options,omitempty" json:"options,omitempty" xml:"options,omitempty"`
 	// The dimensions and weight of the package
-	Parcel *EasypostParcel `form:"parcel,omitempty" json:"parcel,omitempty" xml:"parcel,omitempty"`
+	Parcel *ParcelPayload `form:"parcel,omitempty" json:"parcel,omitempty" xml:"parcel,omitempty"`
 	// The shipper's address, defaults to from_address
-	ReturnAddress *EasypostAddress `form:"return_address,omitempty" json:"return_address,omitempty" xml:"return_address,omitempty"`
-	// Document created to manifest and scan multiple shipments
-	ScanForm *EasypostScanform `form:"scan_form,omitempty" json:"scan_form,omitempty" xml:"scan_form,omitempty"`
+	ReturnAddress *AddressPayload `form:"return_address,omitempty" json:"return_address,omitempty" xml:"return_address,omitempty"`
 	// The destination address
-	ToAddress *EasypostAddress `form:"to_address,omitempty" json:"to_address,omitempty" xml:"to_address,omitempty"`
+	ToAddress *AddressPayload `form:"to_address,omitempty" json:"to_address,omitempty" xml:"to_address,omitempty"`
 	// The USPS zone of the shipment, if purchased with USPS
 	UspsZone *string `form:"usps_zone,omitempty" json:"usps_zone,omitempty" xml:"usps_zone,omitempty"`
 }
@@ -171,28 +167,30 @@ func (c *Client) NewInsureShipmentRequest(ctx context.Context, path string, payl
 	return req, nil
 }
 
-// LabelShipmentPayload is the shipment label action payload.
-type LabelShipmentPayload struct {
+// PruchaseShipmentPayload is the shipment pruchase action payload.
+type PruchaseShipmentPayload struct {
+	// Additionally, insurance may be added during the purchase. To specify an amount to insure, pass the insurance attribute as a string. The currency of all insurance is USD.
+	Insurance *string `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
 	// Selected rate
-	FileFormat string `form:"file_format" json:"file_format" xml:"file_format"`
+	Rate *RatePayload `form:"rate" json:"rate" xml:"rate"`
 }
 
-// LabelShipmentPath computes a request path to the label action of shipment.
-func LabelShipmentPath(id string) string {
-	return fmt.Sprintf("/v2/shipments/%v/label", id)
+// PruchaseShipmentPath computes a request path to the pruchase action of shipment.
+func PruchaseShipmentPath(id string) string {
+	return fmt.Sprintf("/v2/shipments/%v/buy", id)
 }
 
-// A Shipment's PostageLabel can be converted from PNG to other formats. If the PostageLabel was originally generated in a format other than PNG it cannot be converted.
-func (c *Client) LabelShipment(ctx context.Context, path string, payload *LabelShipmentPayload, contentType string) (*http.Response, error) {
-	req, err := c.NewLabelShipmentRequest(ctx, path, payload, contentType)
+// To purchase a Shipment you only need to specify the Rate to purchase. This operation populates the tracking_code and postage_label attributes. The default image format of the associated PostageLabel is PNG. To change this default see the label_format option.
+func (c *Client) PruchaseShipment(ctx context.Context, path string, payload *PruchaseShipmentPayload, contentType string) (*http.Response, error) {
+	req, err := c.NewPruchaseShipmentRequest(ctx, path, payload, contentType)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewLabelShipmentRequest create the request corresponding to the label action endpoint of the shipment resource.
-func (c *Client) NewLabelShipmentRequest(ctx context.Context, path string, payload *LabelShipmentPayload, contentType string) (*http.Request, error) {
+// NewPruchaseShipmentRequest create the request corresponding to the pruchase action endpoint of the shipment resource.
+func (c *Client) NewPruchaseShipmentRequest(ctx context.Context, path string, payload *PruchaseShipmentPayload, contentType string) (*http.Request, error) {
 	var body bytes.Buffer
 	if contentType == "" {
 		contentType = "*/*" // Use default encoder

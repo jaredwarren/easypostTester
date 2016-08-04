@@ -475,6 +475,7 @@ var Shipment = MediaType("application/easypost.shipment+json", func() {
 		})
 		Attribute("batch_status", String, "The current state of the associated BatchShipment")
 		Attribute("batch_message", String, "The current message of the associated BatchShipment")
+		Attribute("scan_form", ScanForm, "Document created to manifest and scan multiple shipments")
 
 		Attribute("created_at", String, "Time Created")
 		Attribute("updated_at", String, "Time Last Updated")
@@ -517,17 +518,16 @@ var Shipment = MediaType("application/easypost.shipment+json", func() {
 var ShipmentPayload = Type("ShipmentPayload", func() {
 	Description("Parcel objects represent the physical container being shipped. Dimensions can be supplied either as length, width, and height dimensions, or a predefined_package string. If you provide a carrier specific predefined_package the associated Shipment will only fetch rates from that carrier.")
 
-	Attribute("to_address", Address, "The destination address")
-	Attribute("from_address", Address, "The origin address")
-	Attribute("return_address", Address, "The shipper's address, defaults to from_address")
-	Attribute("buyer_address", Address, "The buyer's address, defaults to to_address")
-	Attribute("parcel", Parcel, "The dimensions and weight of the package")
+	Attribute("to_address", AddressPayload, "The destination address")
+	Attribute("from_address", AddressPayload, "The origin address")
+	Attribute("return_address", AddressPayload, "The shipper's address, defaults to from_address")
+	Attribute("buyer_address", AddressPayload, "The buyer's address, defaults to to_address")
+	Attribute("parcel", ParcelPayload, "The dimensions and weight of the package")
 
-	Attribute("customs_info", CustomsInfo, "Information for the processing of customs")
-	Attribute("scan_form", ScanForm, "Document created to manifest and scan multiple shipments")
+	Attribute("customs_info", CustomsInfoPayload, "Information for the processing of customs")
 	Attribute("forms", ArrayOf(Any), "All associated Form objects") // Not sure what "form" object looks like
-	Attribute("insurance", Insurance, "The associated Insurance object")
-	Attribute("options", Options, "All of the options passed to the shipment, discussed in more depth below")
+	Attribute("insurance", InsurancePayload, "The associated Insurance object")
+	Attribute("options", OptionsPayload, "All of the options passed to the shipment, discussed in more depth below")
 	Attribute("is_return", Boolean, "Set true to create as a return, discussed in more depth below")
 	Attribute("usps_zone", String, "The USPS zone of the shipment, if purchased with USPS")
 	Attribute("batch_id", String, "The ID of the batch that contains this shipment, if any")
@@ -536,13 +536,24 @@ var ShipmentPayload = Type("ShipmentPayload", func() {
 })
 
 var BuyShipmentPayload = Type("BuyShipmentPayload", func() {
-	Attribute("rate", Rate, "Selected rate")
+	Description("Buy Shipment Payload")
+	Attribute("rate", RatePayload, "Selected rate")
 	Attribute("insurance", String, "Additionally, insurance may be added during the purchase. To specify an amount to insure, pass the insurance attribute as a string. The currency of all insurance is USD.")
 
 	Required("rate")
 })
 
+var RatePayload = Type("RatePayload", func() {
+	Description("Buy Shipment Payload")
+	Attribute("id", String, "Unique, begins with \"rate_\"", func() {
+		Pattern("^rate_")
+	})
+
+	Required("id")
+})
+
 var LabelShipmentPayload = Type("LabelShipmentPayload", func() {
+	Description("Label Shipment Payload")
 	Attribute("file_format", String, "Selected rate", func() {
 		Enum("png", "zpl", "epl2", "pdf")
 	})
@@ -826,8 +837,8 @@ var ShipmentInsurancePayload = Type("ShipmentInsurancePayload", func() {
 
 var InsurancePayload = Type("InsurancePayload", func() {
 	Description("An Insurance created via this endpoint must belong to a shipment purchased outside of EasyPost. Insurance for Shipments created within EasyPost must be created via the Shipment Buy or Insure endpoints.")
-	Attribute("to_address", Address, "The actual destination of the package to be insured")
-	Attribute("from_address", Address, "The actual origin of the package to be insured")
+	Attribute("to_address", AddressPayload, "The actual destination of the package to be insured")
+	Attribute("from_address", AddressPayload, "The actual origin of the package to be insured")
 	Attribute("tracking_code", String, "The tracking code associated with the non-EasyPost-purchased package you'd like to insure")
 	Attribute("reference", String, "Optional. A unique value that may be used in place of ID when doing Retrieve calls for this insurance")
 	Attribute("amount", String, "The USD value of contents you would like to insure. Currently the maximum is between $5000 and $10000 depending on insurer")
@@ -839,8 +850,8 @@ var InsurancePayload = Type("InsurancePayload", func() {
 var InsuranceListPayload = Type("InsuranceListPayload", func() {
 	Description("The Insurance List is a paginated list of all Insurance objects associated with the given API Key. It accepts a variety of parameters which can be used to modify the scope. The has_more attribute indicates whether or not additional pages can be requested. The recommended way of paginating is to use either the before_id or after_id parameter to specify where the next page begins.")
 
-	Attribute("before_id", Address, "Optional pagination parameter. Only records created before the given ID will be included. May not be used with after_id")
-	Attribute("after_id", Address, "Optional pagination parameter. Only records created after the given ID will be included. May not be used with before_id")
+	Attribute("before_id", AddressPayload, "Optional pagination parameter. Only records created before the given ID will be included. May not be used with after_id")
+	Attribute("after_id", AddressPayload, "Optional pagination parameter. Only records created after the given ID will be included. May not be used with before_id")
 	Attribute("start_datetime", String, "Only return records created after this timestamp. Defaults to 1 month ago, or 1 month before a passed end_datetime")
 	Attribute("end_datetime", String, "Only return records created before this timestamp. Defaults to end of the current day, or 1 month after a passed start_datetime")
 	Attribute("page_size", Integer, "The number of records to return on each page. The maximum value is 100, and default is 20.", func() {

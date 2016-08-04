@@ -5,11 +5,6 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var BottlePayload = Type("BottlePayload", func() {
-	Attribute("status", Integer, "status of bottle")
-	Required("status")
-})
-
 // Carrier Accounts ...
 var _ = Resource("carrier_account", func() {
 	BasePath("/carrier_accounts")
@@ -185,21 +180,21 @@ var _ = Resource("shipment", func() {
 		Description("A Shipment is almost exclusively a container for other objects, and thus a Shipment may reuse many of these objects. Additionally, all the objects contained within a Shipment may be created at the same time.")
 		Routing(POST("/"))
 		Payload(ShipmentPayload) // TODO: handles create and return if is_return = true
-		Response(OK)
+		Response(OK, Shipment)
 	})
 
-	Action("buy", func() {
+	Action("pruchase", func() {
 		Description("To purchase a Shipment you only need to specify the Rate to purchase. This operation populates the tracking_code and postage_label attributes. The default image format of the associated PostageLabel is PNG. To change this default see the label_format option.")
 		Routing(POST("/:id/buy"))
 		Payload(BuyShipmentPayload)
-		Response(OK)
+		Response(OK, Shipment)
 	})
 
-	Action("label", func() {
+	Action("convertLabel", func() {
 		Description("A Shipment's PostageLabel can be converted from PNG to other formats. If the PostageLabel was originally generated in a format other than PNG it cannot be converted.")
 		Routing(POST("/:id/label"))
 		Payload(LabelShipmentPayload)
-		Response(OK)
+		Response(OK, Shipment)
 	})
 
 	Action("rates", func() {
@@ -212,7 +207,7 @@ var _ = Resource("shipment", func() {
 		Description("Insuring your Shipment is as simple as sending us the value of the contents. We charge 1% of the value, with a $1 minimum, and handle all the claims. All our claims are paid out within 30 days.")
 		Routing(POST("/:id/insure"))
 		Payload(ShipmentInsurancePayload)
-		Response(OK)
+		Response(OK, Shipment)
 	})
 
 	Action("refund", func() {

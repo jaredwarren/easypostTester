@@ -972,37 +972,13 @@ type createInsurancePayload struct {
 	// The carrier associated with the tracking_code you provided. The carrier will get auto-detected if none is provided
 	Carrier *string `form:"carrier,omitempty" json:"carrier,omitempty" xml:"carrier,omitempty"`
 	// The actual origin of the package to be insured
-	FromAddress *easypostAddress `form:"from_address,omitempty" json:"from_address,omitempty" xml:"from_address,omitempty"`
+	FromAddress *addressPayload `form:"from_address,omitempty" json:"from_address,omitempty" xml:"from_address,omitempty"`
 	// Optional. A unique value that may be used in place of ID when doing Retrieve calls for this insurance
 	Reference *string `form:"reference,omitempty" json:"reference,omitempty" xml:"reference,omitempty"`
 	// The actual destination of the package to be insured
-	ToAddress *easypostAddress `form:"to_address,omitempty" json:"to_address,omitempty" xml:"to_address,omitempty"`
+	ToAddress *addressPayload `form:"to_address,omitempty" json:"to_address,omitempty" xml:"to_address,omitempty"`
 	// The tracking code associated with the non-EasyPost-purchased package you'd like to insure
 	TrackingCode *string `form:"tracking_code,omitempty" json:"tracking_code,omitempty" xml:"tracking_code,omitempty"`
-}
-
-// Finalize sets the default values defined in the design.
-func (payload *createInsurancePayload) Finalize() {
-	if payload.FromAddress != nil {
-		var defaultMode = "test"
-		if payload.FromAddress.Mode == nil {
-			payload.FromAddress.Mode = &defaultMode
-		}
-		var defaultObject = "Address"
-		if payload.FromAddress.Object == nil {
-			payload.FromAddress.Object = &defaultObject
-		}
-	}
-	if payload.ToAddress != nil {
-		var defaultMode = "test"
-		if payload.ToAddress.Mode == nil {
-			payload.ToAddress.Mode = &defaultMode
-		}
-		var defaultObject = "Address"
-		if payload.ToAddress.Object == nil {
-			payload.ToAddress.Object = &defaultObject
-		}
-	}
 }
 
 // Validate runs the validation rules defined in the design.
@@ -1064,11 +1040,11 @@ type CreateInsurancePayload struct {
 	// The carrier associated with the tracking_code you provided. The carrier will get auto-detected if none is provided
 	Carrier *string `form:"carrier,omitempty" json:"carrier,omitempty" xml:"carrier,omitempty"`
 	// The actual origin of the package to be insured
-	FromAddress *EasypostAddress `form:"from_address" json:"from_address" xml:"from_address"`
+	FromAddress *AddressPayload `form:"from_address" json:"from_address" xml:"from_address"`
 	// Optional. A unique value that may be used in place of ID when doing Retrieve calls for this insurance
 	Reference *string `form:"reference,omitempty" json:"reference,omitempty" xml:"reference,omitempty"`
 	// The actual destination of the package to be insured
-	ToAddress *EasypostAddress `form:"to_address" json:"to_address" xml:"to_address"`
+	ToAddress *AddressPayload `form:"to_address" json:"to_address" xml:"to_address"`
 	// The tracking code associated with the non-EasyPost-purchased package you'd like to insure
 	TrackingCode string `form:"tracking_code" json:"tracking_code" xml:"tracking_code"`
 }
@@ -1129,9 +1105,9 @@ func NewListInsuranceContext(ctx context.Context, service *goa.Service) (*ListIn
 // listInsurancePayload is the insurance list action payload.
 type listInsurancePayload struct {
 	// Optional pagination parameter. Only records created after the given ID will be included. May not be used with before_id
-	AfterID *easypostAddress `form:"after_id,omitempty" json:"after_id,omitempty" xml:"after_id,omitempty"`
+	AfterID *addressPayload `form:"after_id,omitempty" json:"after_id,omitempty" xml:"after_id,omitempty"`
 	// Optional pagination parameter. Only records created before the given ID will be included. May not be used with after_id
-	BeforeID *easypostAddress `form:"before_id,omitempty" json:"before_id,omitempty" xml:"before_id,omitempty"`
+	BeforeID *addressPayload `form:"before_id,omitempty" json:"before_id,omitempty" xml:"before_id,omitempty"`
 	// Only return records created before this timestamp. Defaults to end of the current day, or 1 month after a passed start_datetime
 	EndDatetime *string `form:"end_datetime,omitempty" json:"end_datetime,omitempty" xml:"end_datetime,omitempty"`
 	// The number of records to return on each page. The maximum value is 100, and default is 20.
@@ -1142,26 +1118,6 @@ type listInsurancePayload struct {
 
 // Finalize sets the default values defined in the design.
 func (payload *listInsurancePayload) Finalize() {
-	if payload.AfterID != nil {
-		var defaultMode = "test"
-		if payload.AfterID.Mode == nil {
-			payload.AfterID.Mode = &defaultMode
-		}
-		var defaultObject = "Address"
-		if payload.AfterID.Object == nil {
-			payload.AfterID.Object = &defaultObject
-		}
-	}
-	if payload.BeforeID != nil {
-		var defaultMode = "test"
-		if payload.BeforeID.Mode == nil {
-			payload.BeforeID.Mode = &defaultMode
-		}
-		var defaultObject = "Address"
-		if payload.BeforeID.Object == nil {
-			payload.BeforeID.Object = &defaultObject
-		}
-	}
 	var defaultPageSize = 20
 	if payload.PageSize == nil {
 		payload.PageSize = &defaultPageSize
@@ -1217,9 +1173,9 @@ func (payload *listInsurancePayload) Publicize() *ListInsurancePayload {
 // ListInsurancePayload is the insurance list action payload.
 type ListInsurancePayload struct {
 	// Optional pagination parameter. Only records created after the given ID will be included. May not be used with before_id
-	AfterID *EasypostAddress `form:"after_id,omitempty" json:"after_id,omitempty" xml:"after_id,omitempty"`
+	AfterID *AddressPayload `form:"after_id,omitempty" json:"after_id,omitempty" xml:"after_id,omitempty"`
 	// Optional pagination parameter. Only records created before the given ID will be included. May not be used with after_id
-	BeforeID *EasypostAddress `form:"before_id,omitempty" json:"before_id,omitempty" xml:"before_id,omitempty"`
+	BeforeID *AddressPayload `form:"before_id,omitempty" json:"before_id,omitempty" xml:"before_id,omitempty"`
 	// Only return records created before this timestamp. Defaults to end of the current day, or 1 month after a passed start_datetime
 	EndDatetime *string `form:"end_datetime,omitempty" json:"end_datetime,omitempty" xml:"end_datetime,omitempty"`
 	// The number of records to return on each page. The maximum value is 100, and default is 20.
@@ -1422,23 +1378,23 @@ func (ctx *ShowParcelContext) NotFound() error {
 	return nil
 }
 
-// BuyShipmentContext provides the shipment buy action context.
-type BuyShipmentContext struct {
+// ConvertLabelShipmentContext provides the shipment convertLabel action context.
+type ConvertLabelShipmentContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
 	ID      string
-	Payload *BuyShipmentPayload
+	Payload *ConvertLabelShipmentPayload
 }
 
-// NewBuyShipmentContext parses the incoming request URL and body, performs validations and creates the
-// context used by the shipment controller buy action.
-func NewBuyShipmentContext(ctx context.Context, service *goa.Service) (*BuyShipmentContext, error) {
+// NewConvertLabelShipmentContext parses the incoming request URL and body, performs validations and creates the
+// context used by the shipment controller convertLabel action.
+func NewConvertLabelShipmentContext(ctx context.Context, service *goa.Service) (*ConvertLabelShipmentContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
-	rctx := BuyShipmentContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := ConvertLabelShipmentContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramID := req.Params["id"]
 	if len(paramID) > 0 {
 		rawID := paramID[0]
@@ -1447,78 +1403,55 @@ func NewBuyShipmentContext(ctx context.Context, service *goa.Service) (*BuyShipm
 	return &rctx, err
 }
 
-// buyShipmentPayload is the shipment buy action payload.
-type buyShipmentPayload struct {
-	// Additionally, insurance may be added during the purchase. To specify an amount to insure, pass the insurance attribute as a string. The currency of all insurance is USD.
-	Insurance *string `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
+// convertLabelShipmentPayload is the shipment convertLabel action payload.
+type convertLabelShipmentPayload struct {
 	// Selected rate
-	Rate *easypostRate `form:"rate,omitempty" json:"rate,omitempty" xml:"rate,omitempty"`
-}
-
-// Finalize sets the default values defined in the design.
-func (payload *buyShipmentPayload) Finalize() {
-	if payload.Rate != nil {
-		var defaultMode = "test"
-		if payload.Rate.Mode == nil {
-			payload.Rate.Mode = &defaultMode
-		}
-		var defaultObject = "Rate"
-		if payload.Rate.Object == nil {
-			payload.Rate.Object = &defaultObject
-		}
-	}
+	FileFormat *string `form:"file_format,omitempty" json:"file_format,omitempty" xml:"file_format,omitempty"`
 }
 
 // Validate runs the validation rules defined in the design.
-func (payload *buyShipmentPayload) Validate() (err error) {
-	if payload.Rate == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "rate"))
+func (payload *convertLabelShipmentPayload) Validate() (err error) {
+	if payload.FileFormat == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "file_format"))
 	}
 
-	if payload.Rate != nil {
-		if err2 := payload.Rate.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	if payload.FileFormat != nil {
+		if !(*payload.FileFormat == "png" || *payload.FileFormat == "zpl" || *payload.FileFormat == "epl2" || *payload.FileFormat == "pdf") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`raw.file_format`, *payload.FileFormat, []interface{}{"png", "zpl", "epl2", "pdf"}))
 		}
 	}
 	return
 }
 
-// Publicize creates BuyShipmentPayload from buyShipmentPayload
-func (payload *buyShipmentPayload) Publicize() *BuyShipmentPayload {
-	var pub BuyShipmentPayload
-	if payload.Insurance != nil {
-		pub.Insurance = payload.Insurance
-	}
-	if payload.Rate != nil {
-		pub.Rate = payload.Rate.Publicize()
+// Publicize creates ConvertLabelShipmentPayload from convertLabelShipmentPayload
+func (payload *convertLabelShipmentPayload) Publicize() *ConvertLabelShipmentPayload {
+	var pub ConvertLabelShipmentPayload
+	if payload.FileFormat != nil {
+		pub.FileFormat = *payload.FileFormat
 	}
 	return &pub
 }
 
-// BuyShipmentPayload is the shipment buy action payload.
-type BuyShipmentPayload struct {
-	// Additionally, insurance may be added during the purchase. To specify an amount to insure, pass the insurance attribute as a string. The currency of all insurance is USD.
-	Insurance *string `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
+// ConvertLabelShipmentPayload is the shipment convertLabel action payload.
+type ConvertLabelShipmentPayload struct {
 	// Selected rate
-	Rate *EasypostRate `form:"rate" json:"rate" xml:"rate"`
+	FileFormat string `form:"file_format" json:"file_format" xml:"file_format"`
 }
 
 // Validate runs the validation rules defined in the design.
-func (payload *BuyShipmentPayload) Validate() (err error) {
-	if payload.Rate == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "rate"))
+func (payload *ConvertLabelShipmentPayload) Validate() (err error) {
+	if payload.FileFormat == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "file_format"))
 	}
 
-	if payload.Rate != nil {
-		if err2 := payload.Rate.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
+	if !(payload.FileFormat == "png" || payload.FileFormat == "zpl" || payload.FileFormat == "epl2" || payload.FileFormat == "pdf") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`raw.file_format`, payload.FileFormat, []interface{}{"png", "zpl", "epl2", "pdf"}))
 	}
 	return
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *BuyShipmentContext) OK(r *EasypostShipment) error {
+func (ctx *ConvertLabelShipmentContext) OK(r *EasypostShipment) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/easypost.shipment+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
@@ -1547,181 +1480,41 @@ type createShipmentPayload struct {
 	// The ID of the batch that contains this shipment, if any
 	BatchID *string `form:"batch_id,omitempty" json:"batch_id,omitempty" xml:"batch_id,omitempty"`
 	// The buyer's address, defaults to to_address
-	BuyerAddress *easypostAddress `form:"buyer_address,omitempty" json:"buyer_address,omitempty" xml:"buyer_address,omitempty"`
+	BuyerAddress *addressPayload `form:"buyer_address,omitempty" json:"buyer_address,omitempty" xml:"buyer_address,omitempty"`
 	// Information for the processing of customs
-	CustomsInfo *easypostCustomsinfo `form:"customs_info,omitempty" json:"customs_info,omitempty" xml:"customs_info,omitempty"`
+	CustomsInfo *customsInfoPayload `form:"customs_info,omitempty" json:"customs_info,omitempty" xml:"customs_info,omitempty"`
 	// All associated Form objects
 	Forms []interface{} `form:"forms,omitempty" json:"forms,omitempty" xml:"forms,omitempty"`
 	// The origin address
-	FromAddress *easypostAddress `form:"from_address,omitempty" json:"from_address,omitempty" xml:"from_address,omitempty"`
+	FromAddress *addressPayload `form:"from_address,omitempty" json:"from_address,omitempty" xml:"from_address,omitempty"`
 	// The associated Insurance object
-	Insurance *easypostInsurance `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
+	Insurance *insurancePayload `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
 	// Set true to create as a return, discussed in more depth below
 	IsReturn *bool `form:"is_return,omitempty" json:"is_return,omitempty" xml:"is_return,omitempty"`
 	// All of the options passed to the shipment, discussed in more depth below
-	Options *easypostOptions `form:"options,omitempty" json:"options,omitempty" xml:"options,omitempty"`
+	Options *optionsPayload `form:"options,omitempty" json:"options,omitempty" xml:"options,omitempty"`
 	// The dimensions and weight of the package
-	Parcel *easypostParcel `form:"parcel,omitempty" json:"parcel,omitempty" xml:"parcel,omitempty"`
+	Parcel *parcelPayload `form:"parcel,omitempty" json:"parcel,omitempty" xml:"parcel,omitempty"`
 	// The shipper's address, defaults to from_address
-	ReturnAddress *easypostAddress `form:"return_address,omitempty" json:"return_address,omitempty" xml:"return_address,omitempty"`
-	// Document created to manifest and scan multiple shipments
-	ScanForm *easypostScanform `form:"scan_form,omitempty" json:"scan_form,omitempty" xml:"scan_form,omitempty"`
+	ReturnAddress *addressPayload `form:"return_address,omitempty" json:"return_address,omitempty" xml:"return_address,omitempty"`
 	// The destination address
-	ToAddress *easypostAddress `form:"to_address,omitempty" json:"to_address,omitempty" xml:"to_address,omitempty"`
+	ToAddress *addressPayload `form:"to_address,omitempty" json:"to_address,omitempty" xml:"to_address,omitempty"`
 	// The USPS zone of the shipment, if purchased with USPS
 	UspsZone *string `form:"usps_zone,omitempty" json:"usps_zone,omitempty" xml:"usps_zone,omitempty"`
 }
 
 // Finalize sets the default values defined in the design.
 func (payload *createShipmentPayload) Finalize() {
-	if payload.BuyerAddress != nil {
-		var defaultMode = "test"
-		if payload.BuyerAddress.Mode == nil {
-			payload.BuyerAddress.Mode = &defaultMode
-		}
-		var defaultObject = "Address"
-		if payload.BuyerAddress.Object == nil {
-			payload.BuyerAddress.Object = &defaultObject
-		}
-	}
 	if payload.CustomsInfo != nil {
 		for _, e := range payload.CustomsInfo.CustomsItems {
 			var defaultCurrency = "USD"
 			if e.Currency == nil {
 				e.Currency = &defaultCurrency
 			}
-			var defaultObject = "CustomsItem"
-			if e.Object == nil {
-				e.Object = &defaultObject
-			}
 			var defaultOriginCountry = "US"
 			if e.OriginCountry == nil {
 				e.OriginCountry = &defaultOriginCountry
 			}
-		}
-		var defaultNonDeliveryOption = "return"
-		if payload.CustomsInfo.NonDeliveryOption == nil {
-			payload.CustomsInfo.NonDeliveryOption = &defaultNonDeliveryOption
-		}
-		var defaultObject = "CustomsInfo"
-		if payload.CustomsInfo.Object == nil {
-			payload.CustomsInfo.Object = &defaultObject
-		}
-	}
-	if payload.FromAddress != nil {
-		var defaultMode = "test"
-		if payload.FromAddress.Mode == nil {
-			payload.FromAddress.Mode = &defaultMode
-		}
-		var defaultObject = "Address"
-		if payload.FromAddress.Object == nil {
-			payload.FromAddress.Object = &defaultObject
-		}
-	}
-	if payload.Insurance != nil {
-		if payload.Insurance.Fee != nil {
-			var defaultObject = "Fee"
-			if payload.Insurance.Fee.Object == nil {
-				payload.Insurance.Fee.Object = &defaultObject
-			}
-		}
-		if payload.Insurance.FromAddress != nil {
-			var defaultMode = "test"
-			if payload.Insurance.FromAddress.Mode == nil {
-				payload.Insurance.FromAddress.Mode = &defaultMode
-			}
-			var defaultObject = "Address"
-			if payload.Insurance.FromAddress.Object == nil {
-				payload.Insurance.FromAddress.Object = &defaultObject
-			}
-		}
-		var defaultMode = "test"
-		if payload.Insurance.Mode == nil {
-			payload.Insurance.Mode = &defaultMode
-		}
-		var defaultObject = "Insurance"
-		if payload.Insurance.Object == nil {
-			payload.Insurance.Object = &defaultObject
-		}
-		if payload.Insurance.Tracker != nil {
-			for _, e := range payload.Insurance.Tracker.CarrierDetail {
-				var defaultObject = "CarrierDetail"
-				if e.Object == nil {
-					e.Object = &defaultObject
-				}
-			}
-			for _, e := range payload.Insurance.Tracker.Fees {
-				var defaultObject = "Fee"
-				if e.Object == nil {
-					e.Object = &defaultObject
-				}
-			}
-			var defaultMode = "test"
-			if payload.Insurance.Tracker.Mode == nil {
-				payload.Insurance.Tracker.Mode = &defaultMode
-			}
-			var defaultObject = "Tracker"
-			if payload.Insurance.Tracker.Object == nil {
-				payload.Insurance.Tracker.Object = &defaultObject
-			}
-			for _, e := range payload.Insurance.Tracker.TrackingDetails {
-				var defaultObject = "TrackingDetail"
-				if e.Object == nil {
-					e.Object = &defaultObject
-				}
-				if e.TrackingLocation != nil {
-					var defaultObject = "TrackingLocation"
-					if e.TrackingLocation.Object == nil {
-						e.TrackingLocation.Object = &defaultObject
-					}
-				}
-			}
-		}
-	}
-	if payload.Parcel != nil {
-		var defaultMode = "test"
-		if payload.Parcel.Mode == nil {
-			payload.Parcel.Mode = &defaultMode
-		}
-		var defaultObject = "Parcel"
-		if payload.Parcel.Object == nil {
-			payload.Parcel.Object = &defaultObject
-		}
-	}
-	if payload.ReturnAddress != nil {
-		var defaultMode = "test"
-		if payload.ReturnAddress.Mode == nil {
-			payload.ReturnAddress.Mode = &defaultMode
-		}
-		var defaultObject = "Address"
-		if payload.ReturnAddress.Object == nil {
-			payload.ReturnAddress.Object = &defaultObject
-		}
-	}
-	if payload.ScanForm != nil {
-		if payload.ScanForm.Address != nil {
-			var defaultMode = "test"
-			if payload.ScanForm.Address.Mode == nil {
-				payload.ScanForm.Address.Mode = &defaultMode
-			}
-			var defaultObject = "Address"
-			if payload.ScanForm.Address.Object == nil {
-				payload.ScanForm.Address.Object = &defaultObject
-			}
-		}
-		var defaultObject = "ScanForm"
-		if payload.ScanForm.Object == nil {
-			payload.ScanForm.Object = &defaultObject
-		}
-	}
-	if payload.ToAddress != nil {
-		var defaultMode = "test"
-		if payload.ToAddress.Mode == nil {
-			payload.ToAddress.Mode = &defaultMode
-		}
-		var defaultObject = "Address"
-		if payload.ToAddress.Object == nil {
-			payload.ToAddress.Object = &defaultObject
 		}
 	}
 }
@@ -1760,11 +1553,6 @@ func (payload *createShipmentPayload) Validate() (err error) {
 	}
 	if payload.ReturnAddress != nil {
 		if err2 := payload.ReturnAddress.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	if payload.ScanForm != nil {
-		if err2 := payload.ScanForm.Validate(); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
@@ -1809,9 +1597,6 @@ func (payload *createShipmentPayload) Publicize() *CreateShipmentPayload {
 	if payload.ReturnAddress != nil {
 		pub.ReturnAddress = payload.ReturnAddress.Publicize()
 	}
-	if payload.ScanForm != nil {
-		pub.ScanForm = payload.ScanForm.Publicize()
-	}
 	if payload.ToAddress != nil {
 		pub.ToAddress = payload.ToAddress.Publicize()
 	}
@@ -1826,27 +1611,25 @@ type CreateShipmentPayload struct {
 	// The ID of the batch that contains this shipment, if any
 	BatchID *string `form:"batch_id,omitempty" json:"batch_id,omitempty" xml:"batch_id,omitempty"`
 	// The buyer's address, defaults to to_address
-	BuyerAddress *EasypostAddress `form:"buyer_address,omitempty" json:"buyer_address,omitempty" xml:"buyer_address,omitempty"`
+	BuyerAddress *AddressPayload `form:"buyer_address,omitempty" json:"buyer_address,omitempty" xml:"buyer_address,omitempty"`
 	// Information for the processing of customs
-	CustomsInfo *EasypostCustomsinfo `form:"customs_info,omitempty" json:"customs_info,omitempty" xml:"customs_info,omitempty"`
+	CustomsInfo *CustomsInfoPayload `form:"customs_info,omitempty" json:"customs_info,omitempty" xml:"customs_info,omitempty"`
 	// All associated Form objects
 	Forms []interface{} `form:"forms,omitempty" json:"forms,omitempty" xml:"forms,omitempty"`
 	// The origin address
-	FromAddress *EasypostAddress `form:"from_address,omitempty" json:"from_address,omitempty" xml:"from_address,omitempty"`
+	FromAddress *AddressPayload `form:"from_address,omitempty" json:"from_address,omitempty" xml:"from_address,omitempty"`
 	// The associated Insurance object
-	Insurance *EasypostInsurance `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
+	Insurance *InsurancePayload `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
 	// Set true to create as a return, discussed in more depth below
 	IsReturn *bool `form:"is_return,omitempty" json:"is_return,omitempty" xml:"is_return,omitempty"`
 	// All of the options passed to the shipment, discussed in more depth below
-	Options *EasypostOptions `form:"options,omitempty" json:"options,omitempty" xml:"options,omitempty"`
+	Options *OptionsPayload `form:"options,omitempty" json:"options,omitempty" xml:"options,omitempty"`
 	// The dimensions and weight of the package
-	Parcel *EasypostParcel `form:"parcel,omitempty" json:"parcel,omitempty" xml:"parcel,omitempty"`
+	Parcel *ParcelPayload `form:"parcel,omitempty" json:"parcel,omitempty" xml:"parcel,omitempty"`
 	// The shipper's address, defaults to from_address
-	ReturnAddress *EasypostAddress `form:"return_address,omitempty" json:"return_address,omitempty" xml:"return_address,omitempty"`
-	// Document created to manifest and scan multiple shipments
-	ScanForm *EasypostScanform `form:"scan_form,omitempty" json:"scan_form,omitempty" xml:"scan_form,omitempty"`
+	ReturnAddress *AddressPayload `form:"return_address,omitempty" json:"return_address,omitempty" xml:"return_address,omitempty"`
 	// The destination address
-	ToAddress *EasypostAddress `form:"to_address,omitempty" json:"to_address,omitempty" xml:"to_address,omitempty"`
+	ToAddress *AddressPayload `form:"to_address,omitempty" json:"to_address,omitempty" xml:"to_address,omitempty"`
 	// The USPS zone of the shipment, if purchased with USPS
 	UspsZone *string `form:"usps_zone,omitempty" json:"usps_zone,omitempty" xml:"usps_zone,omitempty"`
 }
@@ -1878,18 +1661,8 @@ func (payload *CreateShipmentPayload) Validate() (err error) {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	if payload.Parcel != nil {
-		if err2 := payload.Parcel.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
 	if payload.ReturnAddress != nil {
 		if err2 := payload.ReturnAddress.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	if payload.ScanForm != nil {
-		if err2 := payload.ScanForm.Validate(); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
@@ -1975,23 +1748,23 @@ func (ctx *InsureShipmentContext) OK(r *EasypostShipment) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
-// LabelShipmentContext provides the shipment label action context.
-type LabelShipmentContext struct {
+// PruchaseShipmentContext provides the shipment pruchase action context.
+type PruchaseShipmentContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
 	ID      string
-	Payload *LabelShipmentPayload
+	Payload *PruchaseShipmentPayload
 }
 
-// NewLabelShipmentContext parses the incoming request URL and body, performs validations and creates the
-// context used by the shipment controller label action.
-func NewLabelShipmentContext(ctx context.Context, service *goa.Service) (*LabelShipmentContext, error) {
+// NewPruchaseShipmentContext parses the incoming request URL and body, performs validations and creates the
+// context used by the shipment controller pruchase action.
+func NewPruchaseShipmentContext(ctx context.Context, service *goa.Service) (*PruchaseShipmentContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
-	rctx := LabelShipmentContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := PruchaseShipmentContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramID := req.Params["id"]
 	if len(paramID) > 0 {
 		rawID := paramID[0]
@@ -2000,55 +1773,64 @@ func NewLabelShipmentContext(ctx context.Context, service *goa.Service) (*LabelS
 	return &rctx, err
 }
 
-// labelShipmentPayload is the shipment label action payload.
-type labelShipmentPayload struct {
+// pruchaseShipmentPayload is the shipment pruchase action payload.
+type pruchaseShipmentPayload struct {
+	// Additionally, insurance may be added during the purchase. To specify an amount to insure, pass the insurance attribute as a string. The currency of all insurance is USD.
+	Insurance *string `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
 	// Selected rate
-	FileFormat *string `form:"file_format,omitempty" json:"file_format,omitempty" xml:"file_format,omitempty"`
+	Rate *ratePayload `form:"rate,omitempty" json:"rate,omitempty" xml:"rate,omitempty"`
 }
 
 // Validate runs the validation rules defined in the design.
-func (payload *labelShipmentPayload) Validate() (err error) {
-	if payload.FileFormat == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "file_format"))
+func (payload *pruchaseShipmentPayload) Validate() (err error) {
+	if payload.Rate == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "rate"))
 	}
 
-	if payload.FileFormat != nil {
-		if !(*payload.FileFormat == "png" || *payload.FileFormat == "zpl" || *payload.FileFormat == "epl2" || *payload.FileFormat == "pdf") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`raw.file_format`, *payload.FileFormat, []interface{}{"png", "zpl", "epl2", "pdf"}))
+	if payload.Rate != nil {
+		if err2 := payload.Rate.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
 		}
 	}
 	return
 }
 
-// Publicize creates LabelShipmentPayload from labelShipmentPayload
-func (payload *labelShipmentPayload) Publicize() *LabelShipmentPayload {
-	var pub LabelShipmentPayload
-	if payload.FileFormat != nil {
-		pub.FileFormat = *payload.FileFormat
+// Publicize creates PruchaseShipmentPayload from pruchaseShipmentPayload
+func (payload *pruchaseShipmentPayload) Publicize() *PruchaseShipmentPayload {
+	var pub PruchaseShipmentPayload
+	if payload.Insurance != nil {
+		pub.Insurance = payload.Insurance
+	}
+	if payload.Rate != nil {
+		pub.Rate = payload.Rate.Publicize()
 	}
 	return &pub
 }
 
-// LabelShipmentPayload is the shipment label action payload.
-type LabelShipmentPayload struct {
+// PruchaseShipmentPayload is the shipment pruchase action payload.
+type PruchaseShipmentPayload struct {
+	// Additionally, insurance may be added during the purchase. To specify an amount to insure, pass the insurance attribute as a string. The currency of all insurance is USD.
+	Insurance *string `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
 	// Selected rate
-	FileFormat string `form:"file_format" json:"file_format" xml:"file_format"`
+	Rate *RatePayload `form:"rate" json:"rate" xml:"rate"`
 }
 
 // Validate runs the validation rules defined in the design.
-func (payload *LabelShipmentPayload) Validate() (err error) {
-	if payload.FileFormat == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "file_format"))
+func (payload *PruchaseShipmentPayload) Validate() (err error) {
+	if payload.Rate == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "rate"))
 	}
 
-	if !(payload.FileFormat == "png" || payload.FileFormat == "zpl" || payload.FileFormat == "epl2" || payload.FileFormat == "pdf") {
-		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`raw.file_format`, payload.FileFormat, []interface{}{"png", "zpl", "epl2", "pdf"}))
+	if payload.Rate != nil {
+		if err2 := payload.Rate.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *LabelShipmentContext) OK(r *EasypostShipment) error {
+func (ctx *PruchaseShipmentContext) OK(r *EasypostShipment) error {
 	ctx.ResponseData.Header().Set("Content-Type", "application/easypost.shipment+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

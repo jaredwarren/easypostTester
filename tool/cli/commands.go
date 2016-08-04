@@ -121,8 +121,8 @@ type (
 		PrettyPrint bool
 	}
 
-	// BuyShipmentCommand is the command line data structure for the buy action of shipment
-	BuyShipmentCommand struct {
+	// ConvertLabelShipmentCommand is the command line data structure for the convertLabel action of shipment
+	ConvertLabelShipmentCommand struct {
 		Payload     string
 		ContentType string
 		ID          string
@@ -144,8 +144,8 @@ type (
 		PrettyPrint bool
 	}
 
-	// LabelShipmentCommand is the command line data structure for the label action of shipment
-	LabelShipmentCommand struct {
+	// PruchaseShipmentCommand is the command line data structure for the pruchase action of shipment
+	PruchaseShipmentCommand struct {
 		Payload     string
 		ContentType string
 		ID          string
@@ -219,12 +219,12 @@ type (
 func RegisterCommands(app *cobra.Command, c *client.Client) {
 	var command, sub *cobra.Command
 	command = &cobra.Command{
-		Use:   "buy",
-		Short: `To purchase a Shipment you only need to specify the Rate to purchase. This operation populates the tracking_code and postage_label attributes. The default image format of the associated PostageLabel is PNG. To change this default see the label_format option.`,
+		Use:   "convertLabel",
+		Short: `A Shipment's PostageLabel can be converted from PNG to other formats. If the PostageLabel was originally generated in a format other than PNG it cannot be converted.`,
 	}
-	tmp1 := new(BuyShipmentCommand)
+	tmp1 := new(ConvertLabelShipmentCommand)
 	sub = &cobra.Command{
-		Use:   `shipment ["/v2/shipments/ID/buy"]`,
+		Use:   `shipment ["/v2/shipments/ID/label"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp1.Run(c, args) },
 	}
@@ -347,53 +347,53 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "label",
-		Short: `A Shipment's PostageLabel can be converted from PNG to other formats. If the PostageLabel was originally generated in a format other than PNG it cannot be converted.`,
+		Use:   "list",
+		Short: `list action`,
 	}
-	tmp13 := new(LabelShipmentCommand)
+	tmp13 := new(ListAPIKeyCommand)
 	sub = &cobra.Command{
-		Use:   `shipment ["/v2/shipments/ID/label"]`,
+		Use:   `api_key ["/v2/api_keys"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp13.Run(c, args) },
 	}
 	tmp13.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp13.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "list",
-		Short: `list action`,
-	}
-	tmp14 := new(ListAPIKeyCommand)
+	tmp14 := new(ListCarrierAccountCommand)
 	sub = &cobra.Command{
-		Use:   `api_key ["/v2/api_keys"]`,
+		Use:   `carrier_account ["/v2/carrier_accounts"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp14.Run(c, args) },
 	}
 	tmp14.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp14.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp15 := new(ListCarrierAccountCommand)
+	tmp15 := new(ListInsuranceCommand)
 	sub = &cobra.Command{
-		Use:   `carrier_account ["/v2/carrier_accounts"]`,
+		Use:   `insurance ["/v2/insurances"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp15.Run(c, args) },
 	}
 	tmp15.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp15.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp16 := new(ListInsuranceCommand)
+	tmp16 := new(ListTrackerCommand)
 	sub = &cobra.Command{
-		Use:   `insurance ["/v2/insurances"]`,
+		Use:   `tracker ["/v2/trackers"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp16.Run(c, args) },
 	}
 	tmp16.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp16.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	tmp17 := new(ListTrackerCommand)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "pruchase",
+		Short: `To purchase a Shipment you only need to specify the Rate to purchase. This operation populates the tracking_code and postage_label attributes. The default image format of the associated PostageLabel is PNG. To change this default see the label_format option.`,
+	}
+	tmp17 := new(PruchaseShipmentCommand)
 	sub = &cobra.Command{
-		Use:   `tracker ["/v2/trackers"]`,
+		Use:   `shipment ["/v2/shipments/ID/buy"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp17.Run(c, args) },
 	}
@@ -1036,15 +1036,15 @@ func (cmd *ShowParcelCommand) RegisterFlags(cc *cobra.Command, c *client.Client)
 	cc.Flags().StringVar(&cmd.ID, "id", id, `Parcel ID`)
 }
 
-// Run makes the HTTP request corresponding to the BuyShipmentCommand command.
-func (cmd *BuyShipmentCommand) Run(c *client.Client, args []string) error {
+// Run makes the HTTP request corresponding to the ConvertLabelShipmentCommand command.
+func (cmd *ConvertLabelShipmentCommand) Run(c *client.Client, args []string) error {
 	var path string
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/v2/shipments/%v/buy", cmd.ID)
+		path = fmt.Sprintf("/v2/shipments/%v/label", cmd.ID)
 	}
-	var payload client.BuyShipmentPayload
+	var payload client.ConvertLabelShipmentPayload
 	if cmd.Payload != "" {
 		err := json.Unmarshal([]byte(cmd.Payload), &payload)
 		if err != nil {
@@ -1053,7 +1053,7 @@ func (cmd *BuyShipmentCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.BuyShipment(ctx, path, &payload, cmd.ContentType)
+	resp, err := c.ConvertLabelShipment(ctx, path, &payload, cmd.ContentType)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -1064,7 +1064,7 @@ func (cmd *BuyShipmentCommand) Run(c *client.Client, args []string) error {
 }
 
 // RegisterFlags registers the command flags with the command line.
-func (cmd *BuyShipmentCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+func (cmd *ConvertLabelShipmentCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
 	var id string
@@ -1139,15 +1139,15 @@ func (cmd *InsureShipmentCommand) RegisterFlags(cc *cobra.Command, c *client.Cli
 	cc.Flags().StringVar(&cmd.ID, "id", id, ``)
 }
 
-// Run makes the HTTP request corresponding to the LabelShipmentCommand command.
-func (cmd *LabelShipmentCommand) Run(c *client.Client, args []string) error {
+// Run makes the HTTP request corresponding to the PruchaseShipmentCommand command.
+func (cmd *PruchaseShipmentCommand) Run(c *client.Client, args []string) error {
 	var path string
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/v2/shipments/%v/label", cmd.ID)
+		path = fmt.Sprintf("/v2/shipments/%v/buy", cmd.ID)
 	}
-	var payload client.LabelShipmentPayload
+	var payload client.PruchaseShipmentPayload
 	if cmd.Payload != "" {
 		err := json.Unmarshal([]byte(cmd.Payload), &payload)
 		if err != nil {
@@ -1156,7 +1156,7 @@ func (cmd *LabelShipmentCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.LabelShipment(ctx, path, &payload, cmd.ContentType)
+	resp, err := c.PruchaseShipment(ctx, path, &payload, cmd.ContentType)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -1167,7 +1167,7 @@ func (cmd *LabelShipmentCommand) Run(c *client.Client, args []string) error {
 }
 
 // RegisterFlags registers the command flags with the command line.
-func (cmd *LabelShipmentCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+func (cmd *PruchaseShipmentCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
 	var id string

@@ -15,13 +15,13 @@ func NewShipmentController(service *goa.Service) *ShipmentController {
 	return &ShipmentController{Controller: service.NewController("ShipmentController")}
 }
 
-// Buy runs the buy action.
-func (c *ShipmentController) Buy(ctx *app.BuyShipmentContext) error {
-	// ShipmentController_Buy: start_implement
+// ConvertLabel runs the convertLabel action.
+func (c *ShipmentController) ConvertLabel(ctx *app.ConvertLabelShipmentContext) error {
+	// ShipmentController_ConvertLabel: start_implement
 
 	// Put your logic here
 
-	// ShipmentController_Buy: end_implement
+	// ShipmentController_ConvertLabel: end_implement
 	res := &app.EasypostShipment{}
 	return ctx.OK(res)
 }
@@ -48,13 +48,13 @@ func (c *ShipmentController) Insure(ctx *app.InsureShipmentContext) error {
 	return ctx.OK(res)
 }
 
-// Label runs the label action.
-func (c *ShipmentController) Label(ctx *app.LabelShipmentContext) error {
-	// ShipmentController_Label: start_implement
+// Pruchase runs the pruchase action.
+func (c *ShipmentController) Pruchase(ctx *app.PruchaseShipmentContext) error {
+	// ShipmentController_Pruchase: start_implement
 
 	// Put your logic here
 
-	// ShipmentController_Label: end_implement
+	// ShipmentController_Pruchase: end_implement
 	res := &app.EasypostShipment{}
 	return ctx.OK(res)
 }

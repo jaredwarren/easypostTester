@@ -1309,21 +1309,21 @@ type EasypostShipment struct {
 	// The current state of the associated BatchShipment
 	BatchStatus *string `form:"batch_status,omitempty" json:"batch_status,omitempty" xml:"batch_status,omitempty"`
 	// The buyer's address, defaults to to_address
-	BuyerAddress *EasypostAddress `form:"buyer_address,omitempty" json:"buyer_address,omitempty" xml:"buyer_address,omitempty"`
+	BuyerAddress *AddressPayload `form:"buyer_address,omitempty" json:"buyer_address,omitempty" xml:"buyer_address,omitempty"`
 	// Time Created
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Information for the processing of customs
-	CustomsInfo *EasypostCustomsinfo `form:"customs_info,omitempty" json:"customs_info,omitempty" xml:"customs_info,omitempty"`
+	CustomsInfo *CustomsInfoPayload `form:"customs_info,omitempty" json:"customs_info,omitempty" xml:"customs_info,omitempty"`
 	// The associated Fee objects charged to the billing user account
 	Fees []*EasypostFee `form:"fees,omitempty" json:"fees,omitempty" xml:"fees,omitempty"`
 	// All associated Form objects
 	Forms []interface{} `form:"forms,omitempty" json:"forms,omitempty" xml:"forms,omitempty"`
 	// The origin address
-	FromAddress *EasypostAddress `form:"from_address,omitempty" json:"from_address,omitempty" xml:"from_address,omitempty"`
+	FromAddress *AddressPayload `form:"from_address,omitempty" json:"from_address,omitempty" xml:"from_address,omitempty"`
 	// Unique, begins with "shp_"
 	ID string `form:"id" json:"id" xml:"id"`
 	// The associated Insurance object
-	Insurance *EasypostInsurance `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
+	Insurance *InsurancePayload `form:"insurance,omitempty" json:"insurance,omitempty" xml:"insurance,omitempty"`
 	// Set true to create as a return, discussed in more depth below
 	IsReturn *bool `form:"is_return,omitempty" json:"is_return,omitempty" xml:"is_return,omitempty"`
 	// Any carrier errors encountered during rating, discussed in more depth below
@@ -1333,9 +1333,9 @@ type EasypostShipment struct {
 	// Always: "Shipment"
 	Object string `form:"object" json:"object" xml:"object"`
 	// All of the options passed to the shipment, discussed in more depth below
-	Options *EasypostOptions `form:"options,omitempty" json:"options,omitempty" xml:"options,omitempty"`
+	Options *OptionsPayload `form:"options,omitempty" json:"options,omitempty" xml:"options,omitempty"`
 	// The dimensions and weight of the package
-	Parcel *EasypostParcel `form:"parcel,omitempty" json:"parcel,omitempty" xml:"parcel,omitempty"`
+	Parcel *ParcelPayload `form:"parcel,omitempty" json:"parcel,omitempty" xml:"parcel,omitempty"`
 	// The associated PostageLabel object
 	PostageLabel *EasypostPostagelabel `form:"postage_label,omitempty" json:"postage_label,omitempty" xml:"postage_label,omitempty"`
 	// All associated Rate objects
@@ -1343,7 +1343,7 @@ type EasypostShipment struct {
 	// The current status of the shipment refund process. Possible values are "submitted", "refunded", "rejected".
 	RefundStatus *string `form:"refund_status,omitempty" json:"refund_status,omitempty" xml:"refund_status,omitempty"`
 	// The shipper's address, defaults to from_address
-	ReturnAddress *EasypostAddress `form:"return_address,omitempty" json:"return_address,omitempty" xml:"return_address,omitempty"`
+	ReturnAddress *AddressPayload `form:"return_address,omitempty" json:"return_address,omitempty" xml:"return_address,omitempty"`
 	// Document created to manifest and scan multiple shipments
 	ScanForm *EasypostScanform `form:"scan_form,omitempty" json:"scan_form,omitempty" xml:"scan_form,omitempty"`
 	// The specific rate purchased for the shipment, or null if unpurchased or purchased through another mechanism
@@ -1351,7 +1351,7 @@ type EasypostShipment struct {
 	// The current tracking status of the shipment
 	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 	// The destination address
-	ToAddress *EasypostAddress `form:"to_address,omitempty" json:"to_address,omitempty" xml:"to_address,omitempty"`
+	ToAddress *AddressPayload `form:"to_address,omitempty" json:"to_address,omitempty" xml:"to_address,omitempty"`
 	// The associated Tracker object
 	Tracker *EasypostTracker `form:"tracker,omitempty" json:"tracker,omitempty" xml:"tracker,omitempty"`
 	// If purchased, the tracking code will appear here as well as within the Tracker object
@@ -1412,11 +1412,6 @@ func (mt *EasypostShipment) Validate() (err error) {
 	}
 	if mt.Options != nil {
 		if err2 := mt.Options.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	if mt.Parcel != nil {
-		if err2 := mt.Parcel.Validate(); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}

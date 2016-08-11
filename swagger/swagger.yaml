@@ -948,22 +948,22 @@ definitions:
         credentials: 4.658819e+18
         custom_workflow: true
         test_credentials:
+        - 148
+        - 46
+        - 50
+        - 62
+        - 144
+        - 8
+        - 69
+        - 160
+        - 179
+        - 98
+        - 40
+        - 128
         - 132
-        - 17
-        - 188
-        - 134
-        - 6
-        - 104
-        - 73
-        - 138
-        - 181
-        - 190
-        - 238
-        - 59
-        - 41
-        - 212
-        - 15
-        - 245
+        - 89
+        - 2
+        - 145
       object: CarrierType
       readable: Saepe corrupti.
       type: Et reprehenderit vitae non atque.
@@ -1001,22 +1001,22 @@ definitions:
         credentials: 4.658819e+18
         custom_workflow: true
         test_credentials:
+        - 148
+        - 46
+        - 50
+        - 62
+        - 144
+        - 8
+        - 69
+        - 160
+        - 179
+        - 98
+        - 40
+        - 128
         - 132
-        - 17
-        - 188
-        - 134
-        - 6
-        - 104
-        - 73
-        - 138
-        - 181
-        - 190
-        - 238
-        - 59
-        - 41
-        - 212
-        - 15
-        - 245
+        - 89
+        - 2
+        - 145
       object: CarrierType
       readable: Saepe corrupti.
       type: Et reprehenderit vitae non atque.
@@ -1348,22 +1348,22 @@ definitions:
       test_credentials:
         description: Credentials used in the test environment.
         example:
+        - 148
+        - 46
+        - 50
+        - 62
+        - 144
+        - 8
+        - 69
+        - 160
+        - 179
+        - 98
+        - 40
+        - 128
         - 132
-        - 17
-        - 188
-        - 134
-        - 6
-        - 104
-        - 73
-        - 138
-        - 181
-        - 190
-        - 238
-        - 59
-        - 41
-        - 212
-        - 15
-        - 245
+        - 89
+        - 2
+        - 145
         type: any
     required:
     - credentials
